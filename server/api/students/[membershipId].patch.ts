@@ -1,6 +1,7 @@
 import { requireAuthenticatedTeacher } from '../../auth/teacher-session.ts'
 import { withAuditActor } from '../../database/audit-context.ts'
 import { getDatabase } from '../../database/client.ts'
+import { lockSchoolSemesterChanges } from '../../database/repositories/semesters.ts'
 import { updateStudentIdentity, updateStudentMembershipPeriod } from '../../database/repositories/students.ts'
 import {
   isUuid,
@@ -29,6 +30,16 @@ export default defineEventHandler(async (event) => {
 
   try {
     const result = await withAuditActor(getDatabase(), teacher.id, async (transaction) => {
+      const hints = await transaction<{ school_id: string }[]>`
+        select membership.school_id
+        from semester_memberships as membership
+        join schools as school on school.id = membership.school_id
+        where membership.id = ${membershipId} and school.teacher_id = ${teacher.id}
+      `
+      const hint = hints[0]
+      if (!hint) throw createError({ statusCode: 404, statusMessage: 'Data siswa tidak ditemukan atau tidak dapat diakses.' })
+
+      await lockSchoolSemesterChanges(transaction, hint.school_id)
       const rows = await transaction<{
         student_id: string
         full_name: string

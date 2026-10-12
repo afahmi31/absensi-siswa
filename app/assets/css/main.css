@@ -253,6 +253,66 @@ button:disabled { cursor: wait; }
 .close-form-button { flex: 0 0 auto; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
+.semesters-page { max-width: 1320px; }
+.semester-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 22px; }
+.semester-create-button { width: auto; min-width: 190px; flex: 0 0 auto; }
+.semester-list { display: grid; gap: 16px; }
+.semester-card { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 25px 30px; }
+.semester-card-active { min-height: 126px; }
+.semester-card-copy { min-width: 0; }
+.semester-card-title-row { display: flex; flex-wrap: wrap; align-items: center; gap: 11px; }
+.semester-card-title-row h2 { margin: 0; font-size: 19px; line-height: 1.3; }
+.semester-date-range { margin: 10px 0 0; color: #536b65; font-size: 14px; }
+.semester-archive-note, .semester-active-note { margin: 9px 0 0; color: #536b65; font-size: 13px; line-height: 1.45; }
+.semester-card-actions { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 10px; flex: 0 0 auto; }
+.semester-card-actions .secondary-button, .semester-card-actions .close-semester-button { min-width: 150px; min-height: 46px; }
+.semester-form-card { max-width: 930px; margin: 20px auto 0; padding: clamp(22px, 4vw, 38px); }
+.semester-form { margin-top: 25px; }
+.semester-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 19px 22px; }
+.semester-form .form-field { gap: 8px; }
+.semester-form .form-field label { font-size: 14px; font-weight: 700; }
+.semester-form .form-field input, .semester-form .form-field select { width: 100%; min-height: 48px; padding: 0 13px; color: #172d29; background: #fff; border: 1px solid #cddbd7; border-radius: 10px; font-size: 15px; }
+.semester-form .form-field input:focus-visible, .semester-form .form-field select:focus-visible, .roster-source-option:focus-within { outline: 3px solid #61a695; outline-offset: 2px; }
+.semester-form .form-field [aria-invalid="true"] { border-color: #ae3e36; }
+.roster-source-picker { display: grid; gap: 11px; min-width: 0; margin: 27px 0 0; padding: 0; border: 0; }
+.roster-source-picker legend { margin-bottom: 2px; font-size: 14px; font-weight: 700; }
+.roster-source-option { display: flex; align-items: flex-start; gap: 13px; min-height: 67px; padding: 17px 15px; background: #fff; border: 1px solid #d8e4e0; border-radius: 11px; cursor: pointer; }
+.roster-source-option.roster-source-selected { background: #e8f3ed; border-color: #126451; }
+.roster-source-option input { width: 18px; height: 18px; margin: 2px 0 0; accent-color: #126451; flex: 0 0 auto; }
+.roster-source-option strong, .roster-source-option small { display: block; }
+.roster-source-option strong { font-size: 14px; line-height: 1.4; }
+.roster-source-option small { margin-top: 5px; color: #536b65; font-size: 12px; line-height: 1.45; }
+.roster-copy-notice { margin: 3px 0 0; padding: 16px; }
+.roster-copy-notice h3 { margin: 0; font-size: 14px; }
+.roster-copy-notice p { margin: 6px 0 0; font-size: 13px; }
+.empty-create-button { width: min(100%, 240px); margin-top: 22px; }
+.semester-setup-link { display: inline-block; margin-top: 17px; }
+.dialog-backdrop { position: fixed; z-index: 20; inset: 0; display: grid; place-items: center; overflow-y: auto; padding: 28px; background: rgb(23 45 41 / 42%); }
+.closure-dialog { width: min(100%, 640px); max-height: min(90svh, 880px); overflow-y: auto; padding: 31px 35px; background: #fff; border: 1px solid #d8e4e0; border-radius: 18px; box-shadow: 0 24px 80px rgb(0 0 0 / 18%); }
+.closure-dialog-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+.closure-dialog-heading h2 { margin: 5px 0 0; font-size: 25px; line-height: 1.2; }
+.dialog-dismiss { width: 36px; height: 36px; padding: 0; color: #536b65; background: #f4f7f6; border: 1px solid #d8e4e0; border-radius: 50%; font-size: 24px; line-height: 1; }
+.closure-period-line { margin: 16px 0 0; color: #536b65; font-size: 14px; line-height: 1.5; }
+.closure-loading { margin: 19px 0; color: #536b65; font-size: 14px; }
+.closure-warning, .closure-complete-note { display: grid; gap: 7px; margin-top: 20px; padding: 17px 19px; border-radius: 11px; font-size: 14px; line-height: 1.5; }
+.closure-warning { color: #795612; background: #fff4d8; border: 1px solid #e5d49d; }
+.closure-warning span, .closure-complete-note span { color: #536b65; font-size: 13px; }
+.closure-complete-note { color: #205a43; background: #e9f5ed; border: 1px solid #c9e2d1; }
+.closure-changed-note { margin: 16px 0 0; padding: 12px 14px; color: #795612; background: #fff7e5; border-radius: 9px; font-size: 13px; line-height: 1.45; }
+.closure-counts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; margin: 14px 0 0; }
+.closure-counts > div { padding: 12px; background: #f4f7f6; border-radius: 9px; }
+.closure-counts dt { color: #657b75; font-size: 11px; line-height: 1.35; }
+.closure-counts dd { margin: 5px 0 0; color: #172d29; font-size: 17px; font-weight: 700; }
+.closure-lock-copy { display: grid; gap: 7px; margin-top: 25px; padding-top: 19px; border-top: 1px solid #e5ece9; font-size: 14px; line-height: 1.5; }
+.closure-lock-copy span { color: #536b65; font-size: 13px; }
+.closure-confirm-question { margin: 20px 0 0; font-size: 14px; }
+.closure-dialog-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
+.closure-dialog-actions .secondary-button, .closure-dialog-actions .close-semester-button { min-width: 150px; min-height: 46px; }
+.close-semester-button { min-height: 42px; padding: 9px 16px; color: #fff; background: #a63737; border: 1px solid #a63737; border-radius: 10px; font-weight: 700; }
+.close-semester-button:hover:not(:disabled) { background: #8e2f2f; }
+.close-semester-button:disabled { cursor: wait; opacity: .7; }
+.semester-setup-link:focus-visible, .dialog-dismiss:focus-visible, .close-semester-button:focus-visible { outline: 3px solid #61a695; outline-offset: 3px; }
+
 @media (max-width: 760px) {
   .app-shell { padding: 16px 16px 38px; }
   .app-header { grid-template-columns: minmax(0, 1fr) auto; gap: 13px 10px; padding-bottom: 14px; }
@@ -299,6 +359,26 @@ button:disabled { cursor: wait; }
   .form-field-wide { grid-column: auto; }
   .form-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
   .form-actions .primary-button, .form-actions .secondary-button { width: 100%; min-width: 0; padding-inline: 10px; font-size: 13px; }
+  .semester-heading { align-items: stretch; flex-direction: column; }
+  .semester-create-button { width: 100%; }
+  .semester-card { align-items: stretch; flex-direction: column; gap: 18px; padding: 19px 17px; border-radius: 15px; }
+  .semester-card-title-row { align-items: flex-start; flex-direction: column; gap: 8px; }
+  .semester-card-title-row h2 { font-size: 18px; }
+  .semester-card-actions { display: grid; grid-template-columns: 1fr 1fr; }
+  .semester-card-actions .secondary-button, .semester-card-actions .close-semester-button { width: 100%; min-width: 0; padding-inline: 8px; font-size: 12px; }
+  .semester-card-actions .text-button { justify-self: start; }
+  .semester-form-card { margin-top: 15px; padding: 21px 18px; border-radius: 15px; }
+  .semester-form-grid { grid-template-columns: 1fr; gap: 17px; }
+  .roster-source-picker { margin-top: 23px; }
+  .roster-source-option { padding: 15px 13px; }
+  .dialog-backdrop { align-items: end; padding: 0; }
+  .closure-dialog { width: 100%; max-height: 92svh; padding: 25px 19px 20px; border-radius: 18px 18px 0 0; }
+  .closure-dialog-heading h2 { font-size: 22px; }
+  .closure-counts { grid-template-columns: 1fr; }
+  .closure-counts > div { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .closure-counts dd { margin: 0; }
+  .closure-dialog-actions { display: grid; grid-template-columns: 1fr 1fr; }
+  .closure-dialog-actions .secondary-button, .closure-dialog-actions .close-semester-button { width: 100%; min-width: 0; padding-inline: 9px; font-size: 13px; }
 }
 
 @media (max-width: 760px) {

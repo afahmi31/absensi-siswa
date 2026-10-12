@@ -6,12 +6,61 @@ import { addDays, createSchoolFixture, recordAttendance as recordFixtureAttendan
 import { startTemporaryPostgres } from './support/temporary-postgres.mjs'
 import { correctAttendance, listEffectiveAttendance, recordAttendance } from '../server/database/repositories/attendance.ts'
 import { setCalendarException, setCalendarHoliday, setRoutineSchoolDay } from '../server/database/repositories/calendar.ts'
-import { closeSemester, copyRosterFromPreviousSemester, createSemester } from '../server/database/repositories/semesters.ts'
-import { endStudentMembership, createStudent, updateStudentIdentity } from '../server/database/repositories/students.ts'
+import { closeSemester, copyRosterFromPreviousSemester, createSemester, getSemesterClosurePreview } from '../server/database/repositories/semesters.ts'
+import { addStudentToSemester, endStudentMembership, createStudent, updateStudentIdentity } from '../server/database/repositories/students.ts'
 import { withAuditActor } from '../server/database/audit-context.ts'
+import { listMigrationNames } from './support/migration-names.mjs'
 
 async function expectSqlState(operation: PromiseLike<unknown>, code: string, message: string): Promise<void> {
   await assert.rejects(operation, (error: { code?: string }) => error.code === code, message)
+}
+
+async function prepareExplicitAllOffCalendar(database: postgres.Sql, fixture: Awaited<ReturnType<typeof createSchoolFixture>>): Promise<void> {
+  for (let weekday = 0; weekday < 7; weekday += 1) {
+    await setRoutineSchoolDay(database, {
+      schoolId: fixture.schoolId,
+      dayOfWeek: weekday,
+      effectiveFrom: addDays(fixture.semesterStart, -1),
+      isSchoolDay: false,
+    })
+  }
+}
+
+async function raceClosureWithWrite(
+  database: postgres.Sql,
+  fixture: Awaited<ReturnType<typeof createSchoolFixture>>,
+  write: () => Promise<unknown>,
+): Promise<{ closed: boolean; writeSucceeded: boolean }> {
+  const preview = await getSemesterClosurePreview(database, {
+    semesterId: fixture.semesterId,
+    teacherId: fixture.teacherId,
+  })
+  assert.ok(preview)
+  assert.equal(preview.calendarConfigured, true)
+  const [closureResult, writeResult] = await Promise.allSettled([
+    withAuditActor(database, fixture.teacherId, (transaction) => closeSemester(transaction, {
+      semesterId: fixture.semesterId,
+      teacherId: fixture.teacherId,
+      previewToken: preview.previewToken,
+      confirmed: true,
+    })),
+    write(),
+  ])
+  const closed = closureResult.status === 'fulfilled'
+  const writeSucceeded = writeResult.status === 'fulfilled'
+  assert.notEqual(closed, writeSucceeded, 'Closure and a concurrent semester write must serialize; both cannot succeed.')
+  if (!closed) {
+    assert.equal((closureResult.reason as { statusCode?: number }).statusCode, 409, 'Changed preview must block closure until reviewed again.')
+  } else {
+    assert.equal((writeResult.reason as { code?: string }).code, '55000', 'A write that loses to closure must be rejected by the closed-semester guard.')
+  }
+  const [current] = await database`select status from semesters where id = ${fixture.semesterId}`
+  assert.equal(current.status, closed ? 'closed' : 'active')
+  const [snapshotCount] = await database`
+    select count(*)::int as count from semester_archive_snapshots where semester_id = ${fixture.semesterId}
+  `
+  assert.equal(snapshotCount.count, closed ? 1 : 0)
+  return { closed, writeSucceeded }
 }
 
 test('local PostgreSQL schema preserves school, roster, attendance, calendar, and audit invariants', async (t) => {
@@ -21,19 +70,21 @@ test('local PostgreSQL schema preserves school, roster, attendance, calendar, an
 
   try {
     await t.test('migration runs up, down, and up again with a stable ledger', async () => {
+      const expectedNames = await listMigrationNames()
       const firstUp = await runMigrations(migrator, 'up')
-      assert.equal(firstUp.length, 2)
-      assert.equal(firstUp[0].applied, true)
-      assert.equal(firstUp[1].applied, true)
+      assert.deepEqual(firstUp.map((migration) => migration.name), expectedNames)
+      assert.deepEqual(firstUp.map((migration) => migration.applied), expectedNames.map(() => true))
       const secondUp = await runMigrations(migrator, 'up')
-      assert.deepEqual(secondUp.map((migration) => migration.applied), [false, false])
+      assert.deepEqual(secondUp.map((migration) => migration.name), expectedNames)
+      assert.deepEqual(secondUp.map((migration) => migration.applied), expectedNames.map(() => false))
       const down = await runMigrations(migrator, 'down')
-      assert.deepEqual(down.map((migration) => migration.applied), [true, true])
+      assert.deepEqual(down.map((migration) => migration.name), [...expectedNames].reverse())
+      assert.deepEqual(down.map((migration) => migration.applied), expectedNames.map(() => true))
       const finalUp = await runMigrations(migrator, 'up')
-      assert.equal(finalUp[0].applied, true)
-      assert.equal(finalUp[1].applied, true)
-      const [ledger] = await migrator`select count(*)::int as count from public.schema_migrations`
-      assert.equal(ledger.count, 2)
+      assert.deepEqual(finalUp.map((migration) => migration.name), expectedNames)
+      assert.deepEqual(finalUp.map((migration) => migration.applied), expectedNames.map(() => true))
+      const ledger = await migrator`select name from public.schema_migrations order by name`
+      assert.deepEqual(ledger.map((migration) => migration.name), expectedNames)
     })
 
     await t.test('duplicate names and blank student numbers stay separate; attendance has inclusive dates and one effective record', async () => {
@@ -41,7 +92,7 @@ test('local PostgreSQL schema preserves school, roster, attendance, calendar, an
       await expectSqlState(
         createSemester(app, {
           schoolId: fixture.schoolId,
-          academicYear: '2026/2027-overlap',
+          academicYear: '2026/2027',
           term: 'genap',
           startsOn: fixture.today,
           endsOn: addDays(fixture.today, 2),
@@ -293,6 +344,14 @@ test('local PostgreSQL schema preserves school, roster, attendance, calendar, an
 
     await t.test('identity snapshots update only in the active semester; closure and roster copy preserve history', async () => {
       const fixture = await createSchoolFixture(app, { firstMembershipEnd: null })
+      for (let weekday = 0; weekday < 7; weekday += 1) {
+        await setRoutineSchoolDay(app, {
+          schoolId: fixture.schoolId,
+          dayOfWeek: weekday,
+          effectiveFrom: addDays(fixture.semesterStart, -1),
+          isSchoolDay: false,
+        })
+      }
       const ruleDate = addDays(fixture.today, -2)
       const weekday = new Date(`${ruleDate}T00:00:00Z`).getUTCDay()
       await setRoutineSchoolDay(app, {
@@ -324,8 +383,32 @@ test('local PostgreSQL schema preserves school, roster, attendance, calendar, an
         gender_snapshot: 'L',
       })
 
-      const closed = await closeSemester(app, fixture.semesterId)
-      assert.equal(closed.status, 'closed')
+      const preview = await getSemesterClosurePreview(app, {
+        semesterId: fixture.semesterId,
+        teacherId: fixture.teacherId,
+      })
+      assert.ok(preview)
+      assert.equal(preview.calendarConfigured, true)
+      assert.ok((preview.incompleteSchoolDayCount ?? 0) > 0, 'Incomplete school days remain visible before manual closure.')
+      const closed = await withAuditActor(app, fixture.teacherId, (transaction) => closeSemester(transaction, {
+        semesterId: fixture.semesterId,
+        teacherId: fixture.teacherId,
+        previewToken: preview.previewToken,
+        confirmed: true,
+      }))
+      assert.equal(closed.semester.status, 'closed')
+      const [archiveDetails] = await app`
+        select school_name, class_name, academic_year, term, starts_on::text as starts_on, ends_on::text as ends_on
+        from semester_archive_snapshots where semester_id = ${fixture.semesterId}
+      `
+      assert.deepEqual(archiveDetails, {
+        school_name: 'Sekolah Contoh',
+        class_name: 'Kelas Uji',
+        academic_year: '2026/2027',
+        term: 'ganjil',
+        starts_on: fixture.semesterStart,
+        ends_on: fixture.semesterEnd,
+      })
       await expectSqlState(
         app`update semesters set status = 'active' where id = ${fixture.semesterId}`,
         '55000',
@@ -516,6 +599,112 @@ test('local PostgreSQL schema preserves school, roster, attendance, calendar, an
       `
       assert.equal(rollbackRows.count, 0)
       assert.equal(rollbackEvents.count, 0)
+    })
+
+    await t.test('unset calendar differs from seven explicitly off days and a complete semester still requires closure confirmation', async () => {
+      const fixture = await createSchoolFixture(app)
+      const unsetPreview = await getSemesterClosurePreview(app, {
+        semesterId: fixture.semesterId,
+        teacherId: fixture.teacherId,
+      })
+      assert.ok(unsetPreview)
+      assert.equal(unsetPreview.calendarConfigured, false)
+      assert.equal(unsetPreview.schoolDayCount, null)
+      assert.equal(unsetPreview.blankCellCount, null)
+
+      await prepareExplicitAllOffCalendar(app, fixture)
+      for (const date of [fixture.membershipStart, fixture.membershipEnd, addDays(fixture.today, 1)]) {
+        await setCalendarException(app, { schoolId: fixture.schoolId, date, kind: 'holiday' })
+      }
+      const allOffPreview = await getSemesterClosurePreview(app, {
+        semesterId: fixture.semesterId,
+        teacherId: fixture.teacherId,
+      })
+      assert.ok(allOffPreview)
+      assert.equal(allOffPreview.calendarConfigured, true)
+      assert.equal(allOffPreview.schoolDayCount, 0)
+      assert.equal(allOffPreview.eligibleCellCount, 0)
+      assert.equal(allOffPreview.blankCellCount, 0)
+      assert.equal(allOffPreview.incompleteSchoolDayCount, 0)
+      await assert.rejects(
+        closeSemester(app, {
+          semesterId: fixture.semesterId,
+          teacherId: fixture.teacherId,
+          previewToken: allOffPreview.previewToken,
+          confirmed: false,
+        }),
+        (error: { statusCode?: number }) => error.statusCode === 422,
+        'A complete preview must not skip explicit teacher confirmation.',
+      )
+      const closed = await withAuditActor(app, fixture.teacherId, (transaction) => closeSemester(transaction, {
+        semesterId: fixture.semesterId,
+        teacherId: fixture.teacherId,
+        previewToken: allOffPreview.previewToken,
+        confirmed: true,
+      }))
+      assert.equal(closed.semester.status, 'closed')
+    })
+
+    await t.test('semester closure serializes against attendance, new students, and calendar changes', async (t) => {
+      await t.test('attendance is included in a fresh preview or rejected after closure', async () => {
+        const fixture = await createSchoolFixture(app)
+        await prepareExplicitAllOffCalendar(app, fixture)
+        const race = await raceClosureWithWrite(app, fixture, () => withAuditActor(app, fixture.teacherId, (transaction) =>
+          recordAttendance(transaction, {
+            membershipId: fixture.membershipOneId,
+            semesterId: fixture.semesterId,
+            date: fixture.membershipStart,
+            status: 'H',
+          })))
+        const [attendance] = await app`
+          select count(*)::int as count from attendance_records where semester_id = ${fixture.semesterId}
+        `
+        assert.equal(attendance.count, race.writeSucceeded ? 1 : 0)
+        if (race.writeSucceeded) {
+          const preview = await getSemesterClosurePreview(app, { semesterId: fixture.semesterId, teacherId: fixture.teacherId })
+          assert.ok(preview)
+          assert.equal(preview.filledCellCount, 1)
+          assert.ok((preview.blankCellCount ?? 0) > 0)
+        }
+      })
+
+      await t.test('new memberships are included before closure or rejected from the closed semester', async () => {
+        const fixture = await createSchoolFixture(app)
+        await prepareExplicitAllOffCalendar(app, fixture)
+        const student = await createStudent(app, { fullName: 'Uji Balapan Siswa Baru' })
+        const race = await raceClosureWithWrite(app, fixture, () => withAuditActor(app, fixture.teacherId, (transaction) =>
+          addStudentToSemester(transaction, {
+            semesterId: fixture.semesterId,
+            schoolId: fixture.schoolId,
+            schoolClassId: fixture.classId,
+            studentId: student.id,
+            startsOn: fixture.today,
+          })))
+        const [membership] = await app`
+          select count(*)::int as count from semester_memberships
+          where semester_id = ${fixture.semesterId} and student_id = ${student.id}
+        `
+        assert.equal(membership.count, race.writeSucceeded ? 1 : 0)
+      })
+
+      await t.test('calendar changes update the preview or are rejected after closure', async () => {
+        const fixture = await createSchoolFixture(app)
+        await prepareExplicitAllOffCalendar(app, fixture)
+        const changedDate = addDays(fixture.today, -2)
+        const race = await raceClosureWithWrite(app, fixture, () => withAuditActor(app, fixture.teacherId, (transaction) =>
+          setCalendarException(transaction, {
+            schoolId: fixture.schoolId,
+            date: changedDate,
+            kind: 'school_day',
+            note: 'Perubahan kalender saat uji balapan',
+          })))
+        const [exception] = await app`
+          select kind from calendar_exceptions
+          where school_id = ${fixture.schoolId} and exception_date = ${changedDate}
+        `
+        assert.equal(Boolean(exception), race.writeSucceeded)
+        if (race.writeSucceeded) assert.equal(exception.kind, 'school_day')
+      })
     })
   } finally {
     await Promise.all([app.end({ timeout: 3 }), migrator.end({ timeout: 3 })])

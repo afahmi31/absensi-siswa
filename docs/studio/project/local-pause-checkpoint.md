@@ -13,7 +13,7 @@ Next owner: PM setelah Ardy meminta lanjut.
 
 ## Konfirmasi stop Executor
 
-Executor selesai dan berhenti. db:stop sukses; db:status “Managed PostgreSQL is stopped”. AUTH belum membuat akun/.data/auth-env, migration0002 belum diterapkan. Typecheck sempat lulus sebelum patch cookie/helper/tests terakhir; source saat berhenti belum tervalidasi. Tes AUTH/build/browser belum dijalankan. [Laporan stop](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/reports/LAB002-AUTH-001-report.md>).
+Executor selesai dan berhenti. db:stop sukses; db:status “Managed PostgreSQL is stopped”. AUTH belum membuat akun/.data/auth-env, migration0002 belum diterapkan. Typecheck sempat lulus sebelum patch cookie/helper/tests terakhir; source saat berhenti belum tervalidasi. Tes AUTH/build/browser belum dijalankan. [Laporan stop](reports/LAB002-AUTH-001-report.md).
 
 ## Resume AUTH-001 — 12 Oktober 2026
 
@@ -44,3 +44,11 @@ Ardy meminta melanjutkan task terhenti dari titik aman. Stop terakhir dicabut un
 ## Titik lanjut setelah commit
 
 Commit AUTH lokal selesai: 0ec7f37. Index tertunda sudah diselesaikan; repo app bersih dan tidak mempunyai remote saat diperiksa. Runtime tetap stopped. Acceptance AUTH tetap CLOSED. Untuk pekerjaan fitur berikut, baca spec STUD/SEM dan periksa readiness/dependency sebelum assignment Luna/max. Catatan staging tertunda di atas sekarang merupakan riwayat.
+
+## Checkpoint aktif setelah stop semua pengerjaan
+
+Ardy meminta checkpoint yang menghindari pengulangan dan bentrok. Baca resume-checkpoint.md terlebih dahulu. STUD CLOSED/commit465f865; SEM ON_HOLD hanya preflight, belum source/migration/tests/runtime. Semua Executor berhenti dan tidak ada kelanjutan otomatis. Catatan stop lama di atas merupakan riwayat, bukan titik awal yang harus dikerjakan ulang.
+
+## Checkpoint terbaru
+
+SEM CLOSED; pengerjaan ditahan sesudah review. Status/rencana resume aktif berada di resume-checkpoint.md; rincian AUTH/STUD lama di atas adalah riwayat.

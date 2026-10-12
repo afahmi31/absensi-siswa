@@ -1,0 +1,63 @@
+
+> lab002-website-absensi-siswa@0.0.0 test
+> node scripts/test-all.mjs
+
+▶ local PostgreSQL schema preserves school, roster, attendance, calendar, and audit invariants
+  ✔ migration runs up, down, and up again with a stable ledger (290.8026ms)
+  ✔ duplicate names and blank student numbers stay separate; attendance has inclusive dates and one effective record (520.4629ms)
+  ✔ past rules can initialize dates without history; confirmed holidays exclude without deleting history or restoring it (318.6457ms)
+  ✔ identity snapshots update only in the active semester; closure and roster copy preserve history (332.4862ms)
+  ✔ audit records identify the actor, are immutable, redact auth secrets, and roll back with data (363.3861ms)
+  ✔ unset calendar differs from seven explicitly off days and a complete semester still requires closure confirmation (253.7677ms)
+  ▶ semester closure serializes against attendance, new students, and calendar changes
+    ✔ attendance is included in a fresh preview or rejected after closure (302.8205ms)
+    ✔ new memberships are included before closure or rejected from the closed semester (379.8961ms)
+    ✔ calendar changes update the preview or are rejected after closure (459.245ms)
+  ✔ semester closure serializes against attendance, new students, and calendar changes (1143.6006ms)
+✔ local PostgreSQL schema preserves school, roster, attendance, calendar, and audit invariants (11422.8772ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11649.8042
+✔ local login throttle counts five failures and releases the client after the block expires (0.8994ms)
+▶ teacher login, sealed session, same-origin requests, reset revocation, and generic throttle work over HTTP
+  ✔ unauthenticated pages redirect and future API routes are protected by default (450.2125ms)
+  ✔ unsafe requests reject missing and cross-origin Origin before changing the session (365.1584ms)
+  ✔ empty form fields return the approved field copy (39.2627ms)
+  ✔ wrong known credentials and unknown email return the same generic response (253.8088ms)
+  ✔ a valid login creates a sealed HttpOnly SameSite=Lax local cookie with no sensitive response fields (72.3929ms)
+  ✔ session output is minimal and authenticated future APIs pass the auth gate (252.1469ms)
+  ✔ a second device gets an independent persisted session (286.3556ms)
+  ✔ owner reset increases the account version, carries audit actor, and revokes the old cookie (730.6621ms)
+  ✔ logout revokes only this device session while another device stays authenticated (347.3059ms)
+  ✔ the fifth failure blocks later login attempts for this local client (134.3127ms)
+✔ teacher login, sealed session, same-origin requests, reset revocation, and generic throttle work over HTTP (18355.1957ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 25423.6612
+▶ STUD school setup and semester roster APIs preserve ownership, snapshots, dates, audit and transactions over HTTP
+  ✔ anonymous reads and writes are rejected; authenticated unsafe requests require the same origin (627.8981ms)
+  ✔ school settings validate timezone, create exactly one school/class, update without trusting owner fields (956.5809ms)
+  ✔ owner-scoped semester options include active and archive; fixture roster uses historical snapshots (606.5474ms)
+  ✔ student create allows blank optionals and duplicate names, rejects bad periods/override fields atomically (597.6758ms)
+  ✔ active identity edit keeps archive snapshot, inclusive end is allowed, and attendance/closed guards roll back (347.2657ms)
+  ✔ every school/student write records authenticated actor and never adds partial data after invalid types (98.2324ms)
+  ✔ SEM APIs validate periods, confirm stale-safe closure, archive snapshots, and copy the end-date roster (1818.6975ms)
+✔ STUD school setup and semester roster APIs preserve ownership, snapshots, dates, audit and transactions over HTTP (20358.6389ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 27166.273

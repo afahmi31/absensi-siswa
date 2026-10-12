@@ -9,13 +9,15 @@ PM mengelola keputusan, assignment, pengujian dan acceptance lokal berdasarkan d
 | UI-002 | CLOSED, diterima PM | Desain lanjutan, commit 4241f7d |
 | DATA-001 | CLOSED, diterima PM | PostgreSQL/schema/invariant, commit 8f41e86 |
 | AUTH-001 | CLOSED, diterima PM | Suite independen DATA 6/6 + AUTH 12/12; typecheck; build; browser; CLI reset; PM menyiapkan commit |
-| STUD/SEM/IMP/CAL/ATT/REP/OPS/QA/REL | ANALYSIS | Readiness per dependency; belum assignment fitur berikut |
+| STUD-001 | CLOSED, diterima PM | Commit 465f865; DATA6/AUTH12/STUD7 dan browser lokal |
+| SEM-001 | CLOSED, diterima PM | Review PM/source, HTTP final8/8, browser desktop/HP; stop sesudah SEM |
+| IMP/CAL/ATT/REP/OPS/QA/REL | ANALYSIS | Readiness per dependency; belum assignment |
 
-AUTH menyediakan login/logout, sesi per perangkat, reset owner CLI, guard halaman/API dan form responsif. Pengisian absensi belum tersedia. Sekolah, kelas, semester, siswa dan absensi pada database persisten masih kosong.
+AUTH menyediakan login/logout, sesi per perangkat, reset owner CLI, guard halaman/API dan form responsif. STUD menambahkan pengaturan sekolah/kelas dan daftar siswa. Pengisian absensi belum tersedia. Database persisten belum diberi data sekolah/kelas/semester/siswa/absensi; fixture terpisah telah dipakai untuk pengujian.
 
 Runtime terakhir: dev server loopback http://127.0.0.1:3000 (PID 8244, exec session 1454), database proyek port 55432. Startup harus memuat .data/local-env.ps1 dan .data/auth-env.ps1. Akun fiktif guru@example.test; password terbaru tersimpan hanya di app/.data/teacher-account.json. PM menjalankan reset sebagai uji lokal; gunakan file terbaru. Rahasia diabaikan Git.
 
-Riwayat: Ardy meminta berhenti pada titik aman, kemudian meminta melanjutkan task terhenti. AUTH dilanjutkan dari perubahan yang dipertahankan. Lihat [checkpoint](<local-pause-checkpoint.md>), [laporan stop](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/reports/LAB002-AUTH-001-safe-stop-2026-10-12.md>), [laporan Executor](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/reports/LAB002-AUTH-001-report.md>), dan [review PM](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/reports/LAB002-AUTH-001-pm-review.md>).
+Riwayat: Ardy meminta berhenti pada titik aman, kemudian meminta melanjutkan task terhenti. AUTH dilanjutkan dari perubahan yang dipertahankan. Lihat [checkpoint](local-pause-checkpoint.md), [laporan stop](reports/LAB002-AUTH-001-safe-stop-2026-10-12.md), [laporan Executor](reports/LAB002-AUTH-001-report.md), dan [review PM](reports/LAB002-AUTH-001-pm-review.md).
 
 PM menemukan timeout suite awal dan kesalahan environment pada startup dev server. Keduanya ditangani sebelum acceptance; kegagalan dan hasil ulang dicatat di review. Tidak ada cloud, remote/push, deploy atau data siswa asli. Cetak fisik dan penggunaan guru nyata belum diuji. Next owner PM untuk readiness task pengelolaan sekolah/siswa dan semester; tidak ada janji pengerjaan latar belakang.
 
@@ -42,3 +44,25 @@ STUD-001 ASSIGNED kepada /root/lab002_stud001 (Codex gpt-6-luna/max). ACK dan pr
 ## STUD diterima PM
 
 STUD-001 CLOSED setelah suite independen DATA6/AUTH12/STUD7, typecheck, source review, build dan browser laptop/viewport HP. Acceptance PM melalui delegasi, bukan uji Ardy. Metadata/roster persisten tidak diberi seed; semua data browser fiktif terisolasi. Proses fixture stopped; folder tetap privat .data karena penghapusan ditolak. PM menyiapkan commit lokal, kemudian SEM.
+
+## Commit STUD dan kesiapan SEM
+
+STUD diterima PM dan disimpan pada commit lokal 465f865; app bersih sesudah commit, remote tidak ada. SEM-001 memenuhi readiness: metadata STUD tersedia, guards DATA/AUTH diterima, desain UI002/kontrak penutupan-snapshot jelas, root/ownership/AC/test scope lengkap. PM menggunakan pilihan Executor Luna/max yang sudah didelegasikan. Aktif selanjutnya SEM; tidak ada cloud/deploy/data asli.
+
+
+
+## Status aktif: pengerjaan ditahan
+
+Ardy meminta stop pada titik aman dan checkpoint yang menghindari pengulangan/bentrok. STUD tetap diterima dan commit465f865. SEM ON_HOLD, baru preflight; belum menulis kode/migration atau menjalankan runtime. Task lain ANALYSIS, belum assignment. Tidak ada kelanjutan otomatis. Acuan resume ringkas: resume-checkpoint.md; PM membaca itu dahulu, bukan seluruh riwayat.
+
+## Resume SEM aktif — 12 Oktober 2026
+
+Ardy meminta resume pekerjaan dari checkpoint. HEAD465f865, delta source aplikasi kosong; hanya dokumen PM pending. Agent lama tidak tersedia; dispatch baru tunggal /root/lab002_sem_resume gpt-6-luna/max diterima. SEM ASSIGNED; preflight delta lalu implementasi. PM mempertahankan checkpoint dan bukti task CLOSED, tidak init/reset/instal ulang. Runtime awal tetap stopped. Task lain belum didispatch.
+
+## Batas kelanjutan terbaru
+
+Ardy: setelah LAB002-SEM-001 CLOSED, hentikan dulu karena ada hal yang ingin disampaikan. PM hanya menuntaskan implementasi/revisi, validation, dokumentasi dan commit lokal SEM, kemudian stop sebelum assignment CAL atau task lain. Instruksi ini tidak meminta stop SEM sebelum selesai. Jika ada blocker, laporkan sesuai workflow; jangan mengklaim CLOSED tanpa bukti.
+
+## SEM selesai; pengerjaan ditahan
+
+SEM CLOSED berdasarkan review PM melalui delegasi Ardy. R01 lock-order dan R02 beranda diperbaiki. Browser sintetis membuktikan close belum lengkap, salin2siswa, validation/period guard dan persist. PM test:students final8/8 exit0. Lihat review SEM dan resume-checkpoint.md. Tidak ada assignment sesudah SEM; Git commit lokal disiapkan PM, tanpa remote/deploy. Riwayat runtime/progres sebelumnya bukan status aktif.

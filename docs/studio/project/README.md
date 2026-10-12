@@ -5,7 +5,7 @@ Produk: PROD-002
 Jenis: Labs — produk internal studio
 Klien: tidak berlaku
 Catatan dibuat: 2026-10-11
-Kondisi: Nuxt/Vue full-stack, hosting Vercel; UI-001 CLOSED; setup belum READY.
+Kondisi: Nuxt/Vue full-stack lokal; task sampai SEM-001 CLOSED. Pengerjaan ditahan untuk pembahasan Ardy. Vercel belum dideploy.
 
 ## Tujuan dan batas pekerjaan
 
@@ -118,3 +118,11 @@ Aplikasi lokal tersedia di http://127.0.0.1:3000; login/logout sudah tersedia, p
 ## Stop terbaru — 12 Oktober 2026
 
 Ardy meminta berhenti lagi pada titik aman. AUTH sudah diterima PM; commit lokal masih belum dibuat. Staging/perubahan dipertahankan, runtime milik proyek dihentikan. [Checkpoint terbaru](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/local-pause-checkpoint.md>) menjadi acuan sebelum resume. Tidak ada task baru didispatch atau kelanjutan otomatis.
+
+## Pengerjaan ditahan — checkpoint resume
+
+Status aktif: pengerjaan lokal ditahan atas permintaan Ardy. STUD sudah diterima/commit465f865; SEM ON_HOLD dan baru preflight. [Checkpoint ringkas](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/resume-checkpoint.md>) memuat baseline, status, peta baca minimum, ownership dan langkah lanjut agar tidak mengulang atau bentrok. Tidak ada kelanjutan otomatis.
+
+## Titik aman sesudah SEM
+
+Lihat resume-checkpoint.md dan reports/LAB002-SEM-001-pm-review.md. Task berikut belum ditugaskan. Migration0003 belum diterapkan pada database persisten; tidak ada data sekolah nyata atau deployment.

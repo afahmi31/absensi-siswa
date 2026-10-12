@@ -12,13 +12,14 @@ import { Scrypt } from '@adonisjs/hash/drivers/scrypt'
 import { runMigrations } from '../server/database/migrate.mjs'
 import { provisionTeacherAccount } from '../server/auth/account-admin.ts'
 import { withAuditActor } from '../server/database/audit-context.ts'
-import { closeSemester, createSemester } from '../server/database/repositories/semesters.ts'
+import { closeSemester, createSemester, getSemesterClosurePreview } from '../server/database/repositories/semesters.ts'
 import { addStudentToSemester, createStudent } from '../server/database/repositories/students.ts'
 import { createSchool, createSchoolClass } from '../server/database/repositories/schools.ts'
 import { createTeacherAccount } from '../server/database/repositories/teacher-accounts.ts'
-import { setCalendarException } from '../server/database/repositories/calendar.ts'
+import { setCalendarException, setCalendarHoliday, setRoutineSchoolDay } from '../server/database/repositories/calendar.ts'
 import { recordAttendance } from '../server/database/repositories/attendance.ts'
 import { startTemporaryPostgres } from './support/temporary-postgres.mjs'
+import { listMigrationNames } from './support/migration-names.mjs'
 
 const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const testRoot = path.join(appRoot, '.data', 'tests')
@@ -118,6 +119,26 @@ async function jsonResponse(response: Response): Promise<Record<string, unknown>
   return await response.json() as Record<string, unknown>
 }
 
+async function waitForAdvisoryLockState(
+  database: postgres.Sql,
+  lockClass: 1727 | 1728,
+  minimumGranted: number,
+  minimumWaiting: number,
+): Promise<void> {
+  const deadline = Date.now() + 5_000
+  while (Date.now() < deadline) {
+    const [state] = await database<{ granted_count: number; waiting_count: number }[]>`
+      select count(*) filter (where granted)::int as granted_count,
+             count(*) filter (where not granted)::int as waiting_count
+      from pg_locks
+      where locktype = 'advisory' and classid = ${lockClass}::oid and objsubid = 2
+    `
+    if (Number(state.granted_count) >= minimumGranted && Number(state.waiting_count) >= minimumWaiting) return
+    await delay(25)
+  }
+  throw new Error(`Timed out waiting for advisory lock class ${lockClass} state.`)
+}
+
 function dateShift(date: string, days: number): string {
   const [year, month, day] = date.split('-').map(Number)
   const shifted = new Date(Date.UTC(year!, month! - 1, day! + days))
@@ -139,6 +160,7 @@ test('STUD school setup and semester roster APIs preserve ownership, snapshots, 
   let archiveSemesterId = ''
   let foreignSemesterId = ''
   let activeMembershipId = ''
+  let addedMembershipId = ''
   let archiveMembershipId = ''
   let foreignMembershipId = ''
   let attendanceDate = ''
@@ -146,7 +168,9 @@ test('STUD school setup and semester roster APIs preserve ownership, snapshots, 
 
   try {
     const migrations = await runMigrations(migrator, 'up')
-    assert.deepEqual(migrations.map((migration) => migration.applied), [true, true])
+    const expectedNames = await listMigrationNames()
+    assert.deepEqual(migrations.map((migration) => migration.name), expectedNames)
+    assert.deepEqual(migrations.map((migration) => migration.applied), expectedNames.map(() => true))
 
     const email = `stud-${randomUUID()}@example.invalid`
     const owner = await provisionTeacherAccount(appDatabase, email, await passwordHasher.make(password))
@@ -364,6 +388,7 @@ test('STUD school setup and semester roster APIs preserve ownership, snapshots, 
       assert.equal(added.status, 200)
       const addedBody = await jsonResponse(added)
       assert.equal(typeof addedBody.membershipId, 'string')
+      addedMembershipId = addedBody.membershipId as string
       const [duplicate] = await appDatabase`
         select count(*)::int as count from semester_memberships
         where semester_id = ${activeSemesterId} and name_snapshot = 'Nama Awal'
@@ -449,6 +474,349 @@ test('STUD school setup and semester roster APIs preserve ownership, snapshots, 
       assert.equal(JSON.stringify(actorRows).includes(password), false)
       assert.equal(serverOutput.includes(temporary.runtimeUrl), false)
     })
+
+    await t.test('SEM APIs validate periods, confirm stale-safe closure, archive snapshots, and copy the end-date roster', async () => {
+      const listResponse = await fetchLocal(`${baseUrl}/api/semesters`, { headers: { cookie: ownerCookie } })
+      assert.equal(listResponse.status, 200)
+      const listBody = await jsonResponse(listResponse)
+      const initialSemesters = listBody.semesters as Record<string, unknown>[]
+      const active = initialSemesters.find((semester) => semester.id === activeSemesterId)
+      assert.ok(active)
+      assert.equal(active.academicYear, '2026/2027')
+      assert.equal(active.term, 'ganjil')
+      assert.equal(active.schoolName, 'Sekolah Baru')
+      assert.equal(active.className, 'Kelas B')
+
+      const previewResponse = await fetchLocal(`${baseUrl}/api/semesters/${activeSemesterId}/closure-preview`, {
+        headers: { cookie: ownerCookie },
+      })
+      assert.equal(previewResponse.status, 200)
+      const initialPreview = (await jsonResponse(previewResponse)).preview as Record<string, unknown>
+      assert.equal(initialPreview.calendarConfigured, true)
+      assert.ok(Number(initialPreview.schoolDayCount) > 0)
+      assert.ok(Number(initialPreview.blankCellCount) > 0)
+      assert.ok(Number(initialPreview.incompleteSchoolDayCount) > 0)
+
+      const invalidAcademicYear = await fetchLocal(`${baseUrl}/api/semesters`, {
+        method: 'POST', headers: { 'content-type': 'application/json', origin: baseUrl, cookie: ownerCookie },
+        body: JSON.stringify({
+          academicYear: '2026/2028', term: 'genap', startsOn: dateShift(active.endsOn as string, 1),
+          endsOn: dateShift(active.endsOn as string, 30), rosterSource: 'empty',
+        }),
+      })
+      assert.equal(invalidAcademicYear.status, 422)
+      const invalidYearBody = await jsonResponse(invalidAcademicYear)
+      assert.equal(typeof ((invalidYearBody.data as Record<string, unknown>).fieldErrors as Record<string, unknown>).academicYear, 'string')
+
+      const blockedSecondActive = await fetchLocal(`${baseUrl}/api/semesters`, {
+        method: 'POST', headers: { 'content-type': 'application/json', origin: baseUrl, cookie: ownerCookie },
+        body: JSON.stringify({
+          academicYear: '2027/2028', term: 'ganjil', startsOn: dateShift(active.endsOn as string, 1),
+          endsOn: dateShift(active.endsOn as string, 60), rosterSource: 'empty',
+        }),
+      })
+      assert.equal(blockedSecondActive.status, 409, 'A school cannot start the next semester while one is still active.')
+
+      const excludeMembership = await fetchLocal(`${baseUrl}/api/semesters/${activeSemesterId}`, {
+        method: 'PATCH', headers: { 'content-type': 'application/json', origin: baseUrl, cookie: ownerCookie },
+        body: JSON.stringify({
+          academicYear: active.academicYear,
+          term: active.term,
+          startsOn: attendanceDate,
+          endsOn: active.endsOn,
+        }),
+      })
+      assert.equal(excludeMembership.status, 409)
+      assert.equal(((await jsonResponse(excludeMembership)).data as Record<string, unknown>).reason, 'membership_period_conflict')
+      const [unchangedSemesterPeriod] = await appDatabase`
+        select starts_on::text as starts_on, ends_on::text as ends_on
+        from semesters where id = ${activeSemesterId}
+      `
+      assert.deepEqual(unchangedSemesterPeriod, { starts_on: active.startsOn, ends_on: active.endsOn })
+      const [unchangedMembershipPeriod] = await appDatabase`
+        select starts_on::text as starts_on, ends_on::text as ends_on
+        from semester_memberships where id = ${activeMembershipId}
+      `
+      assert.deepEqual(unchangedMembershipPeriod, {
+        starts_on: dateShift(attendanceDate, -2),
+        ends_on: attendanceDate,
+      }, 'Rejected semester date changes do not move student dates automatically.')
+
+      const shortenMembershipOne = await fetchLocal(`${baseUrl}/api/students/${activeMembershipId}`, {
+        method: 'PATCH', headers: { 'content-type': 'application/json', origin: baseUrl, cookie: ownerCookie },
+        body: JSON.stringify({ startsOn: dateShift(attendanceDate, -2), endsOn: '' }),
+      })
+      assert.equal(shortenMembershipOne.status, 200)
+      const extendMembershipTwo = await fetchLocal(`${baseUrl}/api/students/${addedMembershipId}`, {
+        method: 'PATCH', headers: { 'content-type': 'application/json', origin: baseUrl, cookie: ownerCookie },
+        body: JSON.stringify({ startsOn: dateShift(attendanceDate, -2), endsOn: '' }),
+      })
+      assert.equal(extendMembershipTwo.status, 200)
+
+      const periodFields = {
+        academicYear: active.academicYear,
+        term: active.term,
+        startsOn: active.startsOn,
+        endsOn: dateShift(attendanceDate, -1),
+      }
+      const excludedEffectiveAttendance = await fetchLocal(`${baseUrl}/api/semesters/${activeSemesterId}`, {
+        method: 'PATCH', headers: { 'content-type': 'application/json', origin: baseUrl, cookie: ownerCookie },
+        body: JSON.stringify(periodFields),
+      })
+      assert.equal(excludedEffectiveAttendance.status, 409)
+      assert.equal(((await jsonResponse(excludedEffectiveAttendance)).data as Record<string, unknown>).reason, 'attendance_period_conflict')
+
+      await withAuditActor(appDatabase, ownerTeacherId, (transaction) => setCalendarHoliday(transaction, {
+        schoolId,
+        date: attendanceDate,
+        confirmedAttendanceImpact: true,
+      }))
+      const [excludedHistory] = await appDatabase`
+        select count(*)::int as count from attendance_records
+        where semester_id = ${activeSemesterId} and attendance_date = ${attendanceDate} and is_effective = false
+      `
+      assert.equal(excludedHistory.count, 1)
+      const excludedAttendanceHistory = await fetchLocal(`${baseUrl}/api/semesters/${activeSemesterId}`, {
+        method: 'PATCH', headers: { 'content-type': 'application/json', origin: baseUrl, cookie: ownerCookie },
+        body: JSON.stringify(periodFields),
+      })
+      assert.equal(excludedAttendanceHistory.status, 409)
+      assert.equal(((await jsonResponse(excludedAttendanceHistory)).data as Record<string, unknown>).reason, 'attendance_period_conflict')
+
+      const foreignPreview = await fetchLocal(`${baseUrl}/api/semesters/${foreignSemesterId}/closure-preview`, {
+        headers: { cookie: ownerCookie },
+      })
+      assert.equal(foreignPreview.status, 404)
+
+      async function addRosterMember(fullName: string, endsOn: string) {
+        const response = await fetchLocal(`${baseUrl}/api/students`, {
+          method: 'POST', headers: { 'content-type': 'application/json', origin: baseUrl, cookie: ownerCookie },
+          body: JSON.stringify({ semesterId: activeSemesterId, fullName, startsOn: attendanceDate, endsOn }),
+        })
+        assert.equal(response.status, 200)
+        return (await jsonResponse(response)).membershipId as string
+      }
+      const enrolledThroughLastDay = await addRosterMember('Masih Terdaftar Sampai Akhir', active.endsOn as string)
+      const leftBeforeLastDay = await addRosterMember('Sudah Keluar Sebelum Akhir', dateShift(active.endsOn as string, -1))
+
+      const staleBasePreviewResponse = await fetchLocal(`${baseUrl}/api/semesters/${activeSemesterId}/closure-preview`, {
+        headers: { cookie: ownerCookie },
+      })
+      assert.equal(staleBasePreviewResponse.status, 200)
+      const staleBasePreview = (await jsonResponse(staleBasePreviewResponse)).preview as Record<string, unknown>
+      const staleToken = staleBasePreview.previewToken as string
+      await withAuditActor(appDatabase, ownerTeacherId, (transaction) => setCalendarException(transaction, {
+        schoolId,
+        date: dateShift(attendanceDate, -1),
+        kind: 'school_day',
+        note: 'Perubahan setelah pratinjau penutupan',
+      }))
+      const confirmedTooEarly = await fetchLocal(`${baseUrl}/api/semesters/${activeSemesterId}/close`, {
+        method: 'POST', headers: { 'content-type': 'application/json', origin: baseUrl, cookie: ownerCookie },
+        body: JSON.stringify({ previewToken: staleToken, confirmed: false }),
+      })
+      assert.equal(confirmedTooEarly.status, 422)
+
+      const staleClose = await fetchLocal(`${baseUrl}/api/semesters/${activeSemesterId}/close`, {
+        method: 'POST', headers: { 'content-type': 'application/json', origin: baseUrl, cookie: ownerCookie },
+        body: JSON.stringify({ previewToken: staleToken, confirmed: true }),
+      })
+      assert.equal(staleClose.status, 409)
+      const staleCloseBody = await jsonResponse(staleClose)
+      const staleCloseData = staleCloseBody.data as Record<string, unknown>
+      assert.equal(staleCloseData.reason, 'preview_changed')
+      const currentPreview = staleCloseData.preview as Record<string, unknown>
+      assert.notEqual(currentPreview.previewToken, staleToken)
+      assert.ok(Number(currentPreview.blankCellCount) > 0)
+
+      const closedResponse = await fetchLocal(`${baseUrl}/api/semesters/${activeSemesterId}/close`, {
+        method: 'POST', headers: { 'content-type': 'application/json', origin: baseUrl, cookie: ownerCookie },
+        body: JSON.stringify({ previewToken: currentPreview.previewToken, confirmed: true }),
+      })
+      assert.equal(closedResponse.status, 200)
+      const closedBody = await jsonResponse(closedResponse)
+      const closedPreview = closedBody.preview as Record<string, unknown>
+      assert.equal((closedPreview.semester as Record<string, unknown>).status, 'closed')
+      const [archiveDetails] = await appDatabase`
+        select school_name, class_name, academic_year, term, starts_on::text as starts_on, ends_on::text as ends_on
+        from semester_archive_snapshots where semester_id = ${activeSemesterId}
+      `
+      assert.deepEqual(archiveDetails, {
+        school_name: 'Sekolah Baru',
+        class_name: 'Kelas B',
+        academic_year: '2026/2027',
+        term: 'ganjil',
+        starts_on: active.startsOn,
+        ends_on: active.endsOn,
+      })
+
+      const archivedEdit = await fetchLocal(`${baseUrl}/api/semesters/${activeSemesterId}`, {
+        method: 'PATCH', headers: { 'content-type': 'application/json', origin: baseUrl, cookie: ownerCookie },
+        body: JSON.stringify({ ...periodFields, endsOn: active.endsOn }),
+      })
+      assert.equal(archivedEdit.status, 409)
+      const renamedSchool = await fetchLocal(`${baseUrl}/api/school`, {
+        method: 'PUT', headers: { 'content-type': 'application/json', origin: baseUrl, cookie: ownerCookie },
+        body: JSON.stringify({ name: 'Sekolah Setelah Arsip', className: 'Kelas C', timeZone: 'Asia/Makassar' }),
+      })
+      assert.equal(renamedSchool.status, 200)
+      const archivedListResponse = await fetchLocal(`${baseUrl}/api/semesters`, { headers: { cookie: ownerCookie } })
+      const archivedList = (await jsonResponse(archivedListResponse)).semesters as Record<string, unknown>[]
+      const immutableArchive = archivedList.find((semester) => semester.id === activeSemesterId)
+      assert.equal(immutableArchive?.schoolName, 'Sekolah Baru')
+      assert.equal(immutableArchive?.className, 'Kelas B')
+
+      const nextStart = dateShift(active.endsOn as string, 1)
+      const nextEnd = dateShift(nextStart, 60)
+      const createdCopied = await fetchLocal(`${baseUrl}/api/semesters`, {
+        method: 'POST', headers: { 'content-type': 'application/json', origin: baseUrl, cookie: ownerCookie },
+        body: JSON.stringify({
+          academicYear: '2026/2027', term: 'genap', startsOn: nextStart, endsOn: nextEnd, rosterSource: 'previous',
+        }),
+      })
+      assert.equal(createdCopied.status, 200)
+      const copiedBody = await jsonResponse(createdCopied)
+      const copiedSemester = copiedBody.semester as Record<string, unknown>
+      const copiedRoster = copiedBody.roster as Record<string, unknown>
+      assert.equal(copiedRoster.source, 'previous')
+      assert.equal(copiedRoster.copiedCount, 3)
+      assert.equal((copiedRoster.previousSemester as Record<string, unknown>).id, activeSemesterId)
+      const copiedSemesterId = copiedSemester.id as string
+      const [copiedRows] = await appDatabase`
+        select count(*)::int as count from semester_memberships where semester_id = ${copiedSemesterId}
+      `
+      const [copiedAttendance] = await appDatabase`
+        select count(*)::int as count from attendance_records where semester_id = ${copiedSemesterId}
+      `
+      assert.equal(copiedRows.count, 3, 'End-date membership uses an inclusive boundary; the student who left the day before is not copied.')
+      assert.equal(copiedAttendance.count, 0, 'Roster copying never copies attendance history.')
+      const [targetPeriod] = await appDatabase`
+        select min(starts_on)::text as first_membership_start
+        from semester_memberships where semester_id = ${copiedSemesterId}
+      `
+      assert.equal(targetPeriod.first_membership_start, nextStart)
+
+      const activePeriodEdit = await fetchLocal(`${baseUrl}/api/semesters/${copiedSemesterId}`, {
+        method: 'PATCH', headers: { 'content-type': 'application/json', origin: baseUrl, cookie: ownerCookie },
+        body: JSON.stringify({
+          academicYear: '2026/2027', term: 'genap', startsOn: dateShift(nextStart, 1), endsOn: nextEnd,
+        }),
+      })
+      assert.equal(activePeriodEdit.status, 409)
+      assert.equal(((await jsonResponse(activePeriodEdit)).data as Record<string, unknown>).reason, 'membership_period_conflict')
+      const secondActive = await fetchLocal(`${baseUrl}/api/semesters`, {
+        method: 'POST', headers: { 'content-type': 'application/json', origin: baseUrl, cookie: ownerCookie },
+        body: JSON.stringify({
+          academicYear: '2027/2028', term: 'ganjil', startsOn: dateShift(nextEnd, 1),
+          endsOn: dateShift(nextEnd, 90), rosterSource: 'empty',
+        }),
+      })
+      assert.equal(secondActive.status, 409)
+
+      const nextPreviewResponse = await fetchLocal(`${baseUrl}/api/semesters/${copiedSemesterId}/closure-preview`, {
+        headers: { cookie: ownerCookie },
+      })
+      assert.equal(nextPreviewResponse.status, 200)
+      const nextPreview = (await jsonResponse(nextPreviewResponse)).preview as Record<string, unknown>
+      const closeCopied = await fetchLocal(`${baseUrl}/api/semesters/${copiedSemesterId}/close`, {
+        method: 'POST', headers: { 'content-type': 'application/json', origin: baseUrl, cookie: ownerCookie },
+        body: JSON.stringify({ previewToken: nextPreview.previewToken, confirmed: true }),
+      })
+      assert.equal(closeCopied.status, 200)
+
+      const overlapAfterClose = await fetchLocal(`${baseUrl}/api/semesters`, {
+        method: 'POST', headers: { 'content-type': 'application/json', origin: baseUrl, cookie: ownerCookie },
+        body: JSON.stringify({
+          academicYear: '2028/2029', term: 'ganjil', startsOn: nextStart, endsOn: nextEnd, rosterSource: 'empty',
+        }),
+      })
+      assert.equal(overlapAfterClose.status, 409, 'A closed semester period still prevents a new overlapping period.')
+
+      const createdEmpty = await fetchLocal(`${baseUrl}/api/semesters`, {
+        method: 'POST', headers: { 'content-type': 'application/json', origin: baseUrl, cookie: ownerCookie },
+        body: JSON.stringify({
+          academicYear: '2027/2028', term: 'ganjil', startsOn: dateShift(nextEnd, 1),
+          endsOn: dateShift(nextEnd, 90), rosterSource: 'empty',
+        }),
+      })
+      assert.equal(createdEmpty.status, 200)
+      const emptyBody = await jsonResponse(createdEmpty)
+      assert.equal((emptyBody.roster as Record<string, unknown>).copiedCount, 0)
+      const emptySemesterId = (emptyBody.semester as Record<string, unknown>).id as string
+      const [emptyMemberships] = await appDatabase`
+        select count(*)::int as count from semester_memberships where semester_id = ${emptySemesterId}
+      `
+      assert.equal(emptyMemberships.count, 0)
+
+      const raceSemesterStart = dateShift(nextEnd, 1)
+      const raceStudentResponse = await fetchLocal(`${baseUrl}/api/students`, {
+        method: 'POST', headers: { 'content-type': 'application/json', origin: baseUrl, cookie: ownerCookie },
+        body: JSON.stringify({ semesterId: emptySemesterId, fullName: 'Siswa Uji Urutan Lock', startsOn: raceSemesterStart }),
+      })
+      assert.equal(raceStudentResponse.status, 200)
+      const raceMembershipId = (await jsonResponse(raceStudentResponse)).membershipId as string
+      const racePreviewResponse = await fetchLocal(`${baseUrl}/api/semesters/${emptySemesterId}/closure-preview`, {
+        headers: { cookie: ownerCookie },
+      })
+      assert.equal(racePreviewResponse.status, 200)
+      const racePreview = (await jsonResponse(racePreviewResponse)).preview as Record<string, unknown>
+
+      let releaseCalendarGate!: () => void
+      let signalCalendarGateReady!: () => void
+      const releaseCalendarGatePromise = new Promise<void>((resolve) => { releaseCalendarGate = resolve })
+      const calendarGateReady = new Promise<void>((resolve) => { signalCalendarGateReady = resolve })
+      const calendarGate = appDatabase.begin(async (transaction) => {
+        await transaction`select pg_advisory_xact_lock(1727, hashtext(${schoolId}::text))`
+        signalCalendarGateReady()
+        await releaseCalendarGatePromise
+      })
+      await calendarGateReady
+
+      let closeRace: Promise<Response> | undefined
+      let membershipEditRace: Promise<Response> | undefined
+      let raceSetupError: unknown
+      try {
+        closeRace = fetchLocal(`${baseUrl}/api/semesters/${emptySemesterId}/close`, {
+          method: 'POST', headers: { 'content-type': 'application/json', origin: baseUrl, cookie: ownerCookie },
+          body: JSON.stringify({ previewToken: racePreview.previewToken, confirmed: true }),
+        })
+        await waitForAdvisoryLockState(appDatabase, 1728, 1, 0)
+        await waitForAdvisoryLockState(appDatabase, 1727, 1, 1)
+        membershipEditRace = fetchLocal(`${baseUrl}/api/students/${raceMembershipId}`, {
+          method: 'PATCH', headers: { 'content-type': 'application/json', origin: baseUrl, cookie: ownerCookie },
+          body: JSON.stringify({ endsOn: raceSemesterStart }),
+        })
+        await waitForAdvisoryLockState(appDatabase, 1728, 1, 1)
+      } catch (error) {
+        raceSetupError = error
+      } finally {
+        releaseCalendarGate()
+      }
+      await calendarGate
+      if (raceSetupError) {
+        await Promise.allSettled([closeRace, membershipEditRace].filter((request): request is Promise<Response> => Boolean(request)))
+        throw raceSetupError
+      }
+      assert.ok(closeRace)
+      assert.ok(membershipEditRace)
+      const [raceCloseResponse, raceMembershipEditResponse] = await Promise.all([closeRace, membershipEditRace])
+      assert.equal(raceCloseResponse.status, 200, 'Closure must proceed after the calendar lock is released without a deadlock.')
+      assert.equal(raceMembershipEditResponse.status, 409, 'A membership edit queued behind closure must observe the archived semester.')
+      const [raceMembershipAfterClose] = await appDatabase`
+        select ends_on::text as ends_on from semester_memberships where id = ${raceMembershipId}
+      `
+      assert.equal(raceMembershipAfterClose.ends_on, null, 'The queued STUD edit must not mutate the closed semester.')
+
+      const semesterAudit = await appDatabase<{ actor_teacher_id: string | null; entity_type: string; entity_id: string; new_value: Record<string, unknown> | null }[]>`
+        select actor_teacher_id, entity_type, entity_id, new_value from audit_events
+        where (entity_type = 'semesters' and entity_id in (${activeSemesterId}, ${copiedSemesterId}))
+           or (entity_type = 'semester_archive_snapshots'
+               and new_value ->> 'semester_id' in (${activeSemesterId}, ${copiedSemesterId}))
+      `
+      assert.ok(semesterAudit.some((row) => row.entity_type === 'semesters' && row.entity_id === activeSemesterId && row.actor_teacher_id === ownerTeacherId))
+      assert.ok(semesterAudit.some((row) => row.entity_type === 'semester_archive_snapshots' && row.new_value?.semester_id === activeSemesterId && row.actor_teacher_id === ownerTeacherId))
+      assert.equal(JSON.stringify(semesterAudit).includes('previewToken'), false)
+    })
   } finally {
     if (server) await stopOwnedProcess(server)
     await appDatabase.end({ timeout: 3 })
@@ -486,7 +854,17 @@ async function createSchoolFixtureForOwner(
     startsOn: dateShift(today, -180),
     endsOn: dateShift(today, -120),
   })
-  await withAuditActor(database, teacherId, (transaction) => closeSemester(transaction, archiveSemester.id))
+  const archivePreview = await getSemesterClosurePreview(database, {
+    semesterId: archiveSemester.id,
+    teacherId,
+  })
+  assert.ok(archivePreview)
+  await withAuditActor(database, teacherId, (transaction) => closeSemester(transaction, {
+    semesterId: archiveSemester.id,
+    teacherId,
+    previewToken: archivePreview.previewToken,
+    confirmed: true,
+  }))
 
   const activeSemester = await createSemester(database, {
     schoolId, academicYear: '2026/2027', term: 'ganjil',
@@ -499,6 +877,14 @@ async function createSchoolFixtureForOwner(
     studentId: student.id,
     startsOn: dateShift(today, -5),
   })
+  for (let weekday = 0; weekday < 7; weekday += 1) {
+    await setRoutineSchoolDay(database, {
+      schoolId,
+      dayOfWeek: weekday,
+      effectiveFrom: dateShift(today, -30),
+      isSchoolDay: weekday >= 1 && weekday <= 5,
+    })
+  }
   const attendanceDate = dateShift(today, -1)
   await setCalendarException(database, { schoolId, date: attendanceDate, kind: 'school_day', note: 'Data pengujian sintetis' })
   await withAuditActor(database, teacherId, (transaction) => recordAttendance(transaction, {

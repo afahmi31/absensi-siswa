@@ -10,6 +10,7 @@ import { test } from 'node:test'
 import postgres from 'postgres'
 import { Scrypt } from '@adonisjs/hash/drivers/scrypt'
 import { runMigrations } from '../server/database/migrate.mjs'
+import { listMigrationNames } from './support/migration-names.mjs'
 import { provisionTeacherAccount, resetTeacherAccountPassword } from '../server/auth/account-admin.ts'
 import { isLoginBlocked, recordLoginFailure } from '../server/auth/login-throttle.ts'
 import { shouldUseSecureSessionCookie } from '../server/auth/session-cookie.ts'
@@ -154,7 +155,9 @@ test('teacher login, sealed session, same-origin requests, reset revocation, and
 
   try {
     const migrations = await runMigrations(migrator, 'up')
-    assert.deepEqual(migrations.map((migration) => migration.applied), [true, true])
+    const expectedNames = await listMigrationNames()
+    assert.deepEqual(migrations.map((migration) => migration.name), expectedNames)
+    assert.deepEqual(migrations.map((migration) => migration.applied), expectedNames.map(() => true))
 
     const email = `auth-${randomUUID()}@example.invalid`
     const oldPassword = randomBytes(24).toString('base64url')

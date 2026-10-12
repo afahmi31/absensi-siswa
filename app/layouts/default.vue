@@ -39,6 +39,7 @@ async function logout() {
       <nav class="main-nav" aria-label="Navigasi utama">
         <NuxtLink to="/school" :aria-current="route.path === '/school' ? 'page' : undefined">Data sekolah</NuxtLink>
         <NuxtLink to="/students" :aria-current="route.path === '/students' ? 'page' : undefined">Siswa</NuxtLink>
+        <NuxtLink to="/semesters" :aria-current="route.path === '/semesters' ? 'page' : undefined">Semester</NuxtLink>
       </nav>
 
       <div class="account-actions">

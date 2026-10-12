@@ -3,7 +3,7 @@
     <section class="page-heading">
       <p class="eyebrow">Ruang guru</p>
       <h1>Absensi kelas</h1>
-      <p>Atur data sekolah dan siswa sebelum pengisian absensi tersedia.</p>
+      <p>Atur data sekolah, siswa, dan semester untuk menyiapkan periode belajar.</p>
     </section>
 
     <section class="home-links" aria-label="Data yang dapat dikelola">
@@ -27,7 +27,8 @@
 
     <section class="notice-panel" aria-labelledby="attendance-notice-title">
       <h2 id="attendance-notice-title">Pengisian absensi belum tersedia</h2>
-      <p>Pembuatan semester dan pengisian absensi akan tersedia pada tahap berikutnya.</p>
+      <p>Pembuatan dan pengelolaan semester sudah tersedia. Pengisian absensi akan tersedia pada tahap berikutnya.</p>
+      <NuxtLink class="semester-setup-link" to="/semesters">Kelola semester</NuxtLink>
     </section>
   </main>
 </template>

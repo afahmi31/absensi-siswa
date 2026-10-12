@@ -1,6 +1,6 @@
 # Backlog Delivery LAB-002 v1
 
-Status aktif 12 Oktober 2026: UI001, UI002, SET001, DATA001 dan AUTH001 CLOSED. AUTH diterima PM berdasarkan delegasi lokal Ardy setelah pengujian independen dan browser. Bagian aktivitas lama di bawah dipertahankan sebagai riwayat; status aktif ini dan tabel menjadi acuan. STUD ASSIGNED; task fitur setelahnya belum didispatch.
+Status aktif 12 Oktober 2026: UI001, UI002, SET001, DATA001 dan AUTH001 CLOSED. AUTH diterima PM berdasarkan delegasi lokal Ardy setelah pengujian independen dan browser. Bagian aktivitas lama di bawah dipertahankan sebagai riwayat; status aktif ini dan tabel menjadi acuan. STUD CLOSED; SEM CLOSED melalui delegasi PM; pengerjaan ditahan untuk pembahasan Ardy; task fitur setelahnya belum didispatch.
 
 Pemilik: Project Manager. Tanggal: 2026-10-11.
 Acuan: [rencana](<development-plan-v1.md>), [PRD](<../product/PROD-002-product-prd-v1.md>), [keputusan terbuka](<decisions-and-confirmations.md>).
@@ -22,7 +22,7 @@ Semua task: satu active owner, scope terisolasi, tanpa production/dependency bes
 | LAB002-IMP-001 | Template Excel/preview/impor | ANALYSIS | STUD-001/SEM-001; C03; paket Excel dipilih | Format/validation/partial commit dan dependency dikunci |
 | LAB002-CAL-001 | Hari rutin/pengecualian dan riwayat libur | ANALYSIS | DATA-001/AUTH-001/STUD-001/SEM-001; C07 | Kontrak restore libur/keanggotaan/periode; desain disetujui |
 | LAB002-ATT-001 | Input harian/parsial/koreksi/riwayat | ANALYSIS | STUD-001/SEM-001/CAL-001/AUTH-001; C06/C08; UI-001 disetujui | Save/concurrency/audit jelas; lock kontrak SEM disepakati |
-| LAB002-SEM-001 | Semester/penutupan/arsip/salin siswa | ANALYSIS | DATA-001/AUTH-001/STUD-001; C07/C08; UI-002 terkait | Data/report boundary jelas; lock backend dan closure confirm |
+| LAB002-SEM-001 | Semester/penutupan/arsip/salin siswa | CLOSED | DATA-001/AUTH-001/STUD-001; C07/C08; UI-002 terkait | Data/report boundary jelas; lock backend dan closure confirm |
 | LAB002-REP-001 | Tabel bulan/semester, browser/PDF | ANALYSIS | ATT-001/SEM-001/CAL-001/OPS-001; C05; UI-002 disetujui | Paket/render PDF dipilih, aturan blank/pagination jelas |
 | LAB002-OPS-001 | Penanganan gangguan dan cadangan/pemulihan | ANALYSIS | STUD-001/SEM-001/DATA-001/AUTH-001; C04/C08 | Owner/retensi/akses disetujui; hanya non-production |
 | LAB002-QA-001 | Regression integrasi lintas modul dan paket evidence | ANALYSIS | AUTH/STUD/IMP/CAL/ATT/SEM/REP/OPS | Modul selesai teknis dan kontrak aktif; fixture/repro steps |
