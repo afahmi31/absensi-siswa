@@ -1,0 +1,316 @@
+{
+  "description": "Artefak desain statis LAB002-UI-002. Semua identitas dan isi contoh fiktif.",
+  "renderer": "Node.js v24.19.0; Sharp 0.35.5; libvips 8.18.7; librsvg 2.63.2",
+  "artifacts": [
+    {
+      "name": "01-siswa-hp-daftar",
+      "title": "Siswa — daftar pada HP",
+      "width": 390,
+      "height": 1160,
+      "files": [
+        {
+          "file": "01-siswa-hp-daftar.svg",
+          "bytes": 7712
+        },
+        {
+          "file": "01-siswa-hp-daftar.png",
+          "bytes": 74341
+        }
+      ]
+    },
+    {
+      "name": "02-siswa-hp-form-tambah",
+      "title": "Tambah siswa — HP",
+      "width": 390,
+      "height": 920,
+      "files": [
+        {
+          "file": "02-siswa-hp-form-tambah.svg",
+          "bytes": 4422
+        },
+        {
+          "file": "02-siswa-hp-form-tambah.png",
+          "bytes": 49459
+        }
+      ]
+    },
+    {
+      "name": "03-siswa-laptop-edit",
+      "title": "Ubah data siswa — laptop",
+      "width": 1440,
+      "height": 880,
+      "files": [
+        {
+          "file": "03-siswa-laptop-edit.svg",
+          "bytes": 7456
+        },
+        {
+          "file": "03-siswa-laptop-edit.png",
+          "bytes": 106404
+        }
+      ]
+    },
+    {
+      "name": "04-sekolah-hp-metadata",
+      "title": "Data sekolah — HP",
+      "width": 390,
+      "height": 830,
+      "files": [
+        {
+          "file": "04-sekolah-hp-metadata.svg",
+          "bytes": 4658
+        },
+        {
+          "file": "04-sekolah-hp-metadata.png",
+          "bytes": 49495
+        }
+      ]
+    },
+    {
+      "name": "05-sekolah-laptop-metadata",
+      "title": "Data sekolah — laptop",
+      "width": 1440,
+      "height": 730,
+      "files": [
+        {
+          "file": "05-sekolah-laptop-metadata.svg",
+          "bytes": 5912
+        },
+        {
+          "file": "05-sekolah-laptop-metadata.png",
+          "bytes": 76079
+        }
+      ]
+    },
+    {
+      "name": "06-impor-laptop-duplikat",
+      "title": "Impor Excel — pilihan nama sama",
+      "width": 1440,
+      "height": 860,
+      "files": [
+        {
+          "file": "06-impor-laptop-duplikat.svg",
+          "bytes": 10788
+        },
+        {
+          "file": "06-impor-laptop-duplikat.png",
+          "bytes": 106590
+        }
+      ]
+    },
+    {
+      "name": "07-impor-laptop-validasi",
+      "title": "Impor Excel — kesalahan pada baris terpilih",
+      "width": 1440,
+      "height": 820,
+      "files": [
+        {
+          "file": "07-impor-laptop-validasi.svg",
+          "bytes": 10235
+        },
+        {
+          "file": "07-impor-laptop-validasi.png",
+          "bytes": 90839
+        }
+      ]
+    },
+    {
+      "name": "08-kalender-hp",
+      "title": "Kalender sekolah — tampilan HP",
+      "width": 390,
+      "height": 820,
+      "files": [
+        {
+          "file": "08-kalender-hp.svg",
+          "bytes": 11150
+        },
+        {
+          "file": "08-kalender-hp.png",
+          "bytes": 51413
+        }
+      ]
+    },
+    {
+      "name": "09-kalender-hp-rutin",
+      "title": "Hari sekolah rutin — HP",
+      "width": 390,
+      "height": 910,
+      "files": [
+        {
+          "file": "09-kalender-hp-rutin.svg",
+          "bytes": 6320
+        },
+        {
+          "file": "09-kalender-hp-rutin.png",
+          "bytes": 50791
+        }
+      ]
+    },
+    {
+      "name": "10-kalender-laptop-rutin",
+      "title": "Hari sekolah rutin — laptop",
+      "width": 1440,
+      "height": 700,
+      "files": [
+        {
+          "file": "10-kalender-laptop-rutin.svg",
+          "bytes": 9054
+        },
+        {
+          "file": "10-kalender-laptop-rutin.png",
+          "bytes": 84128
+        }
+      ]
+    },
+    {
+      "name": "11-kalender-laptop-konfirmasi-libur",
+      "title": "Kalender — konfirmasi libur dengan absensi",
+      "width": 1440,
+      "height": 900,
+      "files": [
+        {
+          "file": "11-kalender-laptop-konfirmasi-libur.svg",
+          "bytes": 13899
+        },
+        {
+          "file": "11-kalender-laptop-konfirmasi-libur.png",
+          "bytes": 98666
+        }
+      ]
+    },
+    {
+      "name": "12-semester-hp-buat",
+      "title": "Buat semester baru — HP",
+      "width": 390,
+      "height": 940,
+      "files": [
+        {
+          "file": "12-semester-hp-buat.svg",
+          "bytes": 4309
+        },
+        {
+          "file": "12-semester-hp-buat.png",
+          "bytes": 49209
+        }
+      ]
+    },
+    {
+      "name": "13-semester-laptop-konfirmasi-tutup",
+      "title": "Semester — konfirmasi penutupan",
+      "width": 1440,
+      "height": 900,
+      "files": [
+        {
+          "file": "13-semester-laptop-konfirmasi-tutup.svg",
+          "bytes": 6286
+        },
+        {
+          "file": "13-semester-laptop-konfirmasi-tutup.png",
+          "bytes": 97508
+        }
+      ]
+    },
+    {
+      "name": "14-semester-laptop-ditutup",
+      "title": "Semester — arsip hanya baca",
+      "width": 1440,
+      "height": 800,
+      "files": [
+        {
+          "file": "14-semester-laptop-ditutup.svg",
+          "bytes": 5168
+        },
+        {
+          "file": "14-semester-laptop-ditutup.png",
+          "bytes": 74283
+        }
+      ]
+    },
+    {
+      "name": "15-laporan-hp-pilihan",
+      "title": "Laporan — pilihan dan pratinjau HP",
+      "width": 390,
+      "height": 970,
+      "files": [
+        {
+          "file": "15-laporan-hp-pilihan.svg",
+          "bytes": 5656
+        },
+        {
+          "file": "15-laporan-hp-pilihan.png",
+          "bytes": 52309
+        }
+      ]
+    },
+    {
+      "name": "16-laporan-laptop-pratinjau",
+      "title": "Laporan — pratinjau desktop",
+      "width": 1440,
+      "height": 880,
+      "files": [
+        {
+          "file": "16-laporan-laptop-pratinjau.svg",
+          "bytes": 31802
+        },
+        {
+          "file": "16-laporan-laptop-pratinjau.png",
+          "bytes": 102372
+        }
+      ]
+    },
+    {
+      "name": "17-laporan-laptop-semester",
+      "title": "Laporan semester — kumpulan tabel bulanan",
+      "width": 1440,
+      "height": 890,
+      "files": [
+        {
+          "file": "17-laporan-laptop-semester.svg",
+          "bytes": 9642
+        },
+        {
+          "file": "17-laporan-laptop-semester.png",
+          "bytes": 98239
+        }
+      ]
+    },
+    {
+      "name": "18-contoh-laporan-f4-halaman-1",
+      "title": "Contoh laporan F4 — halaman 1",
+      "width": 1980,
+      "height": 1296,
+      "files": [
+        {
+          "file": "18-contoh-laporan-f4-halaman-1.svg",
+          "bytes": 49927
+        },
+        {
+          "file": "18-contoh-laporan-f4-halaman-1.png",
+          "bytes": 106667
+        }
+      ]
+    },
+    {
+      "name": "19-contoh-laporan-f4-halaman-2",
+      "title": "Contoh laporan F4 — halaman 2",
+      "width": 1980,
+      "height": 1296,
+      "files": [
+        {
+          "file": "19-contoh-laporan-f4-halaman-2.svg",
+          "bytes": 49674
+        },
+        {
+          "file": "19-contoh-laporan-f4-halaman-2.png",
+          "bytes": 106245
+        }
+      ]
+    }
+  ],
+  "overview": {
+    "file": "00-overview.png",
+    "width": 1440,
+    "height": 2170,
+    "bytes": 527723
+  }
+}

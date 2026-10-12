@@ -1,0 +1,7 @@
+# Pemeriksaan PM UI-002
+
+Tanggal2026-10-12. PM menerima arah desain berdasarkan delegasi Ardy; task CLOSED setelah evidence desain memadai. Bukan approval Ardy atau runtimePASS.
+PM membuka contact sheet dan seluruh19 PNG individual; tidak terlihat teks terpotong/overlap pada kanvas contoh. Membaca README/report, parse19 SVG XML dan validasi PNG. Metadata dan hari rutin yang semula belum ada sudah ditambah oleh Executor sebelum submission.
+AC01 PASS artefak ukuran/index/visual. AC02 PASS formnama optionaldata/membership/snapshot/metadata/closedsemester sesuai arah kontrak. AC03 PASS previewduplicate/errorselected/calendar confirm/restoreblank/closureincomplete. AC04 PASS desain tabel1–31/logo/identitas/NIPDJK SIA/blank/kertas/paginationtwoF4headerulang. AC05 PASS notes copy/assumsi/reports/evidence; area task only menurut laporan dan output diamati.
+Rancangan diterima PM untuk implementasi berikutnya. Contoh report F4 rasio benar tetapi bukan PDF/cetak fisik; jumlahdummy bukan expectedtotal, nama panjang/kelasbesar/runtimeresponsive perlu diuji. Logo upload belum nyata; batasfile dipilih OPS. HP metadata dan hari rutin ada, impor/konfirmasimodal banyak dicontoh desktop dengan notes adaptation, runtimeHP diuji saat feature. Desain no appcode/cloud/install/commit/deploy.
+NextPM untuk implementasi setelah dependency; tidak request approval rutin berdasarkan delegasi. ProductionNONE.

@@ -1,0 +1,210 @@
+{
+  "authority": "registry studio; PM docs snapshot 2026-10-12; resync on changes",
+  "entries": [
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\00-overview.png",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\00-overview.png",
+      "sha256": "efaa799e10bfdb3c2760e6466f4ead500b4046554b0474784ace4d48b00a6fe4"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\01-siswa-hp-daftar.png",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\01-siswa-hp-daftar.png",
+      "sha256": "979dccb419955ee0c8e0a55de947d4194acc96d097b9f03ccc58ba1814c95455"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\01-siswa-hp-daftar.svg",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\01-siswa-hp-daftar.svg",
+      "sha256": "b52f9d59b02bc38954e43a498a5f5a265de0fbc6da2d7784486608eb00a7b63c"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\02-siswa-hp-form-tambah.png",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\02-siswa-hp-form-tambah.png",
+      "sha256": "12d4185b1ec4a33e9c0733efccefae9c1d5bdf93f8f1427ea0f6b1963d8dd721"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\02-siswa-hp-form-tambah.svg",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\02-siswa-hp-form-tambah.svg",
+      "sha256": "1d68c59c9247fcaff8b50db4e2aef961ecad413c0f6ab25ac30b309cba80962c"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\03-siswa-laptop-edit.png",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\03-siswa-laptop-edit.png",
+      "sha256": "db8401b6cb9967fae10399856ac90899ef512b8b8f7dc85d9a3927cc39d519ef"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\03-siswa-laptop-edit.svg",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\03-siswa-laptop-edit.svg",
+      "sha256": "24b221618b51aa20764d3d4e67353455fc2370f9c04d0a7ba70af16e04b93872"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\04-sekolah-hp-metadata.png",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\04-sekolah-hp-metadata.png",
+      "sha256": "a0c1c9ecb3f0bc16c9cee910403dc65d6824bb0bf39d7d15d2fdbe5c45d537ca"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\04-sekolah-hp-metadata.svg",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\04-sekolah-hp-metadata.svg",
+      "sha256": "6a5f031963af1a1fc57885a0f1fbb6bd38294aac8c33ad67b9b25d13318bb4c6"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\05-sekolah-laptop-metadata.png",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\05-sekolah-laptop-metadata.png",
+      "sha256": "f00f4250410827a5cb24be25ce87870a5a639e4293fdbe3725045c202aa08d0d"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\05-sekolah-laptop-metadata.svg",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\05-sekolah-laptop-metadata.svg",
+      "sha256": "5a4d03f27b9cd36a0cfe7fe06593709616b6df680af37a3d32fc340d61c049c0"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\06-impor-laptop-duplikat.png",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\06-impor-laptop-duplikat.png",
+      "sha256": "d3b8d9ffa6abc5d60af0ee35501c31c3700f43b868c0b31bf7fd21e1f267b708"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\06-impor-laptop-duplikat.svg",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\06-impor-laptop-duplikat.svg",
+      "sha256": "74dfe8f788e0c5bd2d57da3fb088f8c95ac4eecd80a62363250f59db6f4f86b8"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\07-impor-laptop-validasi.png",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\07-impor-laptop-validasi.png",
+      "sha256": "1f50ef56e94ee3e9b9c5d8546be63b7dc01f215966020640092bde9fb09b2ed0"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\07-impor-laptop-validasi.svg",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\07-impor-laptop-validasi.svg",
+      "sha256": "be76069b8ba0606b199d52419b3d0e43f50466ec30971b0d3fc424abbdd47970"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\08-kalender-hp.png",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\08-kalender-hp.png",
+      "sha256": "1002fbf5f6c28ce4b7c0710c9aa3c9b9b89694cc83e67eb732d057c4378a9bc7"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\08-kalender-hp.svg",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\08-kalender-hp.svg",
+      "sha256": "8840a30f0213c03a3231b05650b9d319bbe04221446af83860c83e081f700313"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\09-kalender-hp-rutin.png",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\09-kalender-hp-rutin.png",
+      "sha256": "88d3a7251a292e1d193b66070430f49249a024a8ffc9d8120641949858c3e0b3"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\09-kalender-hp-rutin.svg",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\09-kalender-hp-rutin.svg",
+      "sha256": "344c51f80523fefebd9bc18bb6ec643373171ed45a048ff521dd46f70e1ea9aa"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\10-kalender-laptop-rutin.png",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\10-kalender-laptop-rutin.png",
+      "sha256": "a511715dda8c58da4ea63abc1ff215df6c04bc58e64624e0e748a6deaeac2a86"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\10-kalender-laptop-rutin.svg",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\10-kalender-laptop-rutin.svg",
+      "sha256": "54fd22bcda5741c7a0661609a9f2e5afbcae142f8adf656e8be82c4a20e05203"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\11-kalender-laptop-konfirmasi-libur.png",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\11-kalender-laptop-konfirmasi-libur.png",
+      "sha256": "8b6d0253e944c48f2fcd8d916531a3799f8045abd3414956f52e4c2d91c7f262"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\11-kalender-laptop-konfirmasi-libur.svg",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\11-kalender-laptop-konfirmasi-libur.svg",
+      "sha256": "54ed8e4bb74227d8bdebd8b552185c93bd322788c90b38bd84045a75272e81f2"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\12-semester-hp-buat.png",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\12-semester-hp-buat.png",
+      "sha256": "226b85804c03ab11d9a5e860638970c39743c3f4a04e7bac3fac1d2a4848093d"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\12-semester-hp-buat.svg",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\12-semester-hp-buat.svg",
+      "sha256": "d2ade2f472bd161ba43460e21ceb6976c7dd313cf58ceadb5782abbccc2273bc"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\13-semester-laptop-konfirmasi-tutup.png",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\13-semester-laptop-konfirmasi-tutup.png",
+      "sha256": "de8f2a77c7596877f83440eb3c2166308be6ba1acd016bc2fdb1c84051e77b9d"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\13-semester-laptop-konfirmasi-tutup.svg",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\13-semester-laptop-konfirmasi-tutup.svg",
+      "sha256": "e2b3773c53ccbaeb35993b4db24f6ad1d8255b30735429aaeaef973542627dce"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\14-semester-laptop-ditutup.png",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\14-semester-laptop-ditutup.png",
+      "sha256": "13304f92481b2aaf3d8019159843ce010deb9c2647a5052e1ff66190b44d9d50"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\14-semester-laptop-ditutup.svg",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\14-semester-laptop-ditutup.svg",
+      "sha256": "24d7fe3dbc696eff6df1ebd7a2df447670fb764ba1c4b5bf98e4dae5c5ef30f1"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\15-laporan-hp-pilihan.png",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\15-laporan-hp-pilihan.png",
+      "sha256": "99db370a7412ccd909ef6a887c8427985e665c99db033c218160e699e8d482f8"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\15-laporan-hp-pilihan.svg",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\15-laporan-hp-pilihan.svg",
+      "sha256": "a5129f92f58e321815c50ec6488e4980068b841d04bfda0e30e412e7919cfe56"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\16-laporan-laptop-pratinjau.png",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\16-laporan-laptop-pratinjau.png",
+      "sha256": "0cb232faf9a55f9be961be996c1ae14d1bcabcea4c5075a91bbcac88b064a4aa"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\16-laporan-laptop-pratinjau.svg",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\16-laporan-laptop-pratinjau.svg",
+      "sha256": "79e4d6e7466938ec6a072f8a8d3120c5097028599338f472767f9f000fca0b55"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\17-laporan-laptop-semester.png",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\17-laporan-laptop-semester.png",
+      "sha256": "55649acbc76039ad8cdd372c048cdb25de6a121c3165ad8fe43b0c3e50dc40cf"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\17-laporan-laptop-semester.svg",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\17-laporan-laptop-semester.svg",
+      "sha256": "f7316836485bbcc9f6e8320c64908919b63d673e9332ed5c9b62f9c84a5bec37"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\18-contoh-laporan-f4-halaman-1.png",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\18-contoh-laporan-f4-halaman-1.png",
+      "sha256": "74ec5b8d5d3cd290b64417feec20415f5938cb2e9ed331ad2093b53a47a375c9"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\18-contoh-laporan-f4-halaman-1.svg",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\18-contoh-laporan-f4-halaman-1.svg",
+      "sha256": "411ffdd44e6fbaf4c019eb9a17541602d28cd8bb3060b152242caf148e99f58e"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\19-contoh-laporan-f4-halaman-2.png",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\19-contoh-laporan-f4-halaman-2.png",
+      "sha256": "8e6e82d7a8af0b54db3166339a48fbe98790263d0024ceeaf59f8d7f107a678a"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\19-contoh-laporan-f4-halaman-2.svg",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\19-contoh-laporan-f4-halaman-2.svg",
+      "sha256": "04a2e6c9764b65731fbcad580bbd6ec19957bc3c6b10c4811d4abdff0bc67b70"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\artifact-inventory.json",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\artifact-inventory.json",
+      "sha256": "9406485e720cdbee649b4b5cba8a7ae74a5091b8c21857a268700ad0b22deddb"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-002\\README.md",
+      "copy": "docs\\studio\\project\\design\\LAB002-UI-002\\README.md",
+      "sha256": "bf9018e8641dde3286c2e8cc2d420400a310e139823ae3d0af1de80f91e5caf6"
+    }
+  ]
+}
