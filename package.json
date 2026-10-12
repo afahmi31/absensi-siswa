@@ -1,0 +1,19 @@
+{
+  "name": "lab002-website-absensi-siswa",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24.15.0 <25", "npm": ">=10.9.3 <11" },
+  "packageManager": "npm@10.9.3",
+  "scripts": {
+    "reproduce": "npm ci",
+    "dev": "nuxt dev --host 127.0.0.1",
+    "typecheck": "nuxt typecheck --checker vue-tsc",
+    "build": "nuxt build --preset vercel",
+    "build:node": "nuxt build --preset node-server",
+    "start:node": "node scripts/start-node.mjs",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": { "nuxt": "4.6.1", "vue": "3.5.43", "vue-router": "5.4.0" },
+  "devDependencies": { "typescript": "5.9.3", "vue-tsc": "3.3.13" }
+}

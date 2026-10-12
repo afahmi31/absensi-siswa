@@ -1,0 +1,89 @@
+COMMAND: git rev-parse --show-toplevel
+D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/app
+COMMAND: git status --short --branch --untracked-files=all
+## No commits yet on master
+?? .env.example
+?? .gitignore
+?? .npmrc
+?? .nvmrc
+?? README.md
+?? app/app.vue
+?? docs/build-and-verification.md
+?? docs/environment.md
+?? docs/evidence/LAB002-SET-001/01-install.txt
+?? docs/evidence/LAB002-SET-001/02-clean-install.txt
+?? docs/evidence/LAB002-SET-001/03-docs-manifest-check.json
+?? docs/evidence/LAB002-SET-001/04-typecheck.txt
+?? docs/evidence/LAB002-SET-001/05-build-vercel.txt
+?? docs/evidence/LAB002-SET-001/06-build-node.txt
+?? docs/evidence/LAB002-SET-001/07-smoke-http.json
+?? docs/evidence/LAB002-SET-001/08-output-inspection.json
+?? docs/evidence/LAB002-SET-001/09-typecheck-runtime24.txt
+?? docs/evidence/LAB002-SET-001/10-build-vercel-runtime24.txt
+?? docs/evidence/LAB002-SET-001/11-smoke-dev-initial.txt
+?? docs/evidence/LAB002-SET-001/11-smoke-dev.json
+?? docs/evidence/LAB002-SET-001/12-build-node-final.txt
+?? docs/evidence/LAB002-SET-001/13-final-inspection.json
+?? docs/studio/README.md
+?? docs/studio/governance/git-and-environments.md
+?? docs/studio/governance/instructions.md
+?? docs/studio/governance/pm-executor-handoff-protocol-v1.0.md
+?? docs/studio/governance/studio-workflow.md
+?? docs/studio/governance/user-facing-copy.md
+?? docs/studio/governance/vibe-coding-from-project-docs.md
+?? docs/studio/governance/workflow-decisions.md
+?? docs/studio/manifest.json
+?? docs/studio/product/PROD-002-product-prd-v1.md
+?? docs/studio/product/PROD-002-website-absensi-siswa.md
+?? docs/studio/project/README.md
+?? docs/studio/project/decisions-and-confirmations.md
+?? docs/studio/project/design/LAB002-UI-001/01-login-hp.png
+?? docs/studio/project/design/LAB002-UI-001/01-login-hp.svg
+?? docs/studio/project/design/LAB002-UI-001/02-login-laptop.png
+?? docs/studio/project/design/LAB002-UI-001/02-login-laptop.svg
+?? docs/studio/project/design/LAB002-UI-001/03-absensi-hp-awal.png
+?? docs/studio/project/design/LAB002-UI-001/03-absensi-hp-awal.svg
+?? docs/studio/project/design/LAB002-UI-001/04-absensi-laptop-awal.png
+?? docs/studio/project/design/LAB002-UI-001/04-absensi-laptop-awal.svg
+?? docs/studio/project/design/LAB002-UI-001/05-absensi-hp-perubahan.png
+?? docs/studio/project/design/LAB002-UI-001/05-absensi-hp-perubahan.svg
+?? docs/studio/project/design/LAB002-UI-001/06-absensi-hp-menyimpan.png
+?? docs/studio/project/design/LAB002-UI-001/06-absensi-hp-menyimpan.svg
+?? docs/studio/project/design/LAB002-UI-001/07-absensi-hp-tersimpan.png
+?? docs/studio/project/design/LAB002-UI-001/07-absensi-hp-tersimpan.svg
+?? docs/studio/project/design/LAB002-UI-001/08-absensi-hp-sebagian.png
+?? docs/studio/project/design/LAB002-UI-001/08-absensi-hp-sebagian.svg
+?? docs/studio/project/design/LAB002-UI-001/09-absensi-hp-gagal.png
+?? docs/studio/project/design/LAB002-UI-001/09-absensi-hp-gagal.svg
+?? docs/studio/project/design/LAB002-UI-001/README.md
+?? docs/studio/project/design/LAB002-UI-001/artifact-inventory.json
+?? docs/studio/project/development-plan-v1.md
+?? docs/studio/project/product-to-pm-handoff.md
+?? docs/studio/project/reports/LAB002-UI-001-design-report.md
+?? docs/studio/project/reports/LAB002-UI-001-pm-review.md
+?? docs/studio/project/stack-vercel-comparison.md
+?? docs/studio/project/tasks.md
+?? docs/studio/project/tasks/LAB002-SET-001-assignment.md
+?? docs/studio/project/tasks/LAB002-SET-001.md
+?? docs/studio/project/tasks/LAB002-UI-001-assignment.md
+?? docs/studio/project/tasks/LAB002-UI-001.md
+?? docs/studio/project/verification-plan.md
+?? nuxt.config.ts
+?? package-lock.json
+?? package.json
+?? scripts/smoke-http.mjs
+?? scripts/start-node.mjs
+?? scripts/sync-studio-docs.mjs
+?? tsconfig.json
+COMMAND: git remote -v
+COMMAND: git log -1
+fatal: your current branch 'master' does not have any commits yet
+COMMAND: git check-ignore -v .env .env.local node_modules/anything .nuxt/anything .output/anything .vercel/anything fake.log
+.gitignore:9:.env	.env
+.gitignore:10:.env.*	.env.local
+.gitignore:1:node_modules/	node_modules/anything
+.gitignore:2:.nuxt/	.nuxt/anything
+.gitignore:3:.output/	.output/anything
+.gitignore:4:.vercel/	.vercel/anything
+.gitignore:12:*.log	fake.log
+Root studio .git present: False

@@ -1,0 +1,267 @@
+{
+  "copiedAt": "2026-10-12T08:01:26.934Z",
+  "task": "LAB002-SET-001",
+  "authority": "Registry studio tetap sumber keputusan aktif. Salinan ini untuk penelusuran development.",
+  "transformations": "Isi requirement dipertahankan. Link ke berkas terpilih memakai path salinan; lainnya menunjuk sumber lokal/web.",
+  "excluded": [
+    "PDF referensi siswa",
+    "data pribadi asli",
+    "secret",
+    "seluruh workspace",
+    "alat render desain"
+  ],
+  "entries": [
+    {
+      "source": "D:\\ayaa-wae-studio\\AGENTS.md",
+      "copy": "docs/studio/governance/instructions.md",
+      "sourceSha256": "94bdd2761d4ca891a3321dbdaa87b2e39ccb07861583f55caa84d4e903320515",
+      "copySha256": "bea26b943773ed253d9248fde0917fbb82b48a198de49fd0b096015e89aecd76"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\docs\\pm-executor-handoff-protocol-v1.0.md",
+      "copy": "docs/studio/governance/pm-executor-handoff-protocol-v1.0.md",
+      "sourceSha256": "df02c33a159675866b3a6dc07368d93c711f4ba64cf139b3783e0b801589426d",
+      "copySha256": "df02c33a159675866b3a6dc07368d93c711f4ba64cf139b3783e0b801589426d"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\docs\\studio-workflow.md",
+      "copy": "docs/studio/governance/studio-workflow.md",
+      "sourceSha256": "2884e46b112aab69cbaeaa0b30951952f9e21862552a342ecad4375c2e97a811",
+      "copySha256": "afdadff912af8b55308f3299f782e3041c18ce4ab399acc2c4fe7929d84370b5"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\docs\\workflow-decisions.md",
+      "copy": "docs/studio/governance/workflow-decisions.md",
+      "sourceSha256": "ded8a84ada48f0e334a199c3ea176bac33486da46b07f7b2d69d339da1ccb53e",
+      "copySha256": "372604cd80299872e8bf85492f8858b7506de9ce9a9fec4e2889fbc56b5e94b8"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\docs\\user-facing-copy.md",
+      "copy": "docs/studio/governance/user-facing-copy.md",
+      "sourceSha256": "6f804b2e0f72d1de4a145874ee77cab5b8d8f5e1034c0fdce111d5bc4c507cfd",
+      "copySha256": "6f804b2e0f72d1de4a145874ee77cab5b8d8f5e1034c0fdce111d5bc4c507cfd"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\docs\\git-and-environments.md",
+      "copy": "docs/studio/governance/git-and-environments.md",
+      "sourceSha256": "390f3342b4c3fb6a098bdf82ddd7a4cd6beaba1d547551277693be415c598b11",
+      "copySha256": "64d1dbe5bd02dcdf684818c26f2096787516455ce6173412ab190bbab45df6b3"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\docs\\vibe-coding-from-project-docs.md",
+      "copy": "docs/studio/governance/vibe-coding-from-project-docs.md",
+      "sourceSha256": "4204391baaef5c14138ed1e1f9b8079d7b74ae5fda2acf9ede636dd13b372569",
+      "copySha256": "82bbf16b7a5fe09393040bcbd185ef0b78a96919e193a89cd1c3815ea2ccb775"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\products\\PROD-002-product-prd-v1.md",
+      "copy": "docs/studio/product/PROD-002-product-prd-v1.md",
+      "sourceSha256": "a7086f8ac463a2544617eecb10903496fc2412a58dad39ad0e018219db3bd2d1",
+      "copySha256": "38a908fbeb5b1eeeb88172008c61d1f33ab2985ba763e8106796f9bc366c9804"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\products\\PROD-002-website-absensi-siswa.md",
+      "copy": "docs/studio/product/PROD-002-website-absensi-siswa.md",
+      "sourceSha256": "1bcae89e8c242ec257ad75fd6c563093ef82195f32d52a808ecfbc586a9aac2e",
+      "copySha256": "1097dbf3a94a96c37173de23ad14f37789613878ddfc97bfcfb7c386c8e0602a"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\README.md",
+      "copy": "docs/studio/project/README.md",
+      "sourceSha256": "35799b6d73c2c5179adeb6775ee25f739ff9d770bc195f1b1233904a3d971a67",
+      "copySha256": "5f55825e0ac405ad453922b32cebc842518b102670b3494058c0424af7f48000"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\development-plan-v1.md",
+      "copy": "docs/studio/project/development-plan-v1.md",
+      "sourceSha256": "6fe88dc748a8059440c4c799b76127c0e53c8cd410581166dfaea79644de53c7",
+      "copySha256": "1f8816638bed3d90d91f09f227b6324f8e5d95927f18fad94cf1d43891d40517"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\tasks.md",
+      "copy": "docs/studio/project/tasks.md",
+      "sourceSha256": "3fbaa4af97c53a42108459d8b8f92ea6d731c9d9cfca19475748fc307db67d87",
+      "copySha256": "7914b20fb7c879b0096069fc698b4933f4a27f8a38a013afec74d59932c43b02"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\decisions-and-confirmations.md",
+      "copy": "docs/studio/project/decisions-and-confirmations.md",
+      "sourceSha256": "fe951d520a81d91c605805c1ff19ae2b45c85a50bceb4c9038234dae67f03fe0",
+      "copySha256": "461783dd18a2295c2bf30d17c99f5f42038a0b6dd38e94d91a46bd64d4af56b7"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\verification-plan.md",
+      "copy": "docs/studio/project/verification-plan.md",
+      "sourceSha256": "5c5b3781f3ab0acd8656ff7dc0786247ce02e721e6a243788a653f32eda66109",
+      "copySha256": "0e601966d447f7baacc636ebfcc7aa02e89ed0a27926783e658c66076490f6f8"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\product-to-pm-handoff.md",
+      "copy": "docs/studio/project/product-to-pm-handoff.md",
+      "sourceSha256": "32ed574b773fe4b3393c8f81ae1e7e92553f89089f5c107a22561e972f778596",
+      "copySha256": "7925ff7ff04ba80eb412c7a8d86f5e66838ba826242f7a70365ed8eae5ec1344"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\stack-vercel-comparison.md",
+      "copy": "docs/studio/project/stack-vercel-comparison.md",
+      "sourceSha256": "154c077b3535d8def5f9a0d3df2810fb9d6f576803011fd6b478af781c7a93c5",
+      "copySha256": "154c077b3535d8def5f9a0d3df2810fb9d6f576803011fd6b478af781c7a93c5"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\tasks\\LAB002-SET-001.md",
+      "copy": "docs/studio/project/tasks/LAB002-SET-001.md",
+      "sourceSha256": "c9065957da6b45947eacc3d85dc10ddb7752e0e0fe78b8bdb0653cec36e2cf00",
+      "copySha256": "6321e7d9fa7833dcf67c9041eccfea8171191d5e4d6be88b9b34e3c1ff64e264"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\tasks\\LAB002-SET-001-assignment.md",
+      "copy": "docs/studio/project/tasks/LAB002-SET-001-assignment.md",
+      "sourceSha256": "e333e23637a0e2b9c6c88879376ab0bb451fde6fd84455634ac8e5c9a6b5fc6f",
+      "copySha256": "f91e6cb72cdecbbdcdd09c1dcdcf8d24d0e30523e01b16731946c32be6a357e4"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\tasks\\LAB002-UI-001.md",
+      "copy": "docs/studio/project/tasks/LAB002-UI-001.md",
+      "sourceSha256": "8d02e6e9e6916eb1b2125b0973977f38093c61e14dda720f2ceeacd6dff56938",
+      "copySha256": "eb788676467c65b83f11c2d318ff756733cdf276189f2fbef41d38c00433e2b4"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\tasks\\LAB002-UI-001-assignment.md",
+      "copy": "docs/studio/project/tasks/LAB002-UI-001-assignment.md",
+      "sourceSha256": "b23f089b675ac643da774e179f3a26fa9887b03300d45f167cfcac9cc63f47ed",
+      "copySha256": "c7df2548e30a7aac0f7d3153d4e2edbcbc1a77ccd9ff7565250118b5f0674f4a"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\reports\\LAB002-UI-001-pm-review.md",
+      "copy": "docs/studio/project/reports/LAB002-UI-001-pm-review.md",
+      "sourceSha256": "48e13ab4bfadd62df5dc1f21e5b81108ca3b15af9c675955f7a83b5a7b2e7b3b",
+      "copySha256": "48e13ab4bfadd62df5dc1f21e5b81108ca3b15af9c675955f7a83b5a7b2e7b3b"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\reports\\LAB002-UI-001-design-report.md",
+      "copy": "docs/studio/project/reports/LAB002-UI-001-design-report.md",
+      "sourceSha256": "0c8f070ca21140cd001dff9403f52c170424025c0b0e436bc704d16fbcb7d751",
+      "copySha256": "0c8f070ca21140cd001dff9403f52c170424025c0b0e436bc704d16fbcb7d751"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-001\\README.md",
+      "copy": "docs/studio/project/design/LAB002-UI-001/README.md",
+      "sourceSha256": "4feb5cd25e0c060f3e61633ca8d5ed53a33f2b5472eea15eaf3b15cde4153edb",
+      "copySha256": "5687986a01151d209cf0022365339c9ff3b4163528bc22b3083ec13f0430a557"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-001\\artifact-inventory.json",
+      "copy": "docs/studio/project/design/LAB002-UI-001/artifact-inventory.json",
+      "sourceSha256": "d77bb4b1d582ff8318e4c3fc203e2770d35dd8868e57d1c3261c1c6911f656c2",
+      "copySha256": "d77bb4b1d582ff8318e4c3fc203e2770d35dd8868e57d1c3261c1c6911f656c2"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-001\\01-login-hp.png",
+      "copy": "docs/studio/project/design/LAB002-UI-001/01-login-hp.png",
+      "sourceSha256": "502b47a913b59a060a8cf6887beeb8a5dc196f3336963fbc86eb226a26b37911",
+      "copySha256": "502b47a913b59a060a8cf6887beeb8a5dc196f3336963fbc86eb226a26b37911"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-001\\01-login-hp.svg",
+      "copy": "docs/studio/project/design/LAB002-UI-001/01-login-hp.svg",
+      "sourceSha256": "5eabfa6b484c35d6be5eab15da2b30c2f443134c2810031181a3ce2a61aae6f9",
+      "copySha256": "5eabfa6b484c35d6be5eab15da2b30c2f443134c2810031181a3ce2a61aae6f9"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-001\\02-login-laptop.png",
+      "copy": "docs/studio/project/design/LAB002-UI-001/02-login-laptop.png",
+      "sourceSha256": "9c60a9c611abde2c493e3143db0f924a3cfc25dadf6fe95e1349a5a2b8716ac2",
+      "copySha256": "9c60a9c611abde2c493e3143db0f924a3cfc25dadf6fe95e1349a5a2b8716ac2"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-001\\02-login-laptop.svg",
+      "copy": "docs/studio/project/design/LAB002-UI-001/02-login-laptop.svg",
+      "sourceSha256": "4f4a80cacd72ef9d00da5f76684aab265e6ecec1c6683b91ce1f307672212c82",
+      "copySha256": "4f4a80cacd72ef9d00da5f76684aab265e6ecec1c6683b91ce1f307672212c82"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-001\\03-absensi-hp-awal.png",
+      "copy": "docs/studio/project/design/LAB002-UI-001/03-absensi-hp-awal.png",
+      "sourceSha256": "67c21feb29bfca1240881111ebc56e1299897ae9b58fcfef67d8496105acb1e6",
+      "copySha256": "67c21feb29bfca1240881111ebc56e1299897ae9b58fcfef67d8496105acb1e6"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-001\\03-absensi-hp-awal.svg",
+      "copy": "docs/studio/project/design/LAB002-UI-001/03-absensi-hp-awal.svg",
+      "sourceSha256": "cc83fdf528d083a7530c4aaa79c87549f120df25229dfc445b85638e47513e9b",
+      "copySha256": "cc83fdf528d083a7530c4aaa79c87549f120df25229dfc445b85638e47513e9b"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-001\\04-absensi-laptop-awal.png",
+      "copy": "docs/studio/project/design/LAB002-UI-001/04-absensi-laptop-awal.png",
+      "sourceSha256": "2673173cf5a50f0b03abf5f998f137380cd86e132342ce3f45312c5ac4d0861b",
+      "copySha256": "2673173cf5a50f0b03abf5f998f137380cd86e132342ce3f45312c5ac4d0861b"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-001\\04-absensi-laptop-awal.svg",
+      "copy": "docs/studio/project/design/LAB002-UI-001/04-absensi-laptop-awal.svg",
+      "sourceSha256": "e2f3522b287862296157f7b10e11de9b1c0ef563f618f72eb7f1d1eee00420e7",
+      "copySha256": "e2f3522b287862296157f7b10e11de9b1c0ef563f618f72eb7f1d1eee00420e7"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-001\\05-absensi-hp-perubahan.png",
+      "copy": "docs/studio/project/design/LAB002-UI-001/05-absensi-hp-perubahan.png",
+      "sourceSha256": "54bd84a42a7ec01bdabc91735b49c0b41bbb0e793dd31c7be2b3782f369b0dbf",
+      "copySha256": "54bd84a42a7ec01bdabc91735b49c0b41bbb0e793dd31c7be2b3782f369b0dbf"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-001\\05-absensi-hp-perubahan.svg",
+      "copy": "docs/studio/project/design/LAB002-UI-001/05-absensi-hp-perubahan.svg",
+      "sourceSha256": "e6a594a76001f00100f81c5ddd219ac8ba47dd783b4251bd4ad4a8adae8e301e",
+      "copySha256": "e6a594a76001f00100f81c5ddd219ac8ba47dd783b4251bd4ad4a8adae8e301e"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-001\\06-absensi-hp-menyimpan.png",
+      "copy": "docs/studio/project/design/LAB002-UI-001/06-absensi-hp-menyimpan.png",
+      "sourceSha256": "29e615759e89b8c73f92a95f01822ee9d1b8200aebd84934554bde7f6b971e96",
+      "copySha256": "29e615759e89b8c73f92a95f01822ee9d1b8200aebd84934554bde7f6b971e96"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-001\\06-absensi-hp-menyimpan.svg",
+      "copy": "docs/studio/project/design/LAB002-UI-001/06-absensi-hp-menyimpan.svg",
+      "sourceSha256": "78af36a40ab5ed5d6b5dccb9029901e3b93e679d7df2a5468d1544ebc858cd9b",
+      "copySha256": "78af36a40ab5ed5d6b5dccb9029901e3b93e679d7df2a5468d1544ebc858cd9b"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-001\\07-absensi-hp-tersimpan.png",
+      "copy": "docs/studio/project/design/LAB002-UI-001/07-absensi-hp-tersimpan.png",
+      "sourceSha256": "1955b97fecd9ea43253857c6fcdb008b21047491b0c68a63444e0602d6fb5f50",
+      "copySha256": "1955b97fecd9ea43253857c6fcdb008b21047491b0c68a63444e0602d6fb5f50"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-001\\07-absensi-hp-tersimpan.svg",
+      "copy": "docs/studio/project/design/LAB002-UI-001/07-absensi-hp-tersimpan.svg",
+      "sourceSha256": "ce8282ffeacee2c2946150e4c0759b7159a69b6c01c7a23ca723501b0a55fe54",
+      "copySha256": "ce8282ffeacee2c2946150e4c0759b7159a69b6c01c7a23ca723501b0a55fe54"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-001\\08-absensi-hp-sebagian.png",
+      "copy": "docs/studio/project/design/LAB002-UI-001/08-absensi-hp-sebagian.png",
+      "sourceSha256": "6aaaf12da232610680371f49caa06c802f3323bd690b59be77cbc836e149777f",
+      "copySha256": "6aaaf12da232610680371f49caa06c802f3323bd690b59be77cbc836e149777f"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-001\\08-absensi-hp-sebagian.svg",
+      "copy": "docs/studio/project/design/LAB002-UI-001/08-absensi-hp-sebagian.svg",
+      "sourceSha256": "3da7ed6727e7ff3f69ab7eb8ed8e06ba944a84dde158e5ab539be686fe55dc43",
+      "copySha256": "3da7ed6727e7ff3f69ab7eb8ed8e06ba944a84dde158e5ab539be686fe55dc43"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-001\\09-absensi-hp-gagal.png",
+      "copy": "docs/studio/project/design/LAB002-UI-001/09-absensi-hp-gagal.png",
+      "sourceSha256": "0d4c7230eabf84fc4d3f60b6edb31350d862898f28dd2e1a0e0f641da3254deb",
+      "copySha256": "0d4c7230eabf84fc4d3f60b6edb31350d862898f28dd2e1a0e0f641da3254deb"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\design\\LAB002-UI-001\\09-absensi-hp-gagal.svg",
+      "copy": "docs/studio/project/design/LAB002-UI-001/09-absensi-hp-gagal.svg",
+      "sourceSha256": "d7f8881e03b6137393854394f72c792a4ed8b3b5eddf323bbe78483ef15b5db2",
+      "copySha256": "d7f8881e03b6137393854394f72c792a4ed8b3b5eddf323bbe78483ef15b5db2"
+    }
+  ]
+}
