@@ -2,7 +2,7 @@
 
 Pemilik: Project Manager (PM), diperankan agent utama dalam chat produk
 Tanggal: 2026-10-11
-Kondisi: Nuxt/Vue full-stack dan hosting Vercel dipilih; UI-001 CLOSED, desain disetujui; setup belum READY.
+Kondisi aktif 12 Oktober 2026: Nuxt 4/Vue/Node 24, PostgreSQL lokal. SET/DATA/AUTH/UI001/UI002 CLOSED; STUD ASSIGNED. Vercel tetap target, belum deploy. Ketentuan tahap planning di bawah adalah riwayat; dependency/status terbaru ada pada tasks.md dan local-progress.md.
 
 ## Acuan dan posisi proyek
 
@@ -12,9 +12,9 @@ Source of truth kebutuhan: [PRD R01–R15](<../product/PROD-002-product-prd-v1.m
 
 Instruksi berlaku: [AGENTS](<../governance/instructions.md>), [workflow](<../governance/studio-workflow.md>), [keputusan workflow](<../governance/workflow-decisions.md>), seluruh [protokol](<../governance/pm-executor-handoff-protocol-v1.0.md>), [copy](<../governance/user-facing-copy.md>), dan [Git/lingkungan](<../governance/git-and-environments.md>). Tidak ditemukan AGENTS/AGENT tambahan di folder LAB-002 saat planning.
 
-Root docs: `D:\ayaa-wae-studio\Labs\LAB-002-website-absensi-siswa`. Codebase belum ditentukan; belum ada aplikasi, dependency terpasang, test suite, repo aplikasi atau runtime aplikasi yang diperiksa. Root studio bukan Git menurut pemeriksaan registry. Dokumen planning tersedia lokal; belum terlacak melalui commit Git.
+Root docs: D:\ayaa-wae-studio\Labs\LAB-002-website-absensi-siswa. Root kode/Git: app di dalam registry tersebut. Fondasi dan AUTH telah diperiksa; commit terakhir 0ec7f37 sebelum STUD. Root studio bukan repo Git. Salinan dokumentasi development tercatat di repo app; registry tetap acuan aktif.
 
-Stack: Nuxt/Vue full-stack dalam satu aplikasi; hosting Vercel. [C01](<decisions-and-confirmations.md#c01--stack-aplikasi>) memuat approval penggantian Laravel. Versi/runtime, route, skema, database/auth/storage dan paket Excel/PDF belum dikunci.
+Stack aktif: Nuxt 4.6.1/Vue/TypeScript, Node 24, PostgreSQL 16 lokal dengan SQL migrations dan Postgres.js. AUTH memakai nuxt-auth-utils/scrypt. Hosting target Vercel; Supabase sebagai provider online kelak belum terhubung. ExcelJS/PDFKit dipilih PM untuk scope lokal dan versi tepat diperiksa pada preflight task terkait. C01 menyimpan riwayat penggantian Laravel.
 
 ## Peta dokumen
 
@@ -199,3 +199,7 @@ Ardy meminta berhenti pada titik aman. AUTH001 ON_HOLD; perubahan belum selesai 
 Task yang terhenti telah dilanjutkan dan CLOSED. PM menerima hasil berdasarkan delegasi lokal Ardy setelah source review, suite independen DATA 6/6 + AUTH 12/12, typecheck, output build Vercel/Node, browser laptop/viewport HP, login persisten dan CLI reset akun fiktif. Revisi timeout serta konfigurasi startup diselesaikan sebelum acceptance. [Review PM](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/reports/LAB002-AUTH-001-pm-review.md>) memuat bukti dan batasnya.
 
 Aplikasi lokal tersedia di http://127.0.0.1:3000; login/logout sudah tersedia, pengisian absensi belum. Password akun lokal terbaru hanya pada app/.data/teacher-account.json setelah reset uji PM. Ini acceptance PM melalui delegasi, bukan uji/approval langsung Ardy. PM menyiapkan commit lokal tanpa remote/push/deploy. Status stop dan laporan sebelumnya merupakan riwayat. Next owner PM untuk readiness fitur berikut; belum assignment baru.
+
+## Dependency aktif diselaraskan
+
+PM memperbarui tabel backlog pada 12 Oktober agar sesuai urutan lokal yang telah dijelaskan: STUD→SEM→CAL→ATT; IMP dan OPS sesudah STUD/SEM, REP sesudah ATT/SEM/CAL/OPS; QA semua modul lalu REL. SEM tidak lagi menunggu UI ATT untuk fondasi/closure yang diuji memakai DATA fixtures. Regression seluruh endpoint setelah tutup tetap QA. Penyelarasan menghapus loop pada tabel lama; tidak mengurangi AC atau mengganti goal PRD.

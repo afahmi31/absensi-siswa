@@ -1,0 +1,56 @@
+
+> lab002-website-absensi-siswa@0.0.0 test
+> node scripts/test-all.mjs
+
+▶ local PostgreSQL schema preserves school, roster, attendance, calendar, and audit invariants
+  ✔ migration runs up, down, and up again with a stable ledger (418.1661ms)
+  ✔ duplicate names and blank student numbers stay separate; attendance has inclusive dates and one effective record (527.3722ms)
+  ✔ past rules can initialize dates without history; confirmed holidays exclude without deleting history or restoring it (413.9251ms)
+  ✔ identity snapshots update only in the active semester; closure and roster copy preserve history (451.8569ms)
+  ✔ audit records identify the actor, are immutable, redact auth secrets, and roll back with data (807.4508ms)
+✔ local PostgreSQL schema preserves school, roster, attendance, calendar, and audit invariants (11372.3354ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11523.3815
+✔ local login throttle counts five failures and releases the client after the block expires (1.7225ms)
+▶ teacher login, sealed session, same-origin requests, reset revocation, and generic throttle work over HTTP
+  ✔ unauthenticated pages redirect and future API routes are protected by default (179.9203ms)
+  ✔ unsafe requests reject missing and cross-origin Origin before changing the session (106.6582ms)
+  ✔ empty form fields return the approved field copy (31.6055ms)
+  ✔ wrong known credentials and unknown email return the same generic response (257.9087ms)
+  ✔ a valid login creates a sealed HttpOnly SameSite=Lax local cookie with no sensitive response fields (113.3621ms)
+  ✔ session output is minimal and authenticated future APIs pass the auth gate (449.5638ms)
+  ✔ a second device gets an independent persisted session (91.9016ms)
+  ✔ owner reset increases the account version, carries audit actor, and revokes the old cookie (366.2386ms)
+  ✔ logout revokes only this device session while another device stays authenticated (294.4801ms)
+  ✔ the fifth failure blocks later login attempts for this local client (100.6454ms)
+✔ teacher login, sealed session, same-origin requests, reset revocation, and generic throttle work over HTTP (19195.5128ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 26028.5328
+▶ STUD school setup and semester roster APIs preserve ownership, snapshots, dates, audit and transactions over HTTP
+  ✔ anonymous reads and writes are rejected; authenticated unsafe requests require the same origin (743.1963ms)
+  ✔ school settings validate timezone, create exactly one school/class, update without trusting owner fields (974.6546ms)
+  ✔ owner-scoped semester options include active and archive; fixture roster uses historical snapshots (1029.217ms)
+  ✔ student create allows blank optionals and duplicate names, rejects bad periods/override fields atomically (439.1697ms)
+  ✔ active identity edit keeps archive snapshot, inclusive end is allowed, and attendance/closed guards roll back (359.2986ms)
+  ✔ every school/student write records authenticated actor and never adds partial data after invalid types (112.6201ms)
+✔ STUD school setup and semester roster APIs preserve ownership, snapshots, dates, audit and transactions over HTTP (22523.196ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 29339.7882

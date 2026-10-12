@@ -146,6 +146,161 @@ button:disabled { cursor: wait; }
 .empty-home h1 { margin: 0; font-size: clamp(1.8rem, 5vw, 2.5rem); line-height: 1.2; }
 .empty-home p { color: #536b65; font-size: 16px; line-height: 1.6; }
 
+.app-shell { min-height: 100svh; padding: 24px clamp(20px, 5vw, 72px) 56px; }
+.app-header {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(20px, 4vw, 52px);
+  max-width: 1320px;
+  margin: 0 auto;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #dfe8e5;
+}
+.main-nav { display: flex; align-items: center; gap: 7px; }
+.main-nav a { padding: 10px 13px; color: #536b65; text-decoration: none; border-radius: 9px; font-size: 14px; font-weight: 700; }
+.main-nav a:hover, .main-nav a[aria-current="page"] { color: #126451; background: #e8f1ee; }
+.main-nav a:focus-visible, .text-button:focus-visible, .home-link-card:focus-visible { outline: 3px solid #61a695; outline-offset: 3px; }
+.app-header .account-actions { justify-self: end; }
+.header-error { grid-column: 1 / -1; margin: -6px 0 0; color: #8d302a; font-size: 14px; }
+.page-content { width: min(100%, 1160px); margin: clamp(44px, 8vh, 84px) auto 0; }
+.page-heading { margin-bottom: 30px; }
+.page-heading h1 { margin: 4px 0 0; font-size: clamp(2rem, 4vw, 2.65rem); line-height: 1.16; letter-spacing: -0.035em; }
+.page-heading > p:not(.eyebrow), .page-heading > div > p:not(.eyebrow) { max-width: 680px; margin: 13px 0 0; color: #536b65; font-size: 16px; line-height: 1.55; }
+.eyebrow { margin: 0; color: #4f776c; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.page-message { margin: -10px 0 18px; padding: 12px 14px; border-radius: 10px; }
+.page-message.form-error { background: #fff0ed; }
+.success-message { color: #205a43; background: #e9f5ed; font-size: 14px; }
+.text-button { padding: 4px 2px; color: #126451; background: transparent; border: 0; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.text-button:hover { color: #0d5545; }
+.content-card { background: #fff; border: 1px solid #d8e4e0; border-radius: 18px; box-shadow: 0 8px 28px rgb(23 45 41 / 3%); }
+.school-form { display: grid; gap: 24px; max-width: 810px; padding: clamp(22px, 4vw, 38px); }
+.form-section-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
+.form-section-heading h2, .roster-header h2 { margin: 0; font-size: 21px; line-height: 1.3; }
+.form-section-heading p:not(.eyebrow), .roster-header p { margin: 8px 0 0; color: #536b65; font-size: 14px; line-height: 1.5; }
+.single-school-badge, .active-badge, .archive-badge { display: inline-flex; align-items: center; min-height: 28px; padding: 5px 10px; color: #28624e; background: #e9f4ee; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.archive-badge { color: #6d5940; background: #f4eee5; }
+.school-form .form-field, .student-form .form-field { gap: 8px; }
+.school-form .form-field label, .student-form .form-field label { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; font-size: 14px; }
+.school-form .form-field input, .student-form .form-field input, .student-form .form-field select, .semester-picker select, .student-search input {
+  width: 100%; min-height: 48px; padding: 0 13px; color: #172d29; background: #fff; border: 1px solid #cddbd7; border-radius: 10px; font-size: 15px;
+}
+.school-form .form-field input:focus-visible, .student-form .form-field input:focus-visible, .student-form .form-field select:focus-visible, .semester-picker select:focus-visible, .student-search input:focus-visible { outline: 3px solid #61a695; outline-offset: 2px; }
+.school-form input[aria-invalid="true"], .student-form input[aria-invalid="true"] { border-color: #ae3e36; }
+.field-help, .optional-label { color: #657b75; font-size: 12px; line-height: 1.45; }
+.field-help { margin: 0; }
+.optional-label { font-weight: 400; }
+.logo-placeholder { display: flex; align-items: center; gap: 13px; padding-top: 18px; border-top: 1px solid #e5ece9; }
+.logo-placeholder-mark { display: grid; place-items: center; width: 46px; height: 46px; color: #8ba39b; background: #f1f5f3; border: 1px dashed #b9cbc4; border-radius: 12px; font-size: 20px; font-weight: 700; }
+.logo-placeholder strong, .logo-placeholder small { display: block; }
+.logo-placeholder strong { font-size: 14px; }
+.logo-placeholder small { margin-top: 4px; color: #657b75; font-size: 12px; }
+.form-submit { width: fit-content; min-width: 210px; }
+.home-content { max-width: 960px; }
+.home-content .page-heading { margin-bottom: 28px; }
+.home-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.home-link-card { display: grid; grid-template-columns: 44px minmax(0, 1fr) 20px; align-items: center; gap: 16px; min-height: 118px; padding: 22px; color: inherit; background: #fff; border: 1px solid #d8e4e0; border-radius: 16px; text-decoration: none; transition: border-color 120ms ease, transform 120ms ease; }
+.home-link-card:hover { border-color: #9bbdb2; transform: translateY(-1px); }
+.home-link-card strong, .home-link-card small { display: block; }
+.home-link-card strong { font-size: 16px; }
+.home-link-card small { margin-top: 7px; color: #536b65; font-size: 13px; line-height: 1.4; }
+.home-link-icon { display: grid; place-items: center; width: 42px; height: 42px; color: #126451; background: #e8f1ee; border-radius: 12px; font-size: 12px; font-weight: 700; }
+.home-link-arrow { color: #49796b; font-size: 23px; }
+.notice-panel { margin-top: 20px; padding: 22px 24px; background: #edf3f1; border-radius: 14px; }
+.notice-panel h2 { margin: 0; font-size: 16px; }
+.notice-panel p { margin: 8px 0 0; color: #536b65; font-size: 14px; line-height: 1.5; }
+.students-page { max-width: 1320px; }
+.students-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; }
+.add-student-button { width: auto; flex: 0 0 auto; }
+.roster-toolbar { display: grid; grid-template-columns: minmax(220px, .8fr) minmax(300px, 1.2fr); gap: 24px; padding: 20px; margin-bottom: 18px; }
+.semester-picker, .student-search { display: grid; align-content: start; gap: 8px; }
+.semester-picker label, .student-search label { font-size: 13px; font-weight: 700; }
+.student-search { margin: 0; }
+.search-controls { display: flex; gap: 10px; }
+.search-controls input { flex: 1; min-width: 0; }
+.search-button { min-width: 94px; }
+.roster-card { padding: clamp(20px, 3vw, 30px); }
+.roster-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding-bottom: 20px; border-bottom: 1px solid #e5ece9; }
+.roster-header p { font-size: 13px; }
+.student-table-wrap { overflow-x: auto; }
+.student-table { width: 100%; border-collapse: collapse; text-align: left; }
+.student-table th { padding: 15px 13px 12px; color: #62766f; font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
+.student-table td { padding: 16px 13px; border-top: 1px solid #edf1ef; color: #536b65; font-size: 13px; vertical-align: middle; }
+.student-table .student-name-cell { color: #172d29; font-size: 14px; font-weight: 700; }
+.table-action-cell { text-align: right; }
+.membership-badge { display: inline-flex; min-height: 25px; align-items: center; padding: 4px 9px; color: #28624e; background: #e9f4ee; border-radius: 999px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.membership-upcoming { color: #52607b; background: #eef1f7; }
+.membership-ended { color: #6d5940; background: #f4eee5; }
+.read-only-label { color: #7b8984; font-size: 12px; }
+.student-cards { display: none; }
+.roster-empty, .empty-state { padding: 42px 24px; text-align: center; }
+.empty-state { max-width: 780px; margin: 16px auto 0; }
+.empty-state-icon { display: inline-grid; place-items: center; width: 52px; height: 52px; margin-bottom: 15px; color: #126451; background: #e8f1ee; border-radius: 15px; font-size: 23px; }
+.roster-empty h3, .empty-state h2 { margin: 0; font-size: 18px; }
+.roster-empty p, .empty-state p { max-width: 520px; margin: 9px auto 0; color: #536b65; font-size: 14px; line-height: 1.5; }
+.roster-empty .text-button { margin-top: 14px; }
+.list-loading { padding: 22px 0; color: #536b65; text-align: center; }
+.pagination { display: flex; align-items: center; justify-content: center; gap: 16px; padding-top: 20px; border-top: 1px solid #edf1ef; }
+.pagination span { color: #536b65; font-size: 13px; }
+.pagination .secondary-button { min-height: 38px; }
+.student-form-card { max-width: 930px; margin: 20px auto 0; padding: clamp(22px, 4vw, 38px); }
+.snapshot-note { margin: 23px 0 0; padding: 13px 15px; color: #41675c; background: #edf5f1; border-radius: 10px; font-size: 13px; line-height: 1.5; }
+.student-form { margin-top: 22px; }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.form-field-wide { grid-column: 1 / -1; }
+.form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 26px; padding-top: 21px; border-top: 1px solid #e5ece9; }
+.form-actions .primary-button, .form-actions .secondary-button { width: auto; min-width: 145px; margin: 0; }
+.close-form-button { flex: 0 0 auto; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+@media (max-width: 760px) {
+  .app-shell { padding: 16px 16px 38px; }
+  .app-header { grid-template-columns: minmax(0, 1fr) auto; gap: 13px 10px; padding-bottom: 14px; }
+  .app-header .brand { gap: 8px; font-size: 16px; }
+  .app-header .brand-mark { width: 32px; height: 32px; border-radius: 9px; }
+  .app-header .brand-mark svg { width: 21px; height: 21px; }
+  .app-header .account-actions { width: auto; gap: 8px; }
+  .app-header .account-email { display: none; }
+  .app-header .secondary-button { min-height: 38px; padding: 7px 11px; font-size: 13px; }
+  .main-nav { grid-column: 1 / -1; gap: 4px; padding-top: 8px; border-top: 1px solid #e5ece9; }
+  .main-nav a { flex: 1; padding: 10px 8px; text-align: center; }
+  .page-content { margin-top: 42px; }
+  .page-heading { margin-bottom: 23px; }
+  .page-heading h1 { font-size: 30px; }
+  .page-heading > p:not(.eyebrow), .page-heading > div > p:not(.eyebrow) { margin-top: 10px; font-size: 15px; }
+  .home-links { grid-template-columns: 1fr; gap: 11px; }
+  .home-link-card { min-height: 100px; padding: 18px; }
+  .notice-panel { padding: 18px; }
+  .school-form { gap: 21px; padding: 21px 18px; border-radius: 15px; }
+  .form-section-heading { gap: 12px; }
+  .form-section-heading h2, .roster-header h2 { font-size: 19px; }
+  .single-school-badge { align-self: flex-start; white-space: normal; }
+  .form-submit { width: 100%; }
+  .students-heading { align-items: stretch; flex-direction: column; }
+  .add-student-button { width: 100%; }
+  .roster-toolbar { grid-template-columns: 1fr; gap: 18px; padding: 18px; }
+  .roster-card { padding: 19px 16px; }
+  .roster-header { flex-wrap: wrap; align-items: center; padding-bottom: 16px; }
+  .student-table-wrap { display: none; }
+  .student-cards { display: grid; gap: 11px; padding-top: 14px; }
+  .student-card { padding: 16px; border: 1px solid #e2eae7; border-radius: 13px; }
+  .student-card-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+  .student-card-heading h3 { margin: 0; color: #172d29; font-size: 16px; line-height: 1.35; }
+  .student-card dl { display: grid; gap: 10px; margin: 17px 0 0; }
+  .student-card dl > div { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 10px; }
+  .student-card dt { color: #657b75; font-size: 12px; }
+  .student-card dd { margin: 0; color: #172d29; font-size: 13px; overflow-wrap: anywhere; }
+  .card-edit-button { width: 100%; min-height: 40px; margin-top: 17px; }
+  .pagination { gap: 9px; }
+  .pagination .secondary-button { padding: 7px 10px; font-size: 12px; }
+  .pagination span { font-size: 12px; white-space: nowrap; }
+  .student-form-card { margin-top: 15px; padding: 21px 18px; border-radius: 15px; }
+  .form-grid { grid-template-columns: 1fr; gap: 17px; }
+  .form-field-wide { grid-column: auto; }
+  .form-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+  .form-actions .primary-button, .form-actions .secondary-button { width: 100%; min-width: 0; padding-inline: 10px; font-size: 13px; }
+}
+
 @media (max-width: 760px) {
   .login-shell { display: block; }
   .login-story { min-height: 118px; padding: 36px 24px 0; background: #f4f7f6; }

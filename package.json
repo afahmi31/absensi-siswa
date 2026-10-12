@@ -25,6 +25,7 @@
     "auth:account:provision": "node scripts/auth-account.mjs provision",
     "auth:account:reset": "node scripts/auth-account.mjs reset",
     "test:auth": "node scripts/test-auth.mjs",
+    "test:students": "node scripts/test-students.mjs",
     "test": "node scripts/test-all.mjs",
     "postinstall": "nuxt prepare"
   },

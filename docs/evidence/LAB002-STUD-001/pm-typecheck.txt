@@ -1,0 +1,3 @@
+
+> lab002-website-absensi-siswa@0.0.0 typecheck
+> nuxt typecheck --checker vue-tsc

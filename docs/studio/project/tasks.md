@@ -1,13 +1,13 @@
 # Backlog Delivery LAB-002 v1
 
-Status aktif 12 Oktober 2026: UI001, UI002, SET001, DATA001 dan AUTH001 CLOSED. AUTH diterima PM berdasarkan delegasi lokal Ardy setelah pengujian independen dan browser. Bagian aktivitas lama di bawah dipertahankan sebagai riwayat; status aktif ini dan tabel menjadi acuan. Task fitur berikut belum didispatch.
+Status aktif 12 Oktober 2026: UI001, UI002, SET001, DATA001 dan AUTH001 CLOSED. AUTH diterima PM berdasarkan delegasi lokal Ardy setelah pengujian independen dan browser. Bagian aktivitas lama di bawah dipertahankan sebagai riwayat; status aktif ini dan tabel menjadi acuan. STUD ASSIGNED; task fitur setelahnya belum didispatch.
 
 Pemilik: Project Manager. Tanggal: 2026-10-11.
 Acuan: [rencana](<development-plan-v1.md>), [PRD](<../product/PROD-002-product-prd-v1.md>), [keputusan terbuka](<decisions-and-confirmations.md>).
 
-Status merupakan lifecycle protokol. Belum dipilih Executor berarti belum ASSIGNED. AC di bawah adalah kriteria yang harus dibuktikan, seluruh hasil delivery masih belum diverifikasi. Task ANALYSIS adalah breakdown konkret awal; PM melengkapi kontrak, path, dependency dan readiness sesudah keputusan yang disebut terpenuhi.
+Status merupakan lifecycle protokol. Belum dipilih Executor berarti belum ASSIGNED. AC di bawah merupakan kriteria yang dibuktikan per task; evidence task CLOSED ada pada laporan/review dan local-progress. Uraian planning awal yang belum diperbarui adalah riwayat, bukan status aktif. Task ANALYSIS adalah breakdown konkret awal; PM melengkapi kontrak, path, dependency dan readiness sesudah keputusan yang disebut terpenuhi.
 
-Semua task: satu active owner, scope terisolasi, tanpa production/dependency besar/commit-push yang tidak diotorisasi. PM menjadi active owner sampai assignment nyata. Root codebase belum ditentukan untuk implementation; calon area di bawah bukan klaim file/simbol sudah ada. Tests menggunakan data fiktif. Seluruh perubahan penting mengikuti flow PRD dan keputusan Ardy.
+Semua task: satu active owner, scope terisolasi, tanpa production/dependency besar/commit-push yang tidak diotorisasi. PM menjadi active owner sampai assignment nyata. Root codebase/Git aktif berada di app dalam registry; implementasi aktual diperiksa pada preflight setiap task. Tests menggunakan data fiktif. Seluruh perubahan penting mengikuti flow PRD dan keputusan Ardy.
 
 ## Peta urutan dan status
 
@@ -18,17 +18,17 @@ Semua task: satu active owner, scope terisolasi, tanpa production/dependency bes
 | LAB002-SET-001 | Fondasi Nuxt lokal/config DB tanpa koneksi nyata | CLOSED | C01 baseline/C02 path disetujui | Pilihan Executor/platform/model/reasoning; preflight runtime saat assignment |
 | LAB002-DATA-001 | Model data, constraints dan arsip | CLOSED | SET-001; C07/C08 | Kontrak perubahan data/audit disetujui; rencana migrasi non-production |
 | LAB002-AUTH-001 | Akun khusus/login/logout dan akses | CLOSED | SET-001; C04 | Provisioning/reset/akses/keamanan jelas; desain login disetujui |
-| LAB002-STUD-001 | Siswa/masa terdaftar/identitas kelas | ANALYSIS | DATA-001/AUTH-001; C07; UI-002 terkait | Kontrak batas tanggal/edit identitas, desain disetujui |
-| LAB002-IMP-001 | Template Excel/preview/impor | ANALYSIS | STUD-001; C03; paket Excel dipilih | Format/validation/partial commit dan dependency dikunci |
-| LAB002-CAL-001 | Hari rutin/pengecualian dan riwayat libur | ANALYSIS | DATA-001/AUTH-001; C07 | Kontrak restore libur/keanggotaan/periode; desain disetujui |
-| LAB002-ATT-001 | Input harian/parsial/koreksi/riwayat | ANALYSIS | STUD-001/CAL-001/AUTH-001; C06/C08; UI-001 disetujui | Save/concurrency/audit jelas; lock kontrak SEM disepakati |
-| LAB002-SEM-001 | Semester/penutupan/arsip/salin siswa | ANALYSIS | ATT-001; C07/C08; UI-002 terkait | Data/report boundary jelas; lock backend dan closure confirm |
-| LAB002-REP-001 | Tabel bulan/semester, browser/PDF | ANALYSIS | ATT-001/SEM-001; C05; UI-002 disetujui | Paket/render PDF dipilih, aturan blank/pagination jelas |
-| LAB002-OPS-001 | Penanganan gangguan dan cadangan/pemulihan | ANALYSIS | Target ops/C04/C08; modul dan storage aktual | Owner/retensi/akses disetujui; hanya non-production |
+| LAB002-STUD-001 | Siswa/masa terdaftar/identitas kelas | CLOSED | DATA-001/AUTH-001; C07; UI-002 terkait | Kontrak batas tanggal/edit identitas, desain disetujui |
+| LAB002-IMP-001 | Template Excel/preview/impor | ANALYSIS | STUD-001/SEM-001; C03; paket Excel dipilih | Format/validation/partial commit dan dependency dikunci |
+| LAB002-CAL-001 | Hari rutin/pengecualian dan riwayat libur | ANALYSIS | DATA-001/AUTH-001/STUD-001/SEM-001; C07 | Kontrak restore libur/keanggotaan/periode; desain disetujui |
+| LAB002-ATT-001 | Input harian/parsial/koreksi/riwayat | ANALYSIS | STUD-001/SEM-001/CAL-001/AUTH-001; C06/C08; UI-001 disetujui | Save/concurrency/audit jelas; lock kontrak SEM disepakati |
+| LAB002-SEM-001 | Semester/penutupan/arsip/salin siswa | ANALYSIS | DATA-001/AUTH-001/STUD-001; C07/C08; UI-002 terkait | Data/report boundary jelas; lock backend dan closure confirm |
+| LAB002-REP-001 | Tabel bulan/semester, browser/PDF | ANALYSIS | ATT-001/SEM-001/CAL-001/OPS-001; C05; UI-002 disetujui | Paket/render PDF dipilih, aturan blank/pagination jelas |
+| LAB002-OPS-001 | Penanganan gangguan dan cadangan/pemulihan | ANALYSIS | STUD-001/SEM-001/DATA-001/AUTH-001; C04/C08 | Owner/retensi/akses disetujui; hanya non-production |
 | LAB002-QA-001 | Regression integrasi lintas modul dan paket evidence | ANALYSIS | AUTH/STUD/IMP/CAL/ATT/SEM/REP/OPS | Modul selesai teknis dan kontrak aktif; fixture/repro steps |
 | LAB002-REL-001 | Paket runtime dan panduan rilis/rollback | ANALYSIS | Versi hasil QA/uji/review; keputusan target/ref | Target versi/build disetujui; tanpa deploy otomatis |
 
-UI-001 dapat berjalan terpisah dari stack/backend. STUD dan CAL berpotensi paralel sesudah fondasi, tetapi PM harus memisahkan area ownership; belum ada izin parallel dispatch aktual. ATT/SEM dependency tidak melingkar: DATA menyiapkan kontrak status periode; ATT menguji penolakan write pada periode tertutup, SEM kemudian menyediakan operasi penutupan dan regression integrasi.
+Urutan aktif untuk UI fitur: STUD → SEM → CAL → ATT. IMP dan OPS sesudah STUD/SEM; REP sesudah ATT/SEM/CAL/OPS. Satu penulis aplikasi per tahap. SEM menguji closure menggunakan fixtures DATA; QA mengulang seluruh endpoint yang tersedia sesudah closure. Urutan ini menggantikan urutan planning awal dan tidak mengurangi AC.
 
 ## Kontrak task tahap mendatang
 
@@ -176,3 +176,11 @@ Ardy menjawab dialog “Setujui hasil setup lokal”. APPROVED untuk hasil fonda
 Aktif 12 Oktober: DATA-001 ASSIGNED /root/lab002_data001 gpt-6-luna/max. [Kontrak lokal](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/local-delivery-contract-v1.md>) memutuskan C03–C08 melalui delegasi PM. Root repo app lokal saja.
 
 Pengerjaan lokal ditahan atas permintaan Ardy12Oktober. UI002/DATA001 CLOSED dengan acceptance PM; AUTH001 ON_HOLD, belum selesai/commit. Task berikut tetap ANALYSIS dan tidak didispatch.
+
+
+
+## Dependency aktif untuk seluruh delivery lokal
+
+12 Oktober 2026, PM memperjelas urutan sesuai bagian “Urutan delivery lokal setelah DATA validated” dalam rencana: STUD → SEM → CAL → ATT. IMP sesudah STUD/SEM; OPS sesudah STUD/SEM menyediakan logo sebelum REP. REP menunggu ATT/SEM/CAL/OPS. QA menunggu semua modul dan mengulang pemulihan pada schema akhir; REL menunggu QA. Satu penulis aplikasi pada satu waktu. SEM memakai fixture DATA untuk closure sebelum UI ATT tersedia; pengujian lintas endpoint setelah closure tetap wajib pada QA. Tidak ada lingkaran ATT↔SEM; dependency lama diuraikan sebagai riwayat, tabel terbaru menjadi acuan.
+
+STUD sudah ASSIGNED /root/lab002_stud001 Luna/max setelah preflight siap. Detail brief lanjutan sedang dirapikan; task tersebut belum READY/ASSIGNED. C06 draft kosong dan revisi hari memperjelas koreksi menurut delegasi lokal, tanpa menghilangkan riwayat.

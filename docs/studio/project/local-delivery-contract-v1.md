@@ -29,3 +29,7 @@ Keputusan PM saat melanjutkan AUTH-001, 12 Oktober 2026, dalam delegasi pengelol
 Cookie berisi identitas tersegel; hash kata sandi dan rahasia sesi tidak dikirim ke respons pengguna. Masa sesi tujuh hari. Request tulis wajib berasal dari origin aplikasi. Cookie production memakai Secure; HTTP loopback diizinkan untuk pengujian lokal. Throttle sementara hanya berlaku non-production per proses, sehingga kontrol pembatasan production/distribusi tetap belum diverifikasi dan perlu dibahas pada target deployment.
 
 Implementasi tetap tanpa signup publik, reset email, layanan Auth cloud, atau koneksi Supabase. Akun persisten lokal menggunakan alamat fiktif; kredensial disimpan pada .data yang diabaikan Git. Data siswa asli tidak dipakai.
+
+## C06 — Draft kosong dan revisi hari
+
+Keputusan PM dalam delegasi lokal Ardy 12 Oktober: guru boleh mengembalikan status yang salah ke Belum diisi saat semester aktif, lalu Simpan. Status lama disimpan sebagai riwayat dan tidak lagi efektif; kosong tidak dihitung Alpa. Ini memperjelas koreksi/input parsial tanpa hard-delete. Token revisi penyimpanan harian mencakup catatan, roster eligible dan kalender yang dibaca, sehingga perubahan dua perangkat/kalender/masa terdaftar menghasilkan konflik terarah sebelum overwrite. Detail implementasi ditetapkan dan diuji pada ATT.

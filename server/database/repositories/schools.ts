@@ -34,6 +34,20 @@ export async function findSchoolForTeacher(database: DatabaseExecutor, teacherId
   return rows[0] ?? null
 }
 
+export async function updateSchoolForTeacher(
+  database: DatabaseExecutor,
+  input: { teacherId: string; name: string; timeZone: string },
+): Promise<School> {
+  const [school] = await database<School[]>`
+    update schools
+    set name = ${input.name}, time_zone = ${input.timeZone}, updated_at = clock_timestamp()
+    where teacher_id = ${input.teacherId}
+    returning id, teacher_id, name, time_zone, logo_path
+  `
+  if (!school) throw new Error('School was not found.')
+  return school
+}
+
 export async function createSchoolClass(
   database: DatabaseExecutor,
   input: { schoolId: string; name: string },
@@ -43,5 +57,19 @@ export async function createSchoolClass(
     returning id, school_id, name
   `
   if (!schoolClass) throw new Error('School class was not created.')
+  return schoolClass
+}
+
+export async function updateSchoolClass(
+  database: DatabaseExecutor,
+  input: { schoolId: string; name: string },
+): Promise<SchoolClass> {
+  const [schoolClass] = await database<SchoolClass[]>`
+    update school_classes
+    set name = ${input.name}
+    where school_id = ${input.schoolId}
+    returning id, school_id, name
+  `
+  if (!schoolClass) throw new Error('School class was not found.')
   return schoolClass
 }

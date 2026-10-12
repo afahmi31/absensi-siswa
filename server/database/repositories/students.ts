@@ -99,3 +99,19 @@ export async function endStudentMembership(
   if (!membership) throw new Error('Semester membership was not found.')
   return membership
 }
+
+export async function updateStudentMembershipPeriod(
+  database: DatabaseExecutor,
+  membershipId: string,
+  period: { startsOn: string; endsOn: string | null },
+): Promise<SemesterMembership> {
+  const [membership] = await database<SemesterMembership[]>`
+    update semester_memberships
+    set starts_on = ${period.startsOn}, ends_on = ${period.endsOn}
+    where id = ${membershipId}
+    returning id, semester_id, school_id, school_class_id, student_id,
+              name_snapshot, student_number_snapshot, gender_snapshot, starts_on, ends_on
+  `
+  if (!membership) throw new Error('Student membership was not found.')
+  return membership
+}

@@ -135,3 +135,9 @@ C04 diperjelas: logout hanya sesi perangkat itu; reset owner mencabut semua sesi
 Task yang terhenti telah dilanjutkan dan CLOSED. PM menerima hasil berdasarkan delegasi lokal Ardy setelah source review, suite independen DATA 6/6 + AUTH 12/12, typecheck, output build Vercel/Node, browser laptop/viewport HP, login persisten dan CLI reset akun fiktif. Revisi timeout serta konfigurasi startup diselesaikan sebelum acceptance. [Review PM](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/reports/LAB002-AUTH-001-pm-review.md>) memuat bukti dan batasnya.
 
 Aplikasi lokal tersedia di http://127.0.0.1:3000; login/logout sudah tersedia, pengisian absensi belum. Password akun lokal terbaru hanya pada app/.data/teacher-account.json setelah reset uji PM. Ini acceptance PM melalui delegasi, bukan uji/approval langsung Ardy. PM menyiapkan commit lokal tanpa remote/push/deploy. Status stop dan laporan sebelumnya merupakan riwayat. Next owner PM untuk readiness fitur berikut; belum assignment baru.
+
+## Kelanjutan semua task dan dependency aktif
+
+Sumber terbaru Ardy: “ya lanjutkan kembali semua tasknya”, 12 Oktober 2026. PM melanjutkan seluruh scope v1 hingga berjalan dan diuji lokal, tetap per task READY/dependency/AC; model Executor Codex gpt-6-luna/max. Commit lokal diizinkan; remote/push/deploy/resource cloud/biaya dan data siswa nyata tidak termasuk. Tidak perlu approval rutin per task dalam delegasi tersebut.
+
+PM menyelaraskan dependency backlog lama dengan keputusan urutan dalam rencana: STUD→SEM→CAL→ATT; IMP dan OPS sesudah STUD/SEM, REP sesudah ATT/SEM/CAL/OPS; QA semua modul lalu REL. Lingkaran ATT↔SEM pada tabel lama digantikan. SEM diuji dengan fixture DATA sebelum UIATT tersedia; QA tetap memeriksa semua jalur tulis sesudah penutupan. STUD ASSIGNED dan preflight siap; task fitur lanjutan belum didispatch. Brief lanjutan dirapikan tanpa mengubah AC; OPS metadata menunjuk STUD, REL commit dimiliki PM.
