@@ -3,7 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=24.15.0 <25", "npm": ">=10.9.3 <11" },
+  "engines": {
+    "node": ">=24.15.0 <25",
+    "npm": ">=10.9.3 <11"
+  },
   "packageManager": "npm@10.9.3",
   "scripts": {
     "reproduce": "npm ci",
@@ -12,8 +15,24 @@
     "build": "nuxt build --preset vercel",
     "build:node": "nuxt build --preset node-server",
     "start:node": "node scripts/start-node.mjs",
+    "db:start": "node scripts/local-db.mjs start",
+    "db:stop": "node scripts/local-db.mjs stop",
+    "db:status": "node scripts/local-db.mjs status",
+    "db:migrate": "node scripts/db-migrate.mjs up",
+    "db:smoke": "node scripts/db-smoke.mjs",
+    "db:rollback": "node scripts/db-migrate.mjs down",
+    "test:data": "node scripts/test-data.mjs",
+    "test": "npm run test:data",
     "postinstall": "nuxt prepare"
   },
-  "dependencies": { "nuxt": "4.6.1", "vue": "3.5.43", "vue-router": "5.4.0" },
-  "devDependencies": { "typescript": "5.9.3", "vue-tsc": "3.3.13" }
+  "dependencies": {
+    "nuxt": "4.6.1",
+    "postgres": "3.4.9",
+    "vue": "3.5.43",
+    "vue-router": "5.4.0"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "vue-tsc": "3.3.13"
+  }
 }

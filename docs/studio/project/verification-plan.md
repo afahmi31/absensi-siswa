@@ -74,3 +74,7 @@ Jika gagal: PM menyebut expected/observed dan AC spesifik; revision sesuai task 
 Product Manager memeriksa apakah input langsung mengurangi kebutuhan penyalinan ulang, laporan sesuai bentuk dan kebutuhan guru, navigasi/state/copy terbaca pada HP/laptop, serta keterbatasan terlihat. Ukuran waktu/penghematan belum disepakati dan tidak diklaim. Bukti minat/penggunaan pasar berbeda dari technical delivery.
 
 Setelah hasil teknis dan uji nyata memenuhi syarat, PM menyiapkan review akhir; keputusan Ardy dicatat terpisah dari task lifecycle. Brief branding, publikasi dan deployment hanya mengikuti penugasan/approval berikutnya.
+
+## Penugasan bukti lokal terbaru — 12 Oktober 2026
+
+Ardy mendelegasikan uji browser/end-to-end lokal kepada PM, keputusan penerimaan/closure dan assignment Luna/max. Ini menggantikan default owner Ardy untuk pengujian lokal sampai sasaran aplikasi lokal terpenuhi. Fisik printer, cloud, deploy dan penggunaan guru nyata tetap belum dilakukan. SET/UI001 sudah CLOSED; DATA/UI002 sedang assignment. Kontrak lokal v1 merinci aturan dan boundary.

@@ -178,3 +178,7 @@ Next owner PM untuk merinci roadmap delivery lokal dan keputusan C03–C08, lalu
 ## Izin Git lokal — 12 Oktober 2026
 
 Ardy: “untuk git kamu bisa init dan commit saja tanpa menambahkan remote”. PM boleh init/commit lokal pada repo aplikasi LAB-002, sesudah memeriksa perubahan dan isi staging. Menggantikan batas belum boleh commit pada delegasi lokal sebelumnya; tidak memberi izin remote/push/deploy. Izin ini berlaku untuk perjalanan delivery lokal dalam scope PRD; source, keputusan dan evidence yang diperlukan disimpan di repo, secret/data asli/output runtime/cache tetap diabaikan.
+
+## Delivery lokal dimulai 12 Oktober 2026
+
+PM menetapkan [kontrak lokal v1](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/local-delivery-contract-v1.md>) dari delegasi Ardy, menyelesaikan detail C03–C08 untuk local delivery. PostgreSQL16 cluster terisolasi, Postgres.js dan SQL migrations; tidak Supabase/cloud. [DATA-001](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/tasks/LAB002-DATA-001.md>) READY sebelum dispatch. Local browser validation PM diotorisasi.
