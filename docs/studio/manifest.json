@@ -1,5 +1,5 @@
 {
-  "copiedAt": "2026-10-12T08:59:16.125Z",
+  "copiedAt": "2026-10-12T11:00:13.433Z",
   "task": "LAB002-SET-001",
   "authority": "Registry studio tetap sumber keputusan aktif. Salinan ini untuk penelusuran development.",
   "transformations": "Isi requirement dipertahankan. Link ke berkas terpilih memakai path salinan; lainnya menunjuk sumber lokal/web.",
@@ -68,32 +68,32 @@
     {
       "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\README.md",
       "copy": "docs/studio/project/README.md",
-      "sourceSha256": "35799b6d73c2c5179adeb6775ee25f739ff9d770bc195f1b1233904a3d971a67",
-      "copySha256": "5f55825e0ac405ad453922b32cebc842518b102670b3494058c0424af7f48000"
+      "sourceSha256": "44640ec528716300e70498d9d40de22398cd934f755cb242cb6a6f65bab14017",
+      "copySha256": "3d7d61c7ff9428660b8a27860f2d083564ac5f5c9150bb700ea6a3e4bf26835f"
     },
     {
       "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\development-plan-v1.md",
       "copy": "docs/studio/project/development-plan-v1.md",
-      "sourceSha256": "31a01801ee92c7c94786715ce0054c19ebe7f7f569ed81c74a3882c3a2c346f3",
-      "copySha256": "eddfa27211ac8d545e312ad703978403614a07ad7985f6f026b2895b242e9d91"
+      "sourceSha256": "2444bebb710584650110ccac6905afb39ddfc9f3a420b337138bb54509182c92",
+      "copySha256": "9819451cd251320d16f3fa71851afc7c7ead98287c00a3b4a035f5724f708b1d"
     },
     {
       "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\tasks.md",
       "copy": "docs/studio/project/tasks.md",
-      "sourceSha256": "c94c5108dca665f0ecec9642f017d7d23c94bcefb0f9d066730c656255f13b2f",
-      "copySha256": "224be75636e1905524bdd22bd4f57a752f4998fbfd8f5dcfe242789f1ad98fab"
+      "sourceSha256": "8f6c251d53f1565e262d975d99810b3b87e9b5bddd85735ea5fb444a58bff41b",
+      "copySha256": "1add8509a2f47849d8ed42fdd797a6e8eec2f956c6bd03c288dd3e6574395748"
     },
     {
       "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\decisions-and-confirmations.md",
       "copy": "docs/studio/project/decisions-and-confirmations.md",
-      "sourceSha256": "0616756bdf7e57e7ee49acdd5ff4808e43a17eb04ff93f528458c617a6503566",
-      "copySha256": "7206d2fd698a4b5bc83021c931123dd65fe9cfed415aa51026beb330cf58a1ec"
+      "sourceSha256": "4f79b2c7d7551b5f1a92fb4353f7275ac2cf619a34878c6fbe3aba9ecceb343e",
+      "copySha256": "bc6c1ddab40e403613409f38320929e55396a295ac965536d26c66a91106ca98"
     },
     {
       "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\verification-plan.md",
       "copy": "docs/studio/project/verification-plan.md",
-      "sourceSha256": "1a91a906d0fa4f3c0e175bae44d095cd5221e84d858a4207a42782e58228b4a2",
-      "copySha256": "882e3a85a96dfeb0021f565e4f7051833a98e086e98baf9bb68e12c5bcdc4e31"
+      "sourceSha256": "1e2142342e4a9ad017d96d9688dc928d47715e8bcd220331475ebee3a8114fa5",
+      "copySha256": "fa0afd56854d57aeada48d1f9dca32b23685b3bae5b68d538eaf50bb3925c24e"
     },
     {
       "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\product-to-pm-handoff.md",

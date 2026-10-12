@@ -1,0 +1,173 @@
+:root {
+  color-scheme: light;
+  font-family: Arial, sans-serif;
+  color: #172d29;
+  background: #f4f7f6;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #__nuxt { min-height: 100%; }
+body { margin: 0; min-width: 320px; }
+button, input { font: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: wait; }
+
+.login-shell {
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+}
+
+.login-story {
+  display: flex;
+  flex-direction: column;
+  padding: 64px clamp(32px, 5.3vw, 76px);
+  background: #e8f0ee;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 13px;
+  width: fit-content;
+  color: #172d29;
+  text-decoration: none;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.brand-mark {
+  width: 36px;
+  height: 36px;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  color: #fff;
+  background: #126451;
+  border-radius: 10px;
+}
+
+.brand-mark svg { width: 24px; height: 24px; fill: currentColor; }
+
+.story-copy {
+  width: min(100%, 510px);
+  margin: auto 0;
+  padding: 48px 0 20px;
+}
+
+.story-copy h1 {
+  max-width: 480px;
+  margin: 0;
+  font-size: clamp(2.2rem, 4vw, 2.9rem);
+  line-height: 1.18;
+  letter-spacing: -0.035em;
+}
+
+.story-copy > p {
+  margin: 28px 0 0;
+  color: #536b65;
+  font-size: 20px;
+  line-height: 1.45;
+}
+
+.attendance-preview {
+  margin-top: 70px;
+  padding: 25px 26px 33px;
+  background: #fff;
+  border: 1px solid #d8e4e0;
+  border-radius: 20px;
+}
+
+.attendance-preview h2 { margin: 0 0 21px; font-size: 20px; }
+.preview-row { display: grid; grid-template-columns: 24px minmax(45px, 1fr) 130px; align-items: center; gap: 15px; min-height: 42px; color: #536b65; font-size: 14px; }
+.preview-square { width: 24px; height: 24px; background: #e8f4ef; border-radius: 6px; }
+.preview-line { height: 1px; background: #dce7e3; }
+
+.login-panel {
+  display: grid;
+  place-items: center;
+  padding: 48px clamp(28px, 6.3vw, 90px);
+}
+
+.login-card {
+  width: min(100%, 560px);
+  min-height: 625px;
+  padding: 48px;
+  background: #fff;
+  border: 1px solid #d8e4e0;
+  border-radius: 22px;
+}
+
+.login-card h1 { margin: 0; font-size: 34px; line-height: 1.2; }
+.login-intro { margin: 14px 0 0; color: #536b65; font-size: 16px; line-height: 1.5; }
+.login-form { display: grid; gap: 27px; margin-top: 42px; }
+.form-field { display: grid; gap: 10px; }
+.form-field label { font-size: 16px; font-weight: 700; }
+.form-field input {
+  width: 100%;
+  min-height: 55px;
+  padding: 0 15px;
+  color: #172d29;
+  background: #fff;
+  border: 1px solid #d5e2de;
+  border-radius: 11px;
+  font-size: 16px;
+}
+.form-field input::placeholder { color: #657b75; opacity: 1; }
+.form-field input:focus-visible, button:focus-visible, .brand:focus-visible { outline: 3px solid #61a695; outline-offset: 3px; }
+.form-field input[aria-invalid="true"] { border-color: #ae3e36; }
+.field-error { margin: 0; color: #a4342c; font-size: 14px; line-height: 1.4; }
+.form-error { margin: 0; color: #8d302a; font-size: 14px; line-height: 1.45; }
+.primary-button {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 4px;
+  padding: 10px 18px;
+  color: #fff;
+  background: #126451;
+  border: 0;
+  border-radius: 11px;
+  font-weight: 700;
+}
+.primary-button:hover:not(:disabled) { background: #0d5545; }
+.primary-button:disabled { opacity: 0.78; }
+
+.home-shell { min-height: 100svh; padding: 28px clamp(22px, 5vw, 72px); }
+.home-header { display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 1320px; margin: 0 auto; }
+.account-actions { display: flex; align-items: center; gap: 16px; }
+.account-email { max-width: min(42vw, 340px); overflow: hidden; color: #536b65; text-overflow: ellipsis; white-space: nowrap; }
+.secondary-button { min-height: 42px; padding: 9px 16px; color: #126451; background: #fff; border: 1px solid #c9d9d4; border-radius: 10px; font-weight: 700; }
+.secondary-button:hover:not(:disabled) { background: #edf4f2; }
+.empty-home { width: min(100%, 800px); margin: clamp(88px, 17vh, 170px) auto 0; }
+.empty-home h1 { margin: 0; font-size: clamp(1.8rem, 5vw, 2.5rem); line-height: 1.2; }
+.empty-home p { color: #536b65; font-size: 16px; line-height: 1.6; }
+
+@media (max-width: 760px) {
+  .login-shell { display: block; }
+  .login-story { min-height: 118px; padding: 36px 24px 0; background: #f4f7f6; }
+  .brand { gap: 12px; font-size: 19px; }
+  .brand-mark { width: 36px; height: 36px; }
+  .story-copy { display: none; }
+  .login-panel { display: block; padding: 68px 24px 42px; }
+  .login-card { width: 100%; min-height: 0; padding: 0; border: 0; border-radius: 0; background: transparent; }
+  .login-card h1 { font-size: 30px; }
+  .login-intro { max-width: 330px; margin-top: 11px; font-size: 16px; }
+  .login-form { gap: 27px; margin-top: 48px; }
+  .form-field { gap: 10px; }
+  .form-field label { font-size: 16px; }
+  .form-field input { min-height: 56px; }
+  .primary-button { min-height: 48px; margin-top: 4px; }
+  .home-shell { padding: 24px; }
+  .home-header { align-items: flex-start; flex-wrap: wrap; }
+  .account-actions { width: 100%; justify-content: space-between; }
+  .account-email { max-width: calc(100vw - 136px); }
+  .empty-home { margin-top: 82px; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .primary-button, .secondary-button { transition: background-color 120ms ease; }
+}

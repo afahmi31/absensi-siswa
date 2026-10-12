@@ -1,0 +1,40 @@
+
+> lab002-website-absensi-siswa@0.0.0 test
+> node scripts/test-all.mjs
+
+▶ local PostgreSQL schema preserves school, roster, attendance, calendar, and audit invariants
+  ✔ migration runs up, down, and up again with a stable ledger (438.8826ms)
+  ✔ duplicate names and blank student numbers stay separate; attendance has inclusive dates and one effective record (817.834ms)
+  ✔ past rules can initialize dates without history; confirmed holidays exclude without deleting history or restoring it (601.2755ms)
+  ✔ identity snapshots update only in the active semester; closure and roster copy preserve history (416.911ms)
+  ✔ audit records identify the actor, are immutable, redact auth secrets, and roll back with data (448.5251ms)
+✔ local PostgreSQL schema preserves school, roster, attendance, calendar, and audit invariants (13876.5719ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 14144.7173
+✔ local login throttle counts five failures and releases the client after the block expires (1.4223ms)
+▶ teacher login, sealed session, same-origin requests, reset revocation, and generic throttle work over HTTP
+  ✔ unauthenticated pages redirect and future API routes are protected by default (306.0774ms)
+  ✔ unsafe requests reject missing and cross-origin Origin before changing the session (91.4601ms)
+  ✔ empty form fields return the approved field copy (31.6635ms)
+  ✔ wrong known credentials and unknown email return the same generic response (242.9142ms)
+  ✔ a valid login creates a sealed HttpOnly SameSite=Lax local cookie with no sensitive response fields (88.5063ms)
+  ✔ session output is minimal and authenticated future APIs pass the auth gate (269.8489ms)
+  ✔ a second device gets an independent persisted session (273.6954ms)
+  ✔ owner reset increases the account version, carries audit actor, and revokes the old cookie (572.2985ms)
+  ✔ logout revokes only this device session while another device stays authenticated (349.7653ms)
+  ✔ the fifth failure blocks later login attempts for this local client (148.7926ms)
+✔ teacher login, sealed session, same-origin requests, reset revocation, and generic throttle work over HTTP (19366.1774ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 26317.1684

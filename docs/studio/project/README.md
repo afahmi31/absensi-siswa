@@ -100,3 +100,21 @@ Next owner PM untuk merinci roadmap delivery lokal dan keputusan C03–C08, lalu
 ## Izin Git lokal — 12 Oktober 2026
 
 Ardy: “untuk git kamu bisa init dan commit saja tanpa menambahkan remote”. PM boleh init/commit lokal pada repo aplikasi LAB-002, sesudah memeriksa perubahan dan isi staging. Menggantikan batas belum boleh commit pada delegasi lokal sebelumnya; tidak memberi izin remote/push/deploy. Izin ini berlaku untuk perjalanan delivery lokal dalam scope PRD; source, keputusan dan evidence yang diperlukan disimpan di repo, secret/data asli/output runtime/cache tetap diabaikan.
+
+## Pengerjaan ditahan — 12 Oktober 2026
+
+Ardy meminta berhenti pada titik aman. AUTH001 ON_HOLD; perubahan belum selesai dipertahankan, tidak commit atau validation baru. UI002/DATA001 sudah CLOSED; commit8f41e86 terakhir. [Checkpoint](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/local-pause-checkpoint.md>). Tidak lanjut otomatis. Next owner PM setelah permintaan lanjut.
+
+## Resume AUTH-001 — 12 Oktober 2026
+
+Ardy meminta melanjutkan task terhenti dari titik aman. AUTH001 ASSIGNED kembali ke /root/lab002_data001 gpt6luna/max. Checkpointstop di atas dipertahankan sebagai riwayat; instruksi stop sebelumnya dicabut untuk kelanjutan AUTH001. Perubahan sebelumnya dipertahankan. Task berikut belum didispatch. NextExecutor laluPM validation.
+
+## AUTH-001 diterima PM — 12 Oktober 2026
+
+Task yang terhenti telah dilanjutkan dan CLOSED. PM menerima hasil berdasarkan delegasi lokal Ardy setelah source review, suite independen DATA 6/6 + AUTH 12/12, typecheck, output build Vercel/Node, browser laptop/viewport HP, login persisten dan CLI reset akun fiktif. Revisi timeout serta konfigurasi startup diselesaikan sebelum acceptance. [Review PM](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/reports/LAB002-AUTH-001-pm-review.md>) memuat bukti dan batasnya.
+
+Aplikasi lokal tersedia di http://127.0.0.1:3000; login/logout sudah tersedia, pengisian absensi belum. Password akun lokal terbaru hanya pada app/.data/teacher-account.json setelah reset uji PM. Ini acceptance PM melalui delegasi, bukan uji/approval langsung Ardy. PM menyiapkan commit lokal tanpa remote/push/deploy. Status stop dan laporan sebelumnya merupakan riwayat. Next owner PM untuk readiness fitur berikut; belum assignment baru.
+
+## Stop terbaru — 12 Oktober 2026
+
+Ardy meminta berhenti lagi pada titik aman. AUTH sudah diterima PM; commit lokal masih belum dibuat. Staging/perubahan dipertahankan, runtime milik proyek dihentikan. [Checkpoint terbaru](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/local-pause-checkpoint.md>) menjadi acuan sebelum resume. Tidak ada task baru didispatch atau kelanjutan otomatis.

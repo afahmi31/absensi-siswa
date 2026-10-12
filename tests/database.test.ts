@@ -22,16 +22,18 @@ test('local PostgreSQL schema preserves school, roster, attendance, calendar, an
   try {
     await t.test('migration runs up, down, and up again with a stable ledger', async () => {
       const firstUp = await runMigrations(migrator, 'up')
-      assert.equal(firstUp.length, 1)
+      assert.equal(firstUp.length, 2)
       assert.equal(firstUp[0].applied, true)
+      assert.equal(firstUp[1].applied, true)
       const secondUp = await runMigrations(migrator, 'up')
-      assert.equal(secondUp[0].applied, false)
+      assert.deepEqual(secondUp.map((migration) => migration.applied), [false, false])
       const down = await runMigrations(migrator, 'down')
-      assert.equal(down[0].applied, true)
+      assert.deepEqual(down.map((migration) => migration.applied), [true, true])
       const finalUp = await runMigrations(migrator, 'up')
       assert.equal(finalUp[0].applied, true)
+      assert.equal(finalUp[1].applied, true)
       const [ledger] = await migrator`select count(*)::int as count from public.schema_migrations`
-      assert.equal(ledger.count, 1)
+      assert.equal(ledger.count, 2)
     })
 
     await t.test('duplicate names and blank student numbers stay separate; attendance has inclusive dates and one effective record', async () => {

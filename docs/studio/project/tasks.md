@@ -1,5 +1,7 @@
 # Backlog Delivery LAB-002 v1
 
+Status aktif 12 Oktober 2026: UI001, UI002, SET001, DATA001 dan AUTH001 CLOSED. AUTH diterima PM berdasarkan delegasi lokal Ardy setelah pengujian independen dan browser. Bagian aktivitas lama di bawah dipertahankan sebagai riwayat; status aktif ini dan tabel menjadi acuan. Task fitur berikut belum didispatch.
+
 Pemilik: Project Manager. Tanggal: 2026-10-11.
 Acuan: [rencana](<development-plan-v1.md>), [PRD](<../product/PROD-002-product-prd-v1.md>), [keputusan terbuka](<decisions-and-confirmations.md>).
 
@@ -15,7 +17,7 @@ Semua task: satu active owner, scope terisolasi, tanpa production/dependency bes
 | LAB002-UI-002 | Desain siswa/impor/kalender/semester/laporan, design-only | CLOSED | Arah UI-001 disetujui; C03/C05/C06/C07 terkait | Semantik state utama jelas dan acuan desain tersedia |
 | LAB002-SET-001 | Fondasi Nuxt lokal/config DB tanpa koneksi nyata | CLOSED | C01 baseline/C02 path disetujui | Pilihan Executor/platform/model/reasoning; preflight runtime saat assignment |
 | LAB002-DATA-001 | Model data, constraints dan arsip | CLOSED | SET-001; C07/C08 | Kontrak perubahan data/audit disetujui; rencana migrasi non-production |
-| LAB002-AUTH-001 | Akun khusus/login/logout dan akses | ANALYSIS | SET-001; C04 | Provisioning/reset/akses/keamanan jelas; desain login disetujui |
+| LAB002-AUTH-001 | Akun khusus/login/logout dan akses | CLOSED | SET-001; C04 | Provisioning/reset/akses/keamanan jelas; desain login disetujui |
 | LAB002-STUD-001 | Siswa/masa terdaftar/identitas kelas | ANALYSIS | DATA-001/AUTH-001; C07; UI-002 terkait | Kontrak batas tanggal/edit identitas, desain disetujui |
 | LAB002-IMP-001 | Template Excel/preview/impor | ANALYSIS | STUD-001; C03; paket Excel dipilih | Format/validation/partial commit dan dependency dikunci |
 | LAB002-CAL-001 | Hari rutin/pengecualian dan riwayat libur | ANALYSIS | DATA-001/AUTH-001; C07 | Kontrak restore libur/keanggotaan/periode; desain disetujui |
@@ -172,3 +174,5 @@ Supabase dipilih untuk PostgreSQL; pemilihan Auth/Storage, provisioning/reset/ak
 Ardy menjawab dialog “Setujui hasil setup lokal”. APPROVED untuk hasil fondasi lokal yang diperiksa PM. Task CLOSED karena seluruh deliverable/AC setup selesai dan tidak ada delivery action tersisa. Tidak memberi izin commit/push/deploy, koneksi layanan, atau assignment task berikutnya. Next owner PM untuk merinci readiness DATA-001/AUTH-001 dan keputusan terkait. Pernyataan pending review sebelumnya merupakan riwayat sebelum approval ini.
 
 Aktif 12 Oktober: DATA-001 ASSIGNED /root/lab002_data001 gpt-6-luna/max. [Kontrak lokal](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/local-delivery-contract-v1.md>) memutuskan C03–C08 melalui delegasi PM. Root repo app lokal saja.
+
+Pengerjaan lokal ditahan atas permintaan Ardy12Oktober. UI002/DATA001 CLOSED dengan acceptance PM; AUTH001 ON_HOLD, belum selesai/commit. Task berikut tetap ANALYSIS dan tidak didispatch.

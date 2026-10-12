@@ -182,3 +182,20 @@ Ardy: “untuk git kamu bisa init dan commit saja tanpa menambahkan remote”. P
 ## Delivery lokal dimulai 12 Oktober 2026
 
 PM menetapkan [kontrak lokal v1](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/local-delivery-contract-v1.md>) dari delegasi Ardy, menyelesaikan detail C03–C08 untuk local delivery. PostgreSQL16 cluster terisolasi, Postgres.js dan SQL migrations; tidak Supabase/cloud. [DATA-001](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/tasks/LAB002-DATA-001.md>) READY sebelum dispatch. Local browser validation PM diotorisasi.
+
+
+## Urutan delivery lokal setelah DATA validated — 12 Oktober
+
+DATA-001 sudah menyediakan kontrak/perintah semester, kalender, audit dan guard closedperiod yang diuji. Setelah AUTH, implementasi STUD metadata/roster dan SEM setup createperiod dapat memakai fixture fiktif untuk verifikasi dan dijalankan berurutan sebelum UI absensi. SEM tidak lagi harus menunggu seluruh UI ATT untuk fondasi createperiod; dependency closurewrite dan completeness telah tersedia DATA, regression HTTP lintasATT tetap wajib ketika ATT/QA tersedia. Ini menghindari lingkaran semesteractive→roster→attendance→semester tanpa mengubah requirement. PM memastikan acceptance SEM tidak mengklaim futureUIwriteguard sudahtested bila hanyaDATAguard saat tahapawal.
+
+Initial app tidak menanam fake sekolah/kelas/semester otomatis sebagai data user. Accountlocal hanyaakun; metadata pengguna dibuat melalui form, kemudian semester, roster. Fixtures testisolated terpisah dari persistentowner app kecuali dedicateddemo yang explicitlocalfake dan restore/resetdidokumentasikan.
+
+## Pengerjaan ditahan — 12 Oktober 2026
+
+Ardy meminta berhenti pada titik aman. AUTH001 ON_HOLD; perubahan belum selesai dipertahankan, tidak commit atau validation baru. UI002/DATA001 sudah CLOSED; commit8f41e86 terakhir. [Checkpoint](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/local-pause-checkpoint.md>). Tidak lanjut otomatis. Next owner PM setelah permintaan lanjut.
+
+## AUTH-001 diterima PM — 12 Oktober 2026
+
+Task yang terhenti telah dilanjutkan dan CLOSED. PM menerima hasil berdasarkan delegasi lokal Ardy setelah source review, suite independen DATA 6/6 + AUTH 12/12, typecheck, output build Vercel/Node, browser laptop/viewport HP, login persisten dan CLI reset akun fiktif. Revisi timeout serta konfigurasi startup diselesaikan sebelum acceptance. [Review PM](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/reports/LAB002-AUTH-001-pm-review.md>) memuat bukti dan batasnya.
+
+Aplikasi lokal tersedia di http://127.0.0.1:3000; login/logout sudah tersedia, pengisian absensi belum. Password akun lokal terbaru hanya pada app/.data/teacher-account.json setelah reset uji PM. Ini acceptance PM melalui delegasi, bukan uji/approval langsung Ardy. PM menyiapkan commit lokal tanpa remote/push/deploy. Status stop dan laporan sebelumnya merupakan riwayat. Next owner PM untuk readiness fitur berikut; belum assignment baru.

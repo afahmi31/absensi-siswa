@@ -29,7 +29,7 @@ try {
   }
   if (!response) throw new Error('Server did not become available')
   const body = await response.text()
-  const expected = ['Website Absensi Siswa', 'Fondasi aplikasi sedang disiapkan.', 'Pengisian absensi belum tersedia.']
+  const expected = ['Website Absensi Siswa', 'Absensi kelas', 'Pengisian absensi belum tersedia.']
   result.status = response.status
   result.textChecks = expected.map(text => ({ text, found: body.includes(text) }))
   result.hasForm = /<form\b/i.test(body)

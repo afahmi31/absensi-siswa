@@ -1,0 +1,6 @@
+Tanggal: 2026-10-12
+Runtime: bundled Node 24.19.0, regular Nuxt development server on 127.0.0.1:3000.
+Account file: app/.data/teacher-account.json, loaded only inside the smoke process; no credential or cookie value was printed.
+Environment: app/.data/local-env.ps1 and app/.data/auth-env.ps1 were loaded by the server process.
+Result: login=200 session=200 logout=200 replay-session=200 (authenticated=false after logout).
+The smoke used the current persistent local account and then revoked its test session by logout. It did not reset the account or alter business data.

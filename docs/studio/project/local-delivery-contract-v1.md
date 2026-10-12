@@ -14,3 +14,18 @@ Tanggal absensi database tipe date; waktu audit UTC; timezone sekolah default As
 Teknis lokal: PostgreSQL cluster proyek terisolasi memakai binary existing PG16, data app/.data/postgres, loopback port55432 atau free port tertera env. SCRAM password random lokal disimpan ignored .env/private file; jangan expose/log. Tidak mengubah service PG18 existing atau Docker yang stopped. Node24/Postgres.js server-only + SQL migrasi versioned transactional dipilih PM; ORM tidak diperlukan untuk scope ini. SQL/repositories typed dan transaksi domain diuji. Supabase tetap target provider online kelak, belum resource/connection.
 
 Langkah delivery: DATA-001 fondasi schema/local DB/invariant/repo tests; AUTH-001 login; UI-002 desain lanjutan PM-review; STUD/IMP/CAL/ATT/SEM/REP/OPS berurutan sesuai dependency dan QA/REL lokal. PM memberi acceptance berdasarkan evidence, browser localhost dan fixtures; fisik cetak dan cloud tetap belum diverifikasi.
+
+
+## Rincian tools laporan/impor — keputusan PM lokal
+
+Excel memakai ExcelJS server-side dengan versi stabil dipin setelah kompatibilitas diperiksa Executor. Upload .xlsx maksimal5MB dan maksimal500baris, validasi ZIP bounded sebelum parse (totaluncompressed20MB; reject macro/embedded binaries/formula cells), dataheaderC03 tetap dan teksNIPD menjaga nolawal. Parser/preview yang gagal tidak mengubah siswa. Ini batasaman v1lokal bukan jumlahsiswasekolah nyata; filemelebihibatas diberi error jelas.
+PDF memakai PDFKit Node server-side dipin setelah kompatibilitas, no Chromiumserver/cloudrender. Dua output browserprint dan PDF file nyata dari modeldata laporan yang sama; ukuran kertas/dimensi pointdanpagination wajibtest. Logo PNG/JPEG maksimal2MB/dimensi4096, private localstorage dan serve protectedroute; sebelum PNG/JPEG decode periksa content magic/dimensions, bukan hanyaextension. PDFfontfamiliar builtin untukteksIndonesia; nama panjangwrap dan rowheightutuh, tidakcrop.
+Sumber resmi ditinjau12Oktober2026: https://github.com/exceljs/exceljs ; https://pdfkit.org/docs/getting_started.html ; https://pdfkit.org/docs/paper_sizes.html . Semua penggunaan runtime akan diuji terkait; belum dependencyterpasang atau PDF/Excel dibuat.
+
+## C04 — Sesi login per perangkat
+
+Keputusan PM saat melanjutkan AUTH-001, 12 Oktober 2026, dalam delegasi pengelolaan lokal Ardy: setiap login mempunyai ID sesi acak dan record server-side. Logout mencabut hanya sesi perangkat tersebut. Reset kata sandi melalui CLI owner menaikkan versi akun dan mencabut semua sesi lama. Ini menjaga penggunaan HP dan laptop tanpa logout saling mengganggu.
+
+Cookie berisi identitas tersegel; hash kata sandi dan rahasia sesi tidak dikirim ke respons pengguna. Masa sesi tujuh hari. Request tulis wajib berasal dari origin aplikasi. Cookie production memakai Secure; HTTP loopback diizinkan untuk pengujian lokal. Throttle sementara hanya berlaku non-production per proses, sehingga kontrol pembatasan production/distribusi tetap belum diverifikasi dan perlu dibahas pada target deployment.
+
+Implementasi tetap tanpa signup publik, reset email, layanan Auth cloud, atau koneksi Supabase. Akun persisten lokal menggunakan alamat fiktif; kredensial disimpan pada .data yang diabaikan Git. Data siswa asli tidak dipakai.

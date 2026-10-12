@@ -1,5 +1,9 @@
+import { TEACHER_SESSION_MAX_AGE_SECONDS } from './shared/auth.ts'
+
 export default defineNuxtConfig({
   compatibilityDate: '2026-10-11',
+  modules: ['nuxt-auth-utils'],
+  css: ['~/assets/css/main.css'],
   devtools: { enabled: false },
   telemetry: false,
   nitro: {
@@ -14,8 +18,18 @@ export default defineNuxtConfig({
     },
   },
   runtimeConfig: {
-    // Reserved for a future server-side database contract; not used in this task.
     databaseUrl: '',
     supabaseUrl: '',
+    session: {
+      name: 'lab002-session',
+      password: '',
+      maxAge: TEACHER_SESSION_MAX_AGE_SECONDS,
+      cookie: {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        path: '/',
+      },
+    },
   },
 })

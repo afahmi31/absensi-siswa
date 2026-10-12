@@ -22,16 +22,22 @@
     "db:smoke": "node scripts/db-smoke.mjs",
     "db:rollback": "node scripts/db-migrate.mjs down",
     "test:data": "node scripts/test-data.mjs",
-    "test": "npm run test:data",
+    "auth:account:provision": "node scripts/auth-account.mjs provision",
+    "auth:account:reset": "node scripts/auth-account.mjs reset",
+    "test:auth": "node scripts/test-auth.mjs",
+    "test": "node scripts/test-all.mjs",
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@adonisjs/hash": "9.1.1",
     "nuxt": "4.6.1",
+    "nuxt-auth-utils": "0.5.31",
     "postgres": "3.4.9",
     "vue": "3.5.43",
     "vue-router": "5.4.0"
   },
   "devDependencies": {
+    "@types/node": "24.19.2",
     "typescript": "5.9.3",
     "vue-tsc": "3.3.13"
   }

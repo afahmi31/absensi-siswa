@@ -1,0 +1,6 @@
+
+> lab002-website-absensi-siswa@0.0.0 db:migrate
+> node scripts/db-migrate.mjs up
+
+Unchanged 0001_core
+Applied 0002_authentication

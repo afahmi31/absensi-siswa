@@ -78,3 +78,7 @@ Setelah hasil teknis dan uji nyata memenuhi syarat, PM menyiapkan review akhir; 
 ## Penugasan bukti lokal terbaru — 12 Oktober 2026
 
 Ardy mendelegasikan uji browser/end-to-end lokal kepada PM, keputusan penerimaan/closure dan assignment Luna/max. Ini menggantikan default owner Ardy untuk pengujian lokal sampai sasaran aplikasi lokal terpenuhi. Fisik printer, cloud, deploy dan penggunaan guru nyata tetap belum dilakukan. SET/UI001 sudah CLOSED; DATA/UI002 sedang assignment. Kontrak lokal v1 merinci aturan dan boundary.
+
+## Evidence AUTH terbaru — 12 Oktober 2026
+
+PM independen: DATA 6/6, AUTH 12/12, typecheck exit 0. Browser laptop dan viewport HP: kosong/salah/valid, reload sesi, logout dan guard privat PASS. Home build terbaru diperiksa; CLI reset persisten akun fiktif PASS. AUTH diterima PM melalui delegasi Ardy. Bukti rinci ada di review AUTH. Ini belum mencakup fitur absensi, laporan, printer fisik, guru nyata atau deployment.

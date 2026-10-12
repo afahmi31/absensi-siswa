@@ -1,0 +1,1 @@
+PASS: owner CLI reset on synthetic local account; private file updated; old password/session rejected; new login/logout succeeds. No secret values printed.
