@@ -4,6 +4,7 @@ import { getDatabase } from '../database/client.ts'
 import { sessionCookieOptions } from './session-cookie.ts'
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+const authenticatedTeacherCacheKey = Symbol('lab002-authenticated-teacher')
 
 export interface AuthenticatedTeacher {
   id: string
@@ -16,8 +17,28 @@ function unauthorized(): never {
   throw createError({ statusCode: 401, statusMessage: 'Silakan masuk untuk melanjutkan.' })
 }
 
-/** Read the sealed identity and compare its version with the database on every protected request. */
-export async function getAuthenticatedTeacher(event: H3Event): Promise<AuthenticatedTeacher | null> {
+/** Reuse one in-flight teacher lookup only for the lifetime of this H3 request. */
+export function getRequestScopedAuthenticatedTeacher(
+  event: H3Event,
+  load: () => Promise<AuthenticatedTeacher | null>,
+): Promise<AuthenticatedTeacher | null> {
+  const context = event.context as unknown as Record<PropertyKey, unknown>
+  const cached = context[authenticatedTeacherCacheKey] as Promise<AuthenticatedTeacher | null> | undefined
+  if (cached) return cached
+
+  // Install the promise before reading the sealed session so all middleware,
+  // handlers, and session hooks on this request share the same DB verification.
+  const lookup = Promise.resolve().then(load)
+  context[authenticatedTeacherCacheKey] = lookup
+  return lookup
+}
+
+/** Read the sealed identity and compare its version with the database for this request. */
+export function getAuthenticatedTeacher(event: H3Event): Promise<AuthenticatedTeacher | null> {
+  return getRequestScopedAuthenticatedTeacher(event, () => loadAuthenticatedTeacher(event))
+}
+
+async function loadAuthenticatedTeacher(event: H3Event): Promise<AuthenticatedTeacher | null> {
   const session = await getUserSession(event)
   const user = session.user
   if (!user) return null
