@@ -1,6 +1,6 @@
 {
-  "copiedAt": "2026-10-13T09:00:18.7101058Z",
-  "task": "LAB002-SEC-001-cloud-result",
+  "copiedAt": "2026-10-13T09:25:44.7280642Z",
+  "task": "LAB002-REL-CLEAN-001-development-preservation",
   "authority": "Registry studio tetap sumber keputusan aktif. Salinan ini untuk penelusuran development.",
   "transformations": "Selected historic copies keep original sync mappings. Current local-trial snapshots normalize Markdown whitespace and link back to absolute registry sources. Hashes reflect saved copies.",
   "excluded": [
@@ -448,6 +448,30 @@
       "copy": "docs/studio/project/reports/LAB002-SEC-001-cloud-result.md",
       "sourceSha256": "2f3a0a55e45dba531c50f4d5dfd862ae4cbcaa193ffc026fa54b31ac7ef41712",
       "copySha256": "2f3a0a55e45dba531c50f4d5dfd862ae4cbcaa193ffc026fa54b31ac7ef41712"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\release-branch-policy.md",
+      "copy": "docs/studio/project/release-branch-policy.md",
+      "sourceSha256": "fc966e61e57eab3f8df72a5f18f93e3aa334511ef32ee0580902f69345a99f34",
+      "copySha256": "fc966e61e57eab3f8df72a5f18f93e3aa334511ef32ee0580902f69345a99f34"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\tasks\\LAB002-REL-CLEAN-001.md",
+      "copy": "docs/studio/project/tasks/LAB002-REL-CLEAN-001.md",
+      "sourceSha256": "125aa7be19b426c232066c2d325c8f7f01c2255a1a66dc6302609cefbdd5b333",
+      "copySha256": "125aa7be19b426c232066c2d325c8f7f01c2255a1a66dc6302609cefbdd5b333"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\reports\\LAB002-CLOUD-DATA-001-transfer-result.md",
+      "copy": "docs/studio/project/reports/LAB002-CLOUD-DATA-001-transfer-result.md",
+      "sourceSha256": "37ffdb6fb5dc7aed70f158b0f90886fddaa951cb722dff37107c227359ba84a3",
+      "copySha256": "37ffdb6fb5dc7aed70f158b0f90886fddaa951cb722dff37107c227359ba84a3"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\reports\\LAB002-CLOUD-DATA-001-snapshot-check.md",
+      "copy": "docs/studio/project/reports/LAB002-CLOUD-DATA-001-snapshot-check.md",
+      "sourceSha256": "84f42158e2bce3e239b8811c32a67d213ce43a39e61f2026b1aaa523282ffd01",
+      "copySha256": "84f42158e2bce3e239b8811c32a67d213ce43a39e61f2026b1aaa523282ffd01"
     }
   ]
 }
