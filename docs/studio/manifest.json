@@ -1,6 +1,6 @@
 {
-  "copiedAt": "2026-10-13T08:59:03.3059613Z",
-  "task": "LAB002-SEC-001-approved-cloud-0007",
+  "copiedAt": "2026-10-13T09:00:18.7101058Z",
+  "task": "LAB002-SEC-001-cloud-result",
   "authority": "Registry studio tetap sumber keputusan aktif. Salinan ini untuk penelusuran development.",
   "transformations": "Selected historic copies keep original sync mappings. Current local-trial snapshots normalize Markdown whitespace and link back to absolute registry sources. Hashes reflect saved copies.",
   "excluded": [
@@ -442,6 +442,12 @@
       "copy": "docs/studio/project/reports/LAB002-SEC-001-pm-review.md",
       "sourceSha256": "c2fa6d85d6167e62c4f2917eabf8c5e023c4867b395c1e9319bef635c64d1f55",
       "copySha256": "c2fa6d85d6167e62c4f2917eabf8c5e023c4867b395c1e9319bef635c64d1f55"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\reports\\LAB002-SEC-001-cloud-result.md",
+      "copy": "docs/studio/project/reports/LAB002-SEC-001-cloud-result.md",
+      "sourceSha256": "2f3a0a55e45dba531c50f4d5dfd862ae4cbcaa193ffc026fa54b31ac7ef41712",
+      "copySha256": "2f3a0a55e45dba531c50f4d5dfd862ae4cbcaa193ffc026fa54b31ac7ef41712"
     }
   ]
 }
