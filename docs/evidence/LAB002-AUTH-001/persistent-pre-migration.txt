@@ -1,1 +1,0 @@
-{"target":{"version_num":160013,"role_name":"lab002_migrator","database_name":"lab002_local","is_loopback":true,"port":55432},"counts":{"teacher_accounts":0,"schools":0,"school_classes":0,"semesters":0,"students":0,"memberships":0,"calendar_rules":0,"calendar_exceptions":0,"attendance_records":0,"audit_events":0,"migrations":1}}

@@ -1,5 +1,0 @@
-
-> lab002-website-absensi-siswa@0.0.0 typecheck
-> nuxt typecheck --checker vue-tsc
-
-EXIT_CODE=0

@@ -1,1 +1,0 @@
-{"anonymousSession":200,"login":200,"httpOnly":true,"sameSiteLax":true,"authenticatedSession":200,"home":200,"logout":200,"replayAfterLogout":401}

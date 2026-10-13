@@ -1,1 +1,0 @@
-{"migrations":2,"teacher_accounts":1,"sessions":1,"revoked_sessions":1,"schools":0,"school_classes":0,"semesters":0,"students":0,"memberships":0,"calendar_rules":0,"calendar_exceptions":0,"attendance_records":0}
