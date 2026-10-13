@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises'
 import postgres from 'postgres'
 import { runMigrations } from '../server/database/migrate.mjs'
+import { hasAllDatabaseRoles } from '../server/database/supabase-role-preflight.mjs'
 
 const projectRef = 'jkiewjlohgmsujcwerpi'
 const apiRoles = ['anon', 'authenticated', 'service_role']
@@ -67,11 +68,11 @@ async function verifyTarget(database, { verifyPostMigration = false } = {}) {
   const [roles] = await database`
     select
       exists (select 1 from pg_roles where rolname = 'lab002_app' and rolcanlogin and not rolsuper and not rolbypassrls and not rolcreatedb and not rolcreaterole) as runtime_role_ready,
-      ${database.array(apiRoles)}::text[] <@ (select array_agg(rolname) from pg_roles) as api_roles_exist,
       exists (select 1 from pg_roles where rolname = 'lab002_migrator' and rolcanlogin and not rolsuper) as migrator_role_ready
   `
+  const apiRolesExist = await hasAllDatabaseRoles(database, apiRoles)
 
-  if (!roles.runtime_role_ready || !roles.api_roles_exist || !roles.migrator_role_ready) {
+  if (!roles.runtime_role_ready || !apiRolesExist || !roles.migrator_role_ready) {
     fail('The least-privilege runtime, migration, or Supabase API roles are not ready.')
   }
 

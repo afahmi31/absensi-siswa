@@ -1,6 +1,6 @@
 {
-  "copiedAt": "2026-10-13T06:39:23.8788658Z",
-  "task": "LAB002-PRE-001-local-review-and-cloud-data-handoff",
+  "copiedAt": "2026-10-13T07:05:31.9697648Z",
+  "task": "LAB002-PRE-001-approved-cloud-schema",
   "authority": "Registry studio tetap sumber keputusan aktif. Salinan ini untuk penelusuran development.",
   "transformations": "Selected historic copies keep original sync mappings. Current local-trial snapshots normalize Markdown whitespace and link back to absolute registry sources. Hashes reflect saved copies.",
   "excluded": [
@@ -406,6 +406,12 @@
       "copy": "docs/studio/project/tasks/LAB002-CLOUD-DATA-001.md",
       "sourceSha256": "a302b380c8f736f727f59887602e3136cfb0c188753300c806d9f9bd88de6fa5",
       "copySha256": "a302b380c8f736f727f59887602e3136cfb0c188753300c806d9f9bd88de6fa5"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\reports\\LAB002-PRE-001-cloud-schema.md",
+      "copy": "docs/studio/project/reports/LAB002-PRE-001-cloud-schema.md",
+      "sourceSha256": "51d7a8cfe1cb829e1b4cf4a26a1311ac6c1f539d046b32f64f9f8529f72dad04",
+      "copySha256": "51d7a8cfe1cb829e1b4cf4a26a1311ac6c1f539d046b32f64f9f8529f72dad04"
     }
   ]
 }
