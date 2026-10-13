@@ -1,4 +1,8 @@
-# Checkpoint aktif LAB-002 — sesudah SEM
+# Acuan lanjut LAB-002 — uji lokal absensi
+
+Status aktif: Ardy melaporkan alur lokal tanpa kendala pada 13 Oktober 2026 dan mengizinkan commit lokal. Node17520 pada3000 dan managedPG55432 aktif. CAL diterima teknis; ATT PM_VALIDATION dengan browsersebagian. Commit lokal diizinkan; remote/push dan Vercel/Supabase menunggu pembahasan terpisah. Lihat local-trial-guide.md dan reviewATT.
+
+## Checkpoint SEM sebelumnya (riwayat)
 
 Tanggal: 12 Oktober 2026. Pengerjaan DITAHAN sesuai permintaan Ardy untuk berbicara sesudah LAB002-SEM-001 CLOSED. Tidak ada kelanjutan otomatis atau assignment berikutnya.
 
@@ -27,3 +31,27 @@ Otorisasi lokal tetap: PM mengelola keputusan/detail/assignment/validasi/accepta
 ## Shutdown terverifikasi
 
 Executor menghentikan hanya fixture-owned PID3512/17360 dan memverifikasi port3101/61138 tidak LISTEN. Fixture privat dipertahankan. Tidak ada Executor aktif atau assignment berikutnya.
+
+
+## Commit selesai
+
+Commit lokal SEM: ecee50ecc3de87bcd6a2e3344d0d3ef4d6e21bad. Repo app bersih sesudah commit; tidak ada remote. Snapshot Git checkpoint dibuat sebelum hash ini ditambahkan pada registry. Pengerjaan tetap ditahan, tanpa assignment berikutnya.
+
+
+## Arah terbaru setelah pembahasan
+
+Stop sesudah SEM telah selesai. Ardy meminta pra-rilis absensi online Vercel, Supabase baru gratis, data siswa sebenarnya. Persiapan dan delivery independen dilanjutkan sesuai pre-release-teacher-pilot.md; tidak ulang task CLOSED. CAL menjadi task berikut, cloud/deploy menunggu target/ref/akses konkret.
+
+
+## Target terbaru: uji lokal dahulu
+
+Ardy meminta aplikasi siap diuji pada komputer lokal. Acuan aktif local-trial-priority.md. CAL lalu ATT dilanjutkan dengan Executor Luna/max; online Vercel/Supabase dan pembahasan Git ditunda sampai hasil uji Ardy. Tidak ada commit baru, remote/push/deploy/cloud. Setelah alur absensi lokal siap, PM menyerahkan URL/runtime/panduan uji dan menunggu hasil Ardy.
+
+## Titik lanjut sesudah handoff
+
+Jangan mengulangsetup ataufixture lama. Baca hasil ujiArdy, reviewATT dan gitdiff WIP CAL/ATT. Commitbaselineecee50e; perubahanbaru belumcommit sesuaiArdy. Source final dikompilasiNode, runtimeaktif denganmetadata privat. TidakmenyatakanATT CLOSED. Tindaklanjuti kendalaArdy perrevision, atau bahasGit/online setelahujiterima. No otomatisassignmentfitur lain.
+## Hasil uji Ardy dan izin commit lokal — 13 Oktober 2026
+
+Ardy: “commit dulu saja. aku sudah coba untuk flow tidak ada masalah”. Ardy melaporkan uji alur lokal tanpa kendala dan memberi izin commit lokal. Tidak ada rincian skenario/perangkat yang dilaporkan, sehingga catatan ini tidak menyatakan setiap kasus konflik409, kegagalan jaringan atau dialog telah diuji satu per satu. Bukti teknis dan batas uji browser PM sebelumnya tetap dipertahankan.
+
+PM memeriksa 18 file runtime yang berubah terhadap snapshot final fixture ATT: semuanya sama. Tidak ada perubahan kode untuk commit ini dan tidak perlu mengulang suite hanya untuk pencatatan/Git. Commit mencakup kalender, absensi harian, migration0004, regresi penambahan siswa/penutupan semester, tes dan dokumentasi. Rahasia, database, backup, log runtime dan hasil build tetap di luar Git. Tidak ada izin remote/push atau deployment dari pesan ini.

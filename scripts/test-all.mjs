@@ -1,6 +1,6 @@
 import { spawnSync } from 'node:child_process'
 
-for (const script of ['scripts/test-data.mjs', 'scripts/test-auth.mjs', 'scripts/test-students.mjs']) {
+for (const script of ['scripts/test-data.mjs', 'scripts/test-auth.mjs', 'scripts/test-students.mjs', 'scripts/test-calendar.mjs', 'scripts/test-attendance.mjs']) {
   const result = spawnSync(process.execPath, [script], {
     cwd: process.cwd(),
     stdio: 'inherit',

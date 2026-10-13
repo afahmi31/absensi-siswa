@@ -11,13 +11,15 @@ PM mengelola keputusan, assignment, pengujian dan acceptance lokal berdasarkan d
 | AUTH-001 | CLOSED, diterima PM | Suite independen DATA 6/6 + AUTH 12/12; typecheck; build; browser; CLI reset; PM menyiapkan commit |
 | STUD-001 | CLOSED, diterima PM | Commit 465f865; DATA6/AUTH12/STUD7 dan browser lokal |
 | SEM-001 | CLOSED, diterima PM | Review PM/source, HTTP final8/8, browser desktop/HP; stop sesudah SEM |
-| IMP/CAL/ATT/REP/OPS/QA/REL | ANALYSIS | Readiness per dependency; belum assignment |
+| CAL-001 | PM_VALIDATION, teknis diterima | HTTP5/5 independen + browserHP/laptop; handoff/Git deferred |
+| ATT-001 | PM_VALIDATION | TeknisHTTP7/7; browsersebagian, menungguujiArdy; runtime3000/55432 aktif |
+| IMP/REP/OPS/QA/REL | ANALYSIS | Sisa v1 ditunda dari uji absensi lokal pertama |
 
 AUTH menyediakan login/logout, sesi per perangkat, reset owner CLI, guard halaman/API dan form responsif. STUD menambahkan pengaturan sekolah/kelas dan daftar siswa. Pengisian absensi belum tersedia. Database persisten belum diberi data sekolah/kelas/semester/siswa/absensi; fixture terpisah telah dipakai untuk pengujian.
 
 Runtime terakhir: dev server loopback http://127.0.0.1:3000 (PID 8244, exec session 1454), database proyek port 55432. Startup harus memuat .data/local-env.ps1 dan .data/auth-env.ps1. Akun fiktif guru@example.test; password terbaru tersimpan hanya di app/.data/teacher-account.json. PM menjalankan reset sebagai uji lokal; gunakan file terbaru. Rahasia diabaikan Git.
 
-Riwayat: Ardy meminta berhenti pada titik aman, kemudian meminta melanjutkan task terhenti. AUTH dilanjutkan dari perubahan yang dipertahankan. Lihat [checkpoint](local-pause-checkpoint.md), [laporan stop](reports/LAB002-AUTH-001-safe-stop-2026-10-12.md), [laporan Executor](reports/LAB002-AUTH-001-report.md), dan [review PM](reports/LAB002-AUTH-001-pm-review.md).
+Riwayat: Ardy meminta berhenti pada titik aman, kemudian meminta melanjutkan task terhenti. AUTH dilanjutkan dari perubahan yang dipertahankan. Lihat [checkpoint](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/local-pause-checkpoint.md>), [laporan stop](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/reports/LAB002-AUTH-001-safe-stop-2026-10-12.md>), [laporan Executor](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/reports/LAB002-AUTH-001-report.md>), dan [review PM](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/reports/LAB002-AUTH-001-pm-review.md>).
 
 PM menemukan timeout suite awal dan kesalahan environment pada startup dev server. Keduanya ditangani sebelum acceptance; kegagalan dan hasil ulang dicatat di review. Tidak ada cloud, remote/push, deploy atau data siswa asli. Cetak fisik dan penggunaan guru nyata belum diuji. Next owner PM untuk readiness task pengelolaan sekolah/siswa dan semester; tidak ada janji pengerjaan latar belakang.
 
@@ -66,3 +68,55 @@ Ardy: setelah LAB002-SEM-001 CLOSED, hentikan dulu karena ada hal yang ingin dis
 ## SEM selesai; pengerjaan ditahan
 
 SEM CLOSED berdasarkan review PM melalui delegasi Ardy. R01 lock-order dan R02 beranda diperbaiki. Browser sintetis membuktikan close belum lengkap, salin2siswa, validation/period guard dan persist. PM test:students final8/8 exit0. Lihat review SEM dan resume-checkpoint.md. Tidak ada assignment sesudah SEM; Git commit lokal disiapkan PM, tanpa remote/deploy. Riwayat runtime/progres sebelumnya bukan status aktif.
+
+Commit SEM selesai: ecee50e; app bersih, remote tidak ada, fixture stopped. SEM CLOSED dan pengerjaan ditahan untuk pembahasan Ardy.
+
+
+## Prioritas pra-rilis guru online — 12 Oktober 2026
+
+Ardy memilih URL Vercel HP/laptop, Supabase baru paket gratis, langsung data siswa sebenarnya. Acuan prioritas aktif: pre-release-teacher-pilot.md. CAL kemudian ATT didahulukan; laporan/impor ditunda dari pra-rilis, PRD lengkap tetap. Kesiapan online/login/backup minimum serta QA wajib sebelum akses guru. Resource/target deployment belum tersedia; tidak ada deploy/biaya/remote/push pada keputusan ini.
+
+
+CAL-001 ASSIGNED pada /root/lab002_sem_resume gpt-6-luna/max; ACK preflight diterima. Vercel target dipilih: project baru khusus LAB-002 di akun Ardy. Koneksi/akses cloud dan release masih pending, tidak ada data siswa nyata di repository/test.
+
+
+## Target terbaru: uji lokal dahulu
+
+Ardy meminta aplikasi siap diuji pada komputer lokal. Acuan aktif local-trial-priority.md. CAL lalu ATT dilanjutkan dengan Executor Luna/max; online Vercel/Supabase dan pembahasan Git ditunda sampai hasil uji Ardy. Tidak ada commit baru, remote/push/deploy/cloud. Setelah alur absensi lokal siap, PM menyerahkan URL/runtime/panduan uji dan menunggu hasil Ardy.
+
+
+## Persiapan runtime lokal
+
+PM menjalankan local-db start: managedPG16 proyek app/.data/postgres aktif pada127.0.0.1:55432. db-migrate up exit0: 0001/0002 unchanged,0003 applied. Tidak reset/rollback/seed data sekolah. Nuxt delivery belum dijalankan; menunggu CAL/ATT dan validation. Fixture/test Executor tetap terisolasi. Runtime ini bukan database cloud atau servicePG lain.
+
+
+## CAL diterima teknis; ATT siap
+
+PM source/test:calendar5/5/browser laptop+HP PASS. Kalender memenuhi AC; fixture tidak menyentuh managed55432. CAL PM_VALIDATION untuk final handoff/Git deferred. ATT READY setelah dependency teknis diterima; Executor tetapLuna/max. Tidak ada commit baru/deploy/cloud, target hanya runtime lokal untuk uji Ardy.
+
+
+ATT-001 ASSIGNED kepada /root/lab002_sem_resume gpt-6-luna/max. CALfixture stopped, managedPG55432 tetap aktif. PM menunggu preflight kontrak migration manual-clear/dayrevision; tidak ada data siswa asli di tes.
+
+## ATT — keputusan preflight PM
+
+PM menerima proposal Executor untuk migration0004 backward-compatible: statusNULL hanya tombstone non-effective manual_clear, effective/holiday-excluded tetap HSIA. Clear adalah update eksplisit record efektif dengan version+1 dan audit old/new; riwayat sebelumnya tetap pada audit immutable, input ulang membuat record efektif baru. Tidak edit migration0001–0003 atau hapus riwayat. Down harus menolak jika manual-clearhistory ada, bukan menghapus history agar rollback lolos.
+
+Revisi hari memakai satu token opaque HMAC-SHA256 atas snapshot koheren keadaan hari, tanpa tabel revision baru. Token terikat school/semester/date/ownership, timezone, eligibility/snapshot roster/updatedstate, routine/exception, seluruh row attendance/version/effective/history. GET tetap read-only. Key server-only privat yang stabil memakai fondasi sesi existing; fixturekey untuktes, tidak dikirim keclient. Ini detail implementasi revisihari, tidak mengurangi konflik409/cakupan AC02.
+
+Save mengunci1728->1727->1729->rowlocks sebelumrecheck dan batchatomik. Metadata timezone juga dilindungi dari perubahan bersamaan sehingga pemeriksaan tanggal konsisten. Type interoperabilitas riwayatCAL dapat dirapikan terarah jikaNULL perlu; tidak mengganti flow kalender. PM memberi izin implementasi proposal setelah preflight; localonly, synthetic tests, no commit/cloud.
+
+## Cadangan sebelum ATT
+
+PM membuat pg_dump custom privat managedDB127.0.0.1:55432/lab002_local dengan pg_dump16: app/.data/backups/before-att-0004-20261012-171713.dump,79657bytes, exit0. Credential dibaca privat sementara dan env dipulihkan; tidak dicetak. Backup tidak diGit, tidak upload/restore. Migration0004 belum diterapkan pada database persisten; menunggu acceptanceATT. Tidak mengklaim restoretested dari keberhasilan dump saja.
+
+## Handoff versi uji lokal
+
+Website3000, ownedNode17520; managedPG55432 aktif. Akunexisting/auth smoke200; migration0004applied, backupprivatada. CALteknisditerima, ATTAPI7/7/browsersebagiantertahanCUAnativedialog. SeluruhinteraksiATT menungguujiArdy, taskPM_VALIDATION. Git/commitbaru danonline ditunda, no assignmentlanjutan. Acuan local-trial-guide.md dan reviewATT.
+
+Fixture ATT dihentikan: PID11428/18332 dan port3101/51840 tidak aktif menurut verifikasi Executor. Tab asal tertahan dialog native; tab tambahan telah ditutup. Runtime Ardy Node17520:3000 dan PG19592:55432 tetap aktif, source tidak berubah sesudah build. Tidak ada task berikut yang ditugaskan.
+
+## Hasil uji Ardy dan izin commit lokal — 13 Oktober 2026
+
+Ardy: “commit dulu saja. aku sudah coba untuk flow tidak ada masalah”. Ardy melaporkan uji alur lokal tanpa kendala dan memberi izin commit lokal. Tidak ada rincian skenario/perangkat yang dilaporkan, sehingga catatan ini tidak menyatakan setiap kasus konflik409, kegagalan jaringan atau dialog telah diuji satu per satu. Bukti teknis dan batas uji browser PM sebelumnya tetap dipertahankan.
+
+PM memeriksa 18 file runtime yang berubah terhadap snapshot final fixture ATT: semuanya sama. Tidak ada perubahan kode untuk commit ini dan tidak perlu mengulang suite hanya untuk pencatatan/Git. Commit mencakup kalender, absensi harian, migration0004, regresi penambahan siswa/penutupan semester, tes dan dokumentasi. Rahasia, database, backup, log runtime dan hasil build tetap di luar Git. Tidak ada izin remote/push atau deployment dari pesan ini.

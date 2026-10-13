@@ -313,6 +313,63 @@ button:disabled { cursor: wait; }
 .close-semester-button:disabled { cursor: wait; opacity: .7; }
 .semester-setup-link:focus-visible, .dialog-dismiss:focus-visible, .close-semester-button:focus-visible { outline: 3px solid #61a695; outline-offset: 3px; }
 
+.attendance-page { max-width: 1180px; }
+.attendance-controls { display: grid; grid-template-columns: minmax(220px, .8fr) minmax(210px, .7fr); gap: 18px 22px; padding: 21px 24px; margin-bottom: 18px; }
+.attendance-controls .form-field { gap: 8px; }
+.attendance-controls label { font-size: 14px; font-weight: 700; }
+.attendance-controls select, .attendance-controls input { width: 100%; min-height: 48px; padding: 0 13px; color: #172d29; background: #fff; border: 1px solid #cddbd7; border-radius: 10px; font-size: 15px; }
+.attendance-controls select:focus-visible, .attendance-controls input:focus-visible, .attendance-choices button:focus-visible { outline: 3px solid #61a695; outline-offset: 2px; }
+.attendance-period { grid-column: 1 / -1; }
+.attendance-summary { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 20px 23px; margin-bottom: 16px; }
+.attendance-summary h2 { margin: 6px 0 0; font-size: 20px; }
+.attendance-summary p:not(.eyebrow) { margin: 5px 0 0; color: #536b65; font-size: 13px; }
+.attendance-dirty-badge { display: inline-flex; align-items: center; min-height: 28px; padding: 5px 10px; color: #795612; background: #fff4d8; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.attendance-readonly { display: grid; gap: 5px; margin: 0 0 16px; padding: 15px 17px; color: #6c4f18; background: #fff5dd; border: 1px solid #ecdba9; border-radius: 12px; font-size: 14px; line-height: 1.45; }
+.attendance-readonly span { color: #665b40; font-size: 13px; }
+.attendance-card { padding: 24px clamp(18px, 3vw, 32px); }
+.attendance-toolbar, .attendance-history-heading { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.attendance-toolbar { padding-bottom: 18px; border-bottom: 1px solid #e5ece9; }
+.attendance-toolbar h2, .attendance-history-heading h2 { margin: 0; font-size: 20px; }
+.attendance-toolbar p, .attendance-history-heading p { margin: 7px 0 0; color: #536b65; font-size: 13px; line-height: 1.45; }
+.attendance-mark-all { min-height: 44px; flex: 0 0 auto; }
+.attendance-table-wrap { overflow-x: auto; }
+.attendance-table { width: 100%; border-collapse: collapse; text-align: left; }
+.attendance-table thead th { padding: 14px 9px 10px; color: #62766f; font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.attendance-table tbody th, .attendance-table tbody td { padding: 14px 9px; border-top: 1px solid #edf1ef; vertical-align: middle; }
+.attendance-student { width: 31%; text-align: left; }
+.attendance-student strong, .attendance-student small { display: block; }
+.attendance-student strong { color: #172d29; font-size: 14px; line-height: 1.4; }
+.attendance-student small { margin-top: 4px; color: #657b75; font-size: 12px; font-weight: 400; }
+.attendance-choices { display: flex; flex-wrap: nowrap; gap: 7px; }
+.attendance-choices button { display: grid; grid-template-columns: 28px minmax(48px, auto); align-items: center; gap: 6px; min-height: 42px; padding: 5px 9px; color: #536b65; background: #fff; border: 1px solid #cddbd7; border-radius: 9px; text-align: left; }
+.attendance-choices button span { display: grid; place-items: center; width: 27px; height: 27px; color: #41675c; background: #f0f5f3; border-radius: 7px; font-size: 13px; font-weight: 700; }
+.attendance-choices button small { font-size: 11px; line-height: 1.2; }
+.attendance-choices button:hover:not(:disabled) { border-color: #7fae9e; }
+.attendance-choices button.attendance-choice-selected { color: #155944; background: #e9f4ee; border-color: #126451; box-shadow: inset 0 0 0 1px #126451; }
+.attendance-choices button.attendance-choice-selected span { color: #fff; background: #126451; }
+.attendance-choices button:disabled { cursor: not-allowed; opacity: .7; }
+.attendance-draft-note { margin-top: 18px; padding: 12px 14px; color: #705114; background: #fff5dd; border-radius: 9px; font-size: 13px; line-height: 1.45; }
+.attendance-feedback { margin-top: 16px; padding: 14px 16px; border-radius: 10px; font-size: 14px; line-height: 1.45; }
+.attendance-feedback p { margin: 0; }
+.attendance-feedback-error { color: #8d302a; background: #fff0ed; }
+.attendance-feedback-error .text-button { margin-top: 8px; color: #8d302a; }
+.attendance-feedback-success { color: #205a43; background: #e9f5ed; }
+.attendance-actions { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 18px; padding-top: 18px; border-top: 1px solid #e5ece9; }
+.attendance-actions .primary-button { width: auto; min-width: 185px; margin: 0; }
+.attendance-history-count { color: #657b75; font-size: 12px; }
+.attendance-history-card { margin-top: 17px; padding: 21px 23px; }
+.attendance-history-heading { align-items: flex-start; }
+.attendance-history-heading > div { min-width: 0; }
+.attendance-history-heading .secondary-button { flex: 0 0 auto; }
+.attendance-history-list { display: grid; gap: 0; margin: 17px 0 0; padding: 0; list-style: none; }
+.attendance-history-list li { display: grid; grid-template-columns: minmax(130px, 1fr) minmax(145px, .8fr) minmax(180px, 1.2fr); gap: 6px 15px; padding: 13px 0; border-top: 1px solid #edf1ef; font-size: 13px; }
+.attendance-history-list li > strong { color: #172d29; }
+.attendance-history-list li > span, .attendance-history-list li > small { color: #536b65; }
+.attendance-history-list li > small:last-child:nth-child(4) { grid-column: 1 / -1; }
+.attendance-history-empty, .attendance-loading { margin: 15px 0 0; color: #536b65; font-size: 14px; }
+.attendance-empty-link { display: inline-flex; align-items: center; min-height: 44px; margin-top: 20px; text-decoration: none; }
+.attendance-empty p { margin-top: 9px; }
+
 @media (max-width: 760px) {
   .app-shell { padding: 16px 16px 38px; }
   .app-header { grid-template-columns: minmax(0, 1fr) auto; gap: 13px 10px; padding-bottom: 14px; }
@@ -323,7 +380,7 @@ button:disabled { cursor: wait; }
   .app-header .account-email { display: none; }
   .app-header .secondary-button { min-height: 38px; padding: 7px 11px; font-size: 13px; }
   .main-nav { grid-column: 1 / -1; gap: 4px; padding-top: 8px; border-top: 1px solid #e5ece9; }
-  .main-nav a { flex: 1; padding: 10px 8px; text-align: center; }
+  .main-nav a { flex: 1 1 auto; min-width: 0; padding: 10px 5px; font-size: 12px; text-align: center; white-space: nowrap; }
   .page-content { margin-top: 42px; }
   .page-heading { margin-bottom: 23px; }
   .page-heading h1 { font-size: 30px; }
@@ -371,6 +428,26 @@ button:disabled { cursor: wait; }
   .semester-form-grid { grid-template-columns: 1fr; gap: 17px; }
   .roster-source-picker { margin-top: 23px; }
   .roster-source-option { padding: 15px 13px; }
+  .attendance-controls { grid-template-columns: 1fr; gap: 15px; padding: 17px; }
+  .attendance-period { grid-column: auto; }
+  .attendance-summary { align-items: flex-start; padding: 18px; }
+  .attendance-card { padding: 18px 15px; }
+  .attendance-toolbar, .attendance-history-heading { align-items: flex-start; flex-direction: column; }
+  .attendance-mark-all, .attendance-history-heading .secondary-button { width: 100%; }
+  .attendance-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+  .attendance-table, .attendance-table tbody, .attendance-table tr, .attendance-table th, .attendance-table td { display: block; width: 100%; }
+  .attendance-table tbody tr { padding: 15px 0; border-top: 1px solid #edf1ef; }
+  .attendance-table tbody th, .attendance-table tbody td { padding: 0; border: 0; }
+  .attendance-table tbody td { margin-top: 11px; }
+  .attendance-choices { gap: 5px; }
+  .attendance-choices button { grid-template-columns: 27px 1fr; flex: 1; gap: 3px; min-width: 0; min-height: 43px; padding: 4px 3px; }
+  .attendance-choices button span { width: 25px; height: 25px; }
+  .attendance-choices button small { font-size: 9px; text-align: center; }
+  .attendance-actions { align-items: stretch; flex-direction: column; }
+  .attendance-actions .primary-button { width: 100%; }
+  .attendance-history-card { padding: 18px; }
+  .attendance-history-list li { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .attendance-history-list li > small { grid-column: 1 / -1; }
   .dialog-backdrop { align-items: end; padding: 0; }
   .closure-dialog { width: 100%; max-height: 92svh; padding: 25px 19px 20px; border-radius: 18px 18px 0 0; }
   .closure-dialog-heading h2 { font-size: 22px; }

@@ -5,17 +5,17 @@ Produk: PROD-002
 Jenis: Labs — produk internal studio
 Klien: tidak berlaku
 Catatan dibuat: 2026-10-11
-Kondisi: Nuxt/Vue full-stack lokal; task sampai SEM-001 CLOSED. Pengerjaan ditahan untuk pembahasan Ardy. Vercel belum dideploy.
+Kondisi aktif: versi uji lokal berjalan pada http://127.0.0.1:3000. CAL diterima teknis; ATT PM_VALIDATION, menunggu uji interaksi Ardy. Git baru dan Vercel/Supabase ditunda.
 
 ## Tujuan dan batas pekerjaan
 
-Membantu seorang guru dengan satu kelas mencatat absensi harian langsung melalui HP/laptop dan menghasilkan laporan bulanan atau kumpulan laporan bulanan untuk satu semester. Detail kebutuhan aktif mengikuti [PRD v1](<../product/PROD-002-product-prd-v1.md>), bukan ringkasan registry ini.
+Membantu seorang guru dengan satu kelas mencatat absensi harian langsung melalui HP/laptop dan menghasilkan laporan bulanan atau kumpulan laporan bulanan untuk satu semester. Detail kebutuhan aktif mengikuti [PRD v1](<D:/ayaa-wae-studio/products/PROD-002-product-prd-v1.md>), bukan ringkasan registry ini.
 
 Persiapan yang disetujui: pencatatan Labs dan penyiapan handoff kepada PM untuk rencana development lengkap, dependency, task, serta kebutuhan konfirmasi. PM tetap harus menampilkan task READY sebelum assignment Executor agar Ardy memilih platform, model, dan reasoning.
 
 ## Persetujuan
 
-- PRD disetujui sebagai acuan arah produk oleh Ardy pada 11 Oktober 2026. Sumber: jawaban dialog dalam chat produk ini, “Setuju PRD sebagai acuan arah produk; detail terbuka tetap dibahas sebelum implementasi”. [Riwayat keputusan produk](<../product/PROD-002-website-absensi-siswa.md#ringkasan-diskusi-dan-keputusan>).
+- PRD disetujui sebagai acuan arah produk oleh Ardy pada 11 Oktober 2026. Sumber: jawaban dialog dalam chat produk ini, “Setuju PRD sebagai acuan arah produk; detail terbuka tetap dibahas sebelum implementasi”. [Riwayat keputusan produk](<D:/ayaa-wae-studio/products/PROD-002-website-absensi-siswa.md#ringkasan-diskusi-dan-keputusan>).
 - Persiapan proyek dan pencatatan Labs disetujui Ardy pada 11 Oktober 2026. Sumber: pesan terbaru dalam chat produk ini, “PRD sudah kusetujui, dan sekarang aku menyetujui produk ini mulai dipersiapkan serta dicatat di Labs.”
 - Permintaan handoff dari pesan yang sama: “Siapkan handoff ke Project Manager untuk menyusun rencana development lengkap, dependency, task, dan kebutuhan konfirmasi dari PRD tersebut.”
 - Batas assignment dari pesan yang sama: “Sebelum assignment Executor, tunjukkan task READY agar aku memilih platform, model, dan reasoning.”
@@ -26,11 +26,11 @@ Persetujuan ini menggantikan batas sebelumnya yang menunggu izin mulai persiapan
 ## Lokasi dokumentasi
 
 - Folder registry studio: `D:\ayaa-wae-studio\Labs\LAB-002-website-absensi-siswa`.
-- Kebutuhan produk: [PRD v1](<../product/PROD-002-product-prd-v1.md>).
-- Perjalanan dan keputusan produk: [catatan produk](<../product/PROD-002-website-absensi-siswa.md>).
-- Penyerahan planning: [handoff Product Manager → PM](<product-to-pm-handoff.md>).
-- [Rencana development v1](<development-plan-v1.md>), [backlog task/dependency/AC](<tasks.md>), [keputusan dan kebutuhan konfirmasi](<decisions-and-confirmations.md>), [verification dan uji Ardy](<verification-plan.md>).
-- [Task READY LAB002-UI-001](<tasks/LAB002-UI-001.md>), [pilihan assignment](<tasks/LAB002-UI-001-assignment.md>). Panduan deploy aktual/kontrak stack belum ada; direncanakan sesuai target yang kelak dipilih.
+- Kebutuhan produk: [PRD v1](<D:/ayaa-wae-studio/products/PROD-002-product-prd-v1.md>).
+- Perjalanan dan keputusan produk: [catatan produk](<D:/ayaa-wae-studio/products/PROD-002-website-absensi-siswa.md>).
+- Penyerahan planning: [handoff Product Manager → PM](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/product-to-pm-handoff.md>).
+- [Rencana development v1](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/development-plan-v1.md>), [backlog task/dependency/AC](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/tasks.md>), [keputusan dan kebutuhan konfirmasi](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/decisions-and-confirmations.md>), [verification dan uji Ardy](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/verification-plan.md>).
+- [Task READY LAB002-UI-001](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/tasks/LAB002-UI-001.md>), [pilihan assignment](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/tasks/LAB002-UI-001-assignment.md>). Panduan deploy aktual/kontrak stack belum ada; direncanakan sesuai target yang kelak dipilih.
 - Review produk, bukti pengujian, dan brief Brand & Content: belum tersedia.
 
 ## Lokasi codebase
@@ -45,13 +45,13 @@ Pemeriksaan 11 Oktober 2026: `git -C D:\ayaa-wae-studio rev-parse --show-topleve
 
 PM menerima handoff pada 11 Oktober 2026 berdasarkan penugasan Ardy di chat utama. Rencana/backlog dan daftar konfirmasi sudah ditulis. Sesudah perbandingan, Ardy memilih Laravel + Inertia/Vue dalam satu aplikasi; versi/database/paket/hosting belum dipilih. Tidak ada subagent PM. Executor UI-001 /root/lab002_ui001 telah menerima assignment dan menyelesaikan preflight; desain sedang dikerjakan.
 
-Kebutuhan konfirmasi dan dampak ke tahap/task tercantum pada [handoff](<product-to-pm-handoff.md#kebutuhan-konfirmasi-dan-dampaknya>). Detail yang hanya memengaruhi implementasi tertentu tidak menahan seluruh planning. Perubahan tujuan/scope tetap dibahas dengan Product Manager dan Ardy; keputusan teknis besar tetap pada Ardy.
+Kebutuhan konfirmasi dan dampak ke tahap/task tercantum pada [handoff](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/product-to-pm-handoff.md#kebutuhan-konfirmasi-dan-dampaknya>). Detail yang hanya memengaruhi implementasi tertentu tidak menahan seluruh planning. Perubahan tujuan/scope tetap dibahas dengan Product Manager dan Ardy; keputusan teknis besar tetap pada Ardy.
 
 Task LAB002-UI-001 design-only: ASSIGNED ke Codex subagent gpt-6.1-sol/high atas pesan Ardy “oke asign ke Codex subagent, **gpt-6.1-sol / high**”, 11 Oktober 2026. Handle aktual /root/lab002_ui001. ACK dan preflight diterima PM; Executor melanjutkan desain statis. Task implementasi masih ANALYSIS. Next owner: Executor untuk artefak/laporan, lalu PM untuk validation sebelum review desain Ardy. Implementasi, pengujian aplikasi, approval desain/hasil, deployment, dan publikasi belum dilakukan.
 
 ## Pembaruan hasil UI-001 — 11 Oktober 2026
 
-Executor selesai menyerahkan sembilan SVG/PNG dan laporan. PM memeriksa semua PNG serta AC; status terbaru READY_FOR_ARDY_REVIEW, next owner Ardy. [Catatan desain](<design/LAB002-UI-001/README.md>), [review PM](<reports/LAB002-UI-001-pm-review.md>). Pernyataan pekerjaan berjalan di atas adalah posisi sebelum hasil kembali. Approval desain/closure dan implementasi belum dilakukan.
+Executor selesai menyerahkan sembilan SVG/PNG dan laporan. PM memeriksa semua PNG serta AC; status terbaru READY_FOR_ARDY_REVIEW, next owner Ardy. [Catatan desain](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/design/LAB002-UI-001/README.md>), [review PM](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/reports/LAB002-UI-001-pm-review.md>). Pernyataan pekerjaan berjalan di atas adalah posisi sebelum hasil kembali. Approval desain/closure dan implementasi belum dilakukan.
 
 ## Keputusan Ardy dan status terbaru
 
@@ -60,7 +60,7 @@ UI-001 APPROVED lalu CLOSED setelah pemeriksaan PM. Catatan READY_FOR_ARDY_REVIE
 
 ## Target Vercel dan evaluasi stack — 11 Oktober 2026
 
-Vercel ditetapkan Ardy sebagai hosting. C01 sedang dievaluasi ulang melalui [perbandingan Nuxt/Vue dan Laravel](<stack-vercel-comparison.md>); Laravel belum digantikan. Setup/implementation yang bergantung pada stack tetap menunggu keputusan. UI-001 sudah CLOSED dengan approval desain; tidak terpengaruh evaluasi ini. Provider database/storage, paket, biaya dan izin deploy belum ditetapkan.
+Vercel ditetapkan Ardy sebagai hosting. C01 sedang dievaluasi ulang melalui [perbandingan Nuxt/Vue dan Laravel](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/stack-vercel-comparison.md>); Laravel belum digantikan. Setup/implementation yang bergantung pada stack tetap menunggu keputusan. UI-001 sudah CLOSED dengan approval desain; tidak terpengaruh evaluasi ini. Provider database/storage, paket, biaya dan izin deploy belum ditetapkan.
 
 ## Keputusan aktif setelah perbandingan
 
@@ -71,11 +71,11 @@ Keputusan aktif: Nuxt/Vue full-stack dalam satu aplikasi, hosting Vercel. Sumber
 Sumber: dua dialog lokasi/database, kemudian penyedia/baseline. Ardy menyetujui root app di folder registry, salinan terarah docs development dalam repo dan Git init lokal; commit/push tetap terpisah. App belum ada saat diperiksa PM.
 Nuxt 4 stabil + TypeScript, Node 24, npm/lockfile dan aplikasi minimal tanpa login/absensi/Excel/PDF disetujui. Rekomendasi patch Nuxt 4.6.1 diperiksa sumber resmi; preflight wajib kompatibilitas.
 Supabase dipilih untuk PostgreSQL; pemilihan Auth/Storage, provisioning/reset/akses C04 dan backup C08 tetap terbuka. Tidak ada layanan dibuat, region/plan/biaya/kredensial ditetapkan.
-[SET-001](<tasks/LAB002-SET-001.md>) READY untuk fondasi lokal/config placeholders tanpa koneksi DB nyata. Tidak ASSIGNED. Provider credentials/ORM/schema bukan dependency scope ini, tetap dependency DATA/AUTH/OPS terkait. C02 path/Git lokal APPROVED; remote/branch strategy/commit/push belum diotorisasi.
+[SET-001](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/tasks/LAB002-SET-001.md>) READY untuk fondasi lokal/config placeholders tanpa koneksi DB nyata. Tidak ASSIGNED. Provider credentials/ORM/schema bukan dependency scope ini, tetap dependency DATA/AUTH/OPS terkait. C02 path/Git lokal APPROVED; remote/branch strategy/commit/push belum diotorisasi.
 
 ## Assignment SET-001 — 11 Oktober 2026
 
-Ardy meminta assignment ke Codex subagent gpt-6.1-sol/high. [SET-001](<tasks/LAB002-SET-001.md>) ASSIGNED, handle aktual /root/lab002_set001, tahap fondasi lokal sesuai brief; hasil/preflight belum tersedia saat dispatch. [Handoff](<tasks/LAB002-SET-001-assignment.md>). Next owner Executor lalu PM untuk validation. Tidak ada izin commit/push/deploy/resource layanan.
+Ardy meminta assignment ke Codex subagent gpt-6.1-sol/high. [SET-001](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/tasks/LAB002-SET-001.md>) ASSIGNED, handle aktual /root/lab002_set001, tahap fondasi lokal sesuai brief; hasil/preflight belum tersedia saat dispatch. [Handoff](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/tasks/LAB002-SET-001-assignment.md>). Next owner Executor lalu PM untuk validation. Tidak ada izin commit/push/deploy/resource layanan.
 
 ## Hasil SET-001 — 11 Oktober 2026
 

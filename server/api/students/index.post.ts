@@ -1,6 +1,7 @@
 import { requireAuthenticatedTeacher } from '../../auth/teacher-session.ts'
 import { withAuditActor } from '../../database/audit-context.ts'
 import { getDatabase } from '../../database/client.ts'
+import { lockSchoolSemesterChanges } from '../../database/repositories/semesters.ts'
 import { addStudentToSemester, createStudent } from '../../database/repositories/students.ts'
 import {
   optionalGender,
@@ -27,6 +28,17 @@ export default defineEventHandler(async (event) => {
 
   try {
     const membership = await withAuditActor(getDatabase(), teacher.id, async (transaction) => {
+      const ownedSemesters = await transaction<{ school_id: string }[]>`
+        select semester.school_id
+        from semesters as semester
+        join schools as school on school.id = semester.school_id
+        where semester.id = ${semesterId} and school.teacher_id = ${teacher.id}
+      `
+      const ownedSemester = ownedSemesters[0]
+      if (!ownedSemester) throw createError({ statusCode: 404, statusMessage: 'Semester tidak ditemukan atau tidak dapat diakses.' })
+
+      await lockSchoolSemesterChanges(transaction, ownedSemester.school_id)
+
       const scopes = await transaction<{
         school_id: string
         class_id: string | null
@@ -45,6 +57,7 @@ export default defineEventHandler(async (event) => {
       `
       const scope = scopes[0]
       if (!scope) throw createError({ statusCode: 404, statusMessage: 'Semester tidak ditemukan atau tidak dapat diakses.' })
+      if (scope.school_id !== ownedSemester.school_id) throw createError({ statusCode: 409, statusMessage: 'Periksa kembali semester lalu coba lagi.' })
       if (scope.status !== 'active') throw createError({ statusCode: 409, statusMessage: 'Semester ini sudah menjadi arsip dan hanya dapat dilihat.' })
       if (!scope.class_id) throw createError({ statusCode: 409, statusMessage: 'Data kelas belum siap. Perbarui data sekolah terlebih dahulu.' })
 

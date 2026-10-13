@@ -37,9 +37,11 @@ async function logout() {
       </NuxtLink>
 
       <nav class="main-nav" aria-label="Navigasi utama">
-        <NuxtLink to="/school" :aria-current="route.path === '/school' ? 'page' : undefined">Data sekolah</NuxtLink>
+        <NuxtLink to="/school" :aria-current="route.path === '/school' ? 'page' : undefined">Sekolah</NuxtLink>
         <NuxtLink to="/students" :aria-current="route.path === '/students' ? 'page' : undefined">Siswa</NuxtLink>
         <NuxtLink to="/semesters" :aria-current="route.path === '/semesters' ? 'page' : undefined">Semester</NuxtLink>
+        <NuxtLink to="/calendar" :aria-current="route.path === '/calendar' ? 'page' : undefined">Kalender</NuxtLink>
+        <NuxtLink to="/attendance" :aria-current="route.path === '/attendance' ? 'page' : undefined">Absensi</NuxtLink>
       </nav>
 
       <div class="account-actions">

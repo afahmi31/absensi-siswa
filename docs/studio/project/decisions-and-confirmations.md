@@ -1,7 +1,7 @@
 # Keputusan dan Konfirmasi LAB-002
 
 Pemilik catatan: Project Manager. Tanggal: 2026-10-11.
-Sumber kebutuhan: [PRD](<../product/PROD-002-product-prd-v1.md>); sumber izin mulai: [registry](<README.md#persetujuan>).
+Sumber kebutuhan: [PRD](<D:/ayaa-wae-studio/products/PROD-002-product-prd-v1.md>); sumber izin mulai: [registry](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/README.md#persetujuan>).
 
 Pilihan belum dijawab tetap OPEN. Rekomendasi bukan keputusan. Konfirmasi disampaikan melalui dialog; urutkan sesuai tahap, jangan menghentikan pekerjaan independen.
 
@@ -9,7 +9,7 @@ Pilihan belum dijawab tetap OPEN. Rekomendasi bukan keputusan. Konfirmasi disamp
 
 Keputusan aktif: Nuxt/Vue full-stack dalam satu aplikasi, hosting Vercel. Sumber: jawaban dialog Ardy “Ganti ke Nuxt/Vue full-stack (rekomendasi PM)”, 11 Oktober 2026. Menggantikan pilihan Laravel + Inertia/Vue sebelumnya karena target hosting. Versi/runtime, database, auth, storage, paket Excel/PDF dan biaya belum dipilih. Tidak memberi izin setup/assignment/deploy. Desain UI-001 APPROVED/CLOSED tetap acuan.
 
-Riwayat: Laravel + Inertia/Vue sempat disetujui; pilihan tersebut kini digantikan. [Perbandingan](<stack-vercel-comparison.md>). Tabel rekomendasi awal di bawah adalah riwayat sebelum hosting Vercel ditetapkan.
+Riwayat: Laravel + Inertia/Vue sempat disetujui; pilihan tersebut kini digantikan. [Perbandingan](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/stack-vercel-comparison.md>). Tabel rekomendasi awal di bawah adalah riwayat sebelum hosting Vercel ditetapkan.
 
 | Pilihan | Cara kerja | Trade-off untuk LAB-002 |
 |---|---|---|
@@ -43,7 +43,7 @@ C03–C08 tidak harus dijawab sebelum semua planning berjalan. Jawaban wajib seb
 
 - PM planning diterima pada chat utama dari pesan “Gunakan peran Project Manager dan jalankan planning dari handoff LAB-002”. Tidak ada subagent PM; Executor UI-001 kini telah didispatch sesuai keputusan terbaru.
 - Scope fitur v1 dan R01–R15 sudah disetujui; tidak perlu diminta ulang.
-- Ardy menjawab “Belum assignment; aku ingin membaca task dahulu” pada dialog UI-001, 11 Oktober 2026. Ini posisi historis sebelum pesan berikutnya. Ardy kemudian menyetujui assignment Codex subagent gpt-6.1-sol/high; [assignment](<tasks/LAB002-UI-001-assignment.md>) kini ASSIGNED dengan handle /root/lab002_ui001.
+- Ardy menjawab “Belum assignment; aku ingin membaca task dahulu” pada dialog UI-001, 11 Oktober 2026. Ini posisi historis sebelum pesan berikutnya. Ardy kemudian menyetujui assignment Codex subagent gpt-6.1-sol/high; [assignment](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/tasks/LAB002-UI-001-assignment.md>) kini ASSIGNED dengan handle /root/lab002_ui001.
 - Desain awal harus direview Ardy sebelum implementasi terkait; approval task desain bukan approval hasil desain.
 - Memilih stack tidak mengizinkan coding seluruh backlog, layanan berbayar, commit/push, production atau publikasi.
 
@@ -62,7 +62,7 @@ Setelah jawaban tersedia, PM mencatat sumber, memperbarui PRD bila flow produk b
 
 ## Pembaruan hasil UI-001 — 11 Oktober 2026
 
-Executor selesai menyerahkan sembilan SVG/PNG dan laporan. PM memeriksa semua PNG serta AC; status terbaru READY_FOR_ARDY_REVIEW, next owner Ardy. [Catatan desain](<design/LAB002-UI-001/README.md>), [review PM](<reports/LAB002-UI-001-pm-review.md>). Pernyataan pekerjaan berjalan di atas adalah posisi sebelum hasil kembali. Approval desain/closure dan implementasi belum dilakukan.
+Executor selesai menyerahkan sembilan SVG/PNG dan laporan. PM memeriksa semua PNG serta AC; status terbaru READY_FOR_ARDY_REVIEW, next owner Ardy. [Catatan desain](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/design/LAB002-UI-001/README.md>), [review PM](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/reports/LAB002-UI-001-pm-review.md>). Pernyataan pekerjaan berjalan di atas adalah posisi sebelum hasil kembali. Approval desain/closure dan implementasi belum dilakukan.
 
 ## Keputusan Ardy dan status terbaru
 
@@ -82,11 +82,11 @@ Keputusan aktif: Nuxt/Vue full-stack dalam satu aplikasi, hosting Vercel. Sumber
 Sumber: dua dialog lokasi/database, kemudian penyedia/baseline. Ardy menyetujui root app di folder registry, salinan terarah docs development dalam repo dan Git init lokal; commit/push tetap terpisah. App belum ada saat diperiksa PM.
 Nuxt 4 stabil + TypeScript, Node 24, npm/lockfile dan aplikasi minimal tanpa login/absensi/Excel/PDF disetujui. Rekomendasi patch Nuxt 4.6.1 diperiksa sumber resmi; preflight wajib kompatibilitas.
 Supabase dipilih untuk PostgreSQL; pemilihan Auth/Storage, provisioning/reset/akses C04 dan backup C08 tetap terbuka. Tidak ada layanan dibuat, region/plan/biaya/kredensial ditetapkan.
-[SET-001](<tasks/LAB002-SET-001.md>) READY untuk fondasi lokal/config placeholders tanpa koneksi DB nyata. Tidak ASSIGNED. Provider credentials/ORM/schema bukan dependency scope ini, tetap dependency DATA/AUTH/OPS terkait. C02 path/Git lokal APPROVED; remote/branch strategy/commit/push belum diotorisasi.
+[SET-001](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/tasks/LAB002-SET-001.md>) READY untuk fondasi lokal/config placeholders tanpa koneksi DB nyata. Tidak ASSIGNED. Provider credentials/ORM/schema bukan dependency scope ini, tetap dependency DATA/AUTH/OPS terkait. C02 path/Git lokal APPROVED; remote/branch strategy/commit/push belum diotorisasi.
 
 ## Assignment SET-001 — 11 Oktober 2026
 
-Ardy meminta assignment ke Codex subagent gpt-6.1-sol/high. [SET-001](<tasks/LAB002-SET-001.md>) ASSIGNED, handle aktual /root/lab002_set001, tahap fondasi lokal sesuai brief; hasil/preflight belum tersedia saat dispatch. [Handoff](<tasks/LAB002-SET-001-assignment.md>). Next owner Executor lalu PM untuk validation. Tidak ada izin commit/push/deploy/resource layanan.
+Ardy meminta assignment ke Codex subagent gpt-6.1-sol/high. [SET-001](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/tasks/LAB002-SET-001.md>) ASSIGNED, handle aktual /root/lab002_set001, tahap fondasi lokal sesuai brief; hasil/preflight belum tersedia saat dispatch. [Handoff](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/tasks/LAB002-SET-001-assignment.md>). Next owner Executor lalu PM untuk validation. Tidak ada izin commit/push/deploy/resource layanan.
 
 ## Hasil SET-001 — 11 Oktober 2026
 
@@ -141,3 +141,20 @@ Aplikasi lokal tersedia di http://127.0.0.1:3000; login/logout sudah tersedia, p
 Sumber terbaru Ardy: “ya lanjutkan kembali semua tasknya”, 12 Oktober 2026. PM melanjutkan seluruh scope v1 hingga berjalan dan diuji lokal, tetap per task READY/dependency/AC; model Executor Codex gpt-6-luna/max. Commit lokal diizinkan; remote/push/deploy/resource cloud/biaya dan data siswa nyata tidak termasuk. Tidak perlu approval rutin per task dalam delegasi tersebut.
 
 PM menyelaraskan dependency backlog lama dengan keputusan urutan dalam rencana: STUD→SEM→CAL→ATT; IMP dan OPS sesudah STUD/SEM, REP sesudah ATT/SEM/CAL/OPS; QA semua modul lalu REL. Lingkaran ATT↔SEM pada tabel lama digantikan. SEM diuji dengan fixture DATA sebelum UIATT tersedia; QA tetap memeriksa semua jalur tulis sesudah penutupan. STUD ASSIGNED dan preflight siap; task fitur lanjutan belum didispatch. Brief lanjutan dirapikan tanpa mengubah AC; OPS metadata menunjuk STUD, REL commit dimiliki PM.
+
+## Prioritas pra-rilis guru online — 12 Oktober 2026
+
+Ardy memilih URL Vercel HP/laptop, Supabase baru paket gratis, langsung data siswa sebenarnya. Acuan prioritas aktif: pre-release-teacher-pilot.md. CAL kemudian ATT didahulukan; laporan/impor ditunda dari pra-rilis, PRD lengkap tetap. Kesiapan online/login/backup minimum serta QA wajib sebelum akses guru. Resource/target deployment belum tersedia; tidak ada deploy/biaya/remote/push pada keputusan ini.
+
+## ATT — keputusan preflight PM
+
+PM menerima proposal Executor untuk migration0004 backward-compatible: statusNULL hanya tombstone non-effective manual_clear, effective/holiday-excluded tetap HSIA. Clear adalah update eksplisit record efektif dengan version+1 dan audit old/new; riwayat sebelumnya tetap pada audit immutable, input ulang membuat record efektif baru. Tidak edit migration0001–0003 atau hapus riwayat. Down harus menolak jika manual-clearhistory ada, bukan menghapus history agar rollback lolos.
+
+Revisi hari memakai satu token opaque HMAC-SHA256 atas snapshot koheren keadaan hari, tanpa tabel revision baru. Token terikat school/semester/date/ownership, timezone, eligibility/snapshot roster/updatedstate, routine/exception, seluruh row attendance/version/effective/history. GET tetap read-only. Key server-only privat yang stabil memakai fondasi sesi existing; fixturekey untuktes, tidak dikirim keclient. Ini detail implementasi revisihari, tidak mengurangi konflik409/cakupan AC02.
+
+Save mengunci1728->1727->1729->rowlocks sebelumrecheck dan batchatomik. Metadata timezone juga dilindungi dari perubahan bersamaan sehingga pemeriksaan tanggal konsisten. Type interoperabilitas riwayatCAL dapat dirapikan terarah jikaNULL perlu; tidak mengganti flow kalender. PM memberi izin implementasi proposal setelah preflight; localonly, synthetic tests, no commit/cloud.
+## Hasil uji Ardy dan izin commit lokal — 13 Oktober 2026
+
+Ardy: “commit dulu saja. aku sudah coba untuk flow tidak ada masalah”. Ardy melaporkan uji alur lokal tanpa kendala dan memberi izin commit lokal. Tidak ada rincian skenario/perangkat yang dilaporkan, sehingga catatan ini tidak menyatakan setiap kasus konflik409, kegagalan jaringan atau dialog telah diuji satu per satu. Bukti teknis dan batas uji browser PM sebelumnya tetap dipertahankan.
+
+PM memeriksa 18 file runtime yang berubah terhadap snapshot final fixture ATT: semuanya sama. Tidak ada perubahan kode untuk commit ini dan tidak perlu mengulang suite hanya untuk pencatatan/Git. Commit mencakup kalender, absensi harian, migration0004, regresi penambahan siswa/penutupan semester, tes dan dokumentasi. Rahasia, database, backup, log runtime dan hasil build tetap di luar Git. Tidak ada izin remote/push atau deployment dari pesan ini.
