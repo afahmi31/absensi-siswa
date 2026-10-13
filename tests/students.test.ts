@@ -173,7 +173,7 @@ test('STUD school setup and semester roster APIs preserve ownership, snapshots, 
     assert.deepEqual(migrations.map((migration) => migration.applied), expectedNames.map(() => true))
 
     const email = `stud-${randomUUID()}@example.invalid`
-    const owner = await provisionTeacherAccount(appDatabase, email, await passwordHasher.make(password))
+    const owner = await provisionTeacherAccount(migrator, email, await passwordHasher.make(password))
     ownerTeacherId = owner.id
     const port = await availablePort()
     baseUrl = `http://127.0.0.1:${port}`
@@ -283,7 +283,7 @@ test('STUD school setup and semester roster APIs preserve ownership, snapshots, 
       archiveMembershipId = school.archiveMembershipId
       attendanceDate = school.attendanceDate
 
-      const foreignTeacher = await createTeacherAccount(appDatabase, `foreign-${randomUUID()}@example.invalid`)
+      const foreignTeacher = await createTeacherAccount(migrator, `foreign-${randomUUID()}@example.invalid`)
       const foreignSchool = await createSchool(appDatabase, { teacherId: foreignTeacher.id, name: 'Sekolah Lain' })
       const foreignClass = await createSchoolClass(appDatabase, { schoolId: foreignSchool.id, name: 'Kelas Asing' })
       const [todayRow] = await appDatabase`select school_local_today(${foreignSchool.id})::text as today`

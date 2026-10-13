@@ -13,7 +13,7 @@ Panduan untuk alat transfer yang disiapkan di `scripts/cloud-data-transfer.mjs`.
 
 ## Tahapan alat
 
-1. Siapkan snapshot privat dengan `node scripts/cloud-data-transfer.mjs prepare`. Alat hanya memilih sebelas tabel aplikasi yang diizinkan, memakai custom-format `pg_dump` data-only, dan memeriksa ulang bentuk schema serta ledger checksum migrasi setelah snapshot. Source harus cocok tepat dengan baseline lama 0001–0004 yang checksum-nya dipatok, atau ledger lengkap 0001–0006. Ledger parsial lain dan checksum berbeda ditolak. Manifest mencatat ledger source dan target secara terpisah; ledger source tidak disalin. Target tetap harus cocok dengan seluruh ledger terkini 0001–0006 beserta checksum persisnya. Output hanya menyebut jumlah total baris, ukuran arsip, dan nama manifest.
+1. Siapkan snapshot privat dengan `node scripts/cloud-data-transfer.mjs prepare`. Alat hanya memilih sebelas tabel aplikasi yang diizinkan, memakai custom-format `pg_dump` data-only, dan memeriksa ulang bentuk schema serta ledger checksum migrasi setelah snapshot. Source harus cocok tepat dengan baseline lama 0001–0004 yang checksum-nya dipatok, atau ledger lengkap 0001–0006 yang ditinjau. Ledger parsial lain dan checksum berbeda ditolak. Manifest mencatat ledger source dan target secara terpisah; ledger source tidak disalin. Target harus cocok dengan seluruh ledger terkini 0001–0007 beserta checksum persisnya. Output hanya menyebut jumlah total baris, ukuran arsip, dan nama manifest.
 2. Setelah snapshot dan manifest ditinjau PM, jalankan pemeriksaan target read-only:
 
    ```text
@@ -39,7 +39,7 @@ Jika koneksi terputus ketika hasil commit belum diketahui, jangan ulangi import.
 
 ## Rehearsal lokal
 
-Rehearsal membuat cluster PostgreSQL 16 disposable dan memakai hanya data sintetis. Ia mempertahankan skenario ledger penuh 0001–0006 ke 0001–0006, lalu menguji source 0001–0004 terhadap target 0001–0006. Source baseline lama dibangun dari salinan sementara migration runner dan hanya empat pasang migration lama; file migration aplikasi tidak diubah.
+Rehearsal membuat cluster PostgreSQL 16 disposable dan memakai hanya data sintetis. Ia menguji source ledger penuh yang ditinjau 0001–0006 ke target 0001–0007, lalu source lama 0001–0004 ke target 0001–0007. Masing-masing source baseline dibangun dari salinan sementara migration runner dengan pasangan migration yang disebut tepat; file migration aplikasi tidak diubah.
 
 ```text
 node scripts/test-cloud-data-transfer.mjs

@@ -1,6 +1,6 @@
 {
-  "copiedAt": "2026-10-13T07:54:09.4662553Z",
-  "task": "LAB002-CLOUD-DATA-001-revision-pm-review",
+  "copiedAt": "2026-10-13T08:59:03.3059613Z",
+  "task": "LAB002-SEC-001-approved-cloud-0007",
   "authority": "Registry studio tetap sumber keputusan aktif. Salinan ini untuk penelusuran development.",
   "transformations": "Selected historic copies keep original sync mappings. Current local-trial snapshots normalize Markdown whitespace and link back to absolute registry sources. Hashes reflect saved copies.",
   "excluded": [
@@ -408,12 +408,6 @@
       "copySha256": "a68494b2437a14b94ccbbdf97a5df234369359826dd40228d373ce63bfdd2808"
     },
     {
-      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\tasks\\LAB002-SEC-001.md",
-      "copy": "docs/studio/project/tasks/LAB002-SEC-001.md",
-      "sourceSha256": "3229d501dca39f3ae38ee0b2b08f551bdce252ba20a841f20b2ec9c8c9c65bd1",
-      "copySha256": "3229d501dca39f3ae38ee0b2b08f551bdce252ba20a841f20b2ec9c8c9c65bd1"
-    },
-    {
       "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\reports\\LAB002-CLOUD-DATA-001-report.md",
       "copy": "docs/studio/project/reports/LAB002-CLOUD-DATA-001-report.md",
       "sourceSha256": "e8c8cc12350dbb61c27cea434ff907af2548c7ea4845c13ac4834beb47cd8987",
@@ -428,8 +422,26 @@
     {
       "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\resume-checkpoint.md",
       "copy": "docs/studio/project/resume-checkpoint.md",
-      "sourceSha256": "b2a72951957b4de7840b08b51e61b7c6fc24df99128586399c6e798d6993b89c",
-      "copySha256": "b2a72951957b4de7840b08b51e61b7c6fc24df99128586399c6e798d6993b89c"
+      "sourceSha256": "3fb19ce2b18d39031720c38a173041b6019743e80f2c5a4603cf33658c88fbd5",
+      "copySha256": "3fb19ce2b18d39031720c38a173041b6019743e80f2c5a4603cf33658c88fbd5"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\tasks\\LAB002-SEC-001.md",
+      "copy": "docs/studio/project/tasks/LAB002-SEC-001.md",
+      "sourceSha256": "e7007487600c53f1e7f1ffc9f18e0e3662b8072539d5492bf5a1b720c243e93d",
+      "copySha256": "e7007487600c53f1e7f1ffc9f18e0e3662b8072539d5492bf5a1b720c243e93d"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\reports\\LAB002-SEC-001-report.md",
+      "copy": "docs/studio/project/reports/LAB002-SEC-001-report.md",
+      "sourceSha256": "f67420952876c731b43beb97085c047f9b7867b3e0c8f07c7de468ade6172054",
+      "copySha256": "f67420952876c731b43beb97085c047f9b7867b3e0c8f07c7de468ade6172054"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\reports\\LAB002-SEC-001-pm-review.md",
+      "copy": "docs/studio/project/reports/LAB002-SEC-001-pm-review.md",
+      "sourceSha256": "c2fa6d85d6167e62c4f2917eabf8c5e023c4867b395c1e9319bef635c64d1f55",
+      "copySha256": "c2fa6d85d6167e62c4f2917eabf8c5e023c4867b395c1e9319bef635c64d1f55"
     }
   ]
 }

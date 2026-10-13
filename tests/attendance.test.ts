@@ -161,10 +161,11 @@ async function addMembership(
 
 async function createFixture(
   database: postgres.Sql,
+  accountDatabase: postgres.Sql,
   input: { password: string; emailSuffix: string; setupRoutine: boolean },
 ): Promise<AttendanceFixture> {
   const email = `att-${input.emailSuffix}-${randomUUID()}@example.invalid`
-  const teacher = await provisionTeacherAccount(database, email, await passwordHasher.make(input.password))
+  const teacher = await provisionTeacherAccount(accountDatabase, email, await passwordHasher.make(input.password))
   const school = await createSchool(database, { teacherId: teacher.id, name: 'Sekolah Absensi Uji', timeZone: 'Asia/Jakarta' })
   const schoolClass = await createSchoolClass(database, { schoolId: school.id, name: 'Kelas Uji' })
   const [local] = await database<{ today: string }[]>`select school_local_today(${school.id})::text as today`
@@ -259,8 +260,8 @@ test('ATT protected daily attendance preserves drafts, audit history, day revisi
     assert.deepEqual(migrations.map((migration) => migration.name), expectedNames)
     assert.deepEqual(migrations.map((migration) => migration.applied), expectedNames.map(() => true))
 
-    fixture = await createFixture(database, { password, emailSuffix: 'primary', setupRoutine: false })
-    const foreignTeacher = await createTeacherAccount(database, `foreign-${randomUUID()}@example.invalid`)
+    fixture = await createFixture(database, migrator, { password, emailSuffix: 'primary', setupRoutine: false })
+    const foreignTeacher = await createTeacherAccount(migrator, `foreign-${randomUUID()}@example.invalid`)
     const foreignSchool = await createSchool(database, { teacherId: foreignTeacher.id, name: 'Sekolah Guru Lain', timeZone: 'Asia/Jakarta' })
     await createSchoolClass(database, { schoolId: foreignSchool.id, name: 'Kelas Guru Lain' })
     const foreignSemester = await createSemester(database, {

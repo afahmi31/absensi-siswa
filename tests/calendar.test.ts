@@ -246,12 +246,12 @@ test('CAL calendar APIs preserve ownership, weekly rules, attendance history, ar
     assert.deepEqual(migrations.map((migration) => migration.applied), expectedNames.map(() => true))
 
     const email = `calendar-${randomUUID()}@example.invalid`
-    const owner = await provisionTeacherAccount(appDatabase, email, await passwordHasher.make(password))
+    const owner = await provisionTeacherAccount(migrator, email, await passwordHasher.make(password))
     ownerId = owner.id
     fixture = await createCalendarFixture(appDatabase, ownerId, 'Sekolah Kalender Uji')
-    const foreignTeacher = await createTeacherAccount(appDatabase, `foreign-${randomUUID()}@example.invalid`)
+    const foreignTeacher = await createTeacherAccount(migrator, `foreign-${randomUUID()}@example.invalid`)
     const foreignFixture = await createCalendarFixture(appDatabase, foreignTeacher.id, 'Sekolah Milik Guru Lain')
-    const priorTeacher = await createTeacherAccount(appDatabase, `prior-${randomUUID()}@example.invalid`)
+    const priorTeacher = await createTeacherAccount(migrator, `prior-${randomUUID()}@example.invalid`)
     const priorFixture = await createCalendarFixture(appDatabase, priorTeacher.id, 'Sekolah Semester Lampau', -120)
     const port = await availablePort()
     baseUrl = `http://127.0.0.1:${port}`

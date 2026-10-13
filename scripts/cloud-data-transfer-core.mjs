@@ -36,14 +36,11 @@ const approvedSourceBaseline = Object.freeze({
   '0003_semester_archive_snapshots': '4f8d98bb05f1a188a394c8a88916323ad580d101a482d0c4d853f9db77c8a56c',
   '0004_attendance_manual_clear': '81749cdc9ad0e51a3453454d4364f848863cf94df5c0d60b37d83d5ee7fdd46a',
 })
-const approvedFullSourceNames = Object.freeze([
-  '0001_core',
-  '0002_authentication',
-  '0003_semester_archive_snapshots',
-  '0004_attendance_manual_clear',
-  '0005_private_runtime_access',
-  '0006_shared_login_throttle',
-])
+const approvedFullSourceBaseline = Object.freeze({
+  ...approvedSourceBaseline,
+  '0005_private_runtime_access': 'eb72e6ef5cae317de1282fde31e0d67cadcd4cf424b281ccbf44eaccb8f7c652',
+  '0006_shared_login_throttle': '925d87cc11d4af59be72b378beaf17b7a599cb2349111b02a6064565518d1737',
+})
 
 function quoteIdentifier(identifier) {
   if (!/^[a-z_][a-z0-9_]*$/.test(identifier)) throw new Error('Transfer metadata contains an invalid identifier.')
@@ -215,16 +212,10 @@ function sameLedger(actual, expected) {
 
 async function expectedSourceMigrationSets() {
   const current = await expectedMigrationChecksums()
-  const baselineNames = Object.keys(approvedSourceBaseline)
-  const currentBaseline = Object.fromEntries(baselineNames.map((name) => [name, current[name]]))
-  if (!sameLedger(currentBaseline, approvedSourceBaseline)) {
+  if (Object.entries(approvedFullSourceBaseline).some(([name, checksum]) => current[name] !== checksum)) {
     throw new Error('The reviewed local source migration baseline has changed.')
   }
-  const sets = [approvedSourceBaseline]
-  if (sameLedger(current, Object.fromEntries(approvedFullSourceNames.map((name) => [name, current[name]])))) {
-    sets.push(current)
-  }
-  return sets
+  return [approvedSourceBaseline, approvedFullSourceBaseline]
 }
 
 async function verifySourceMigrationLedger(actual) {
@@ -576,7 +567,7 @@ function validateManifest(manifest) {
   const sourceNames = Object.keys(manifest.sourceMigrations ?? {}).sort()
   const approvedSourceNameSets = [
     Object.keys(approvedSourceBaseline).sort(),
-    [...approvedFullSourceNames].sort(),
+    Object.keys(approvedFullSourceBaseline).sort(),
   ]
   if (
     !approvedSourceNameSets.some((names) => JSON.stringify(names) === JSON.stringify(sourceNames))
