@@ -1,5 +1,13 @@
 # Uji lokal Website Absensi Siswa
 
+## Pemeriksaan data guru — 13 Oktober 2026
+
+Data guru sudah dipakai database lokal. Buka http://127.0.0.1:3000 dan masuk kembali dengan akun yang sama. Periksa sekolah/kelas II, semester ganjil 2026/2027 (14 Juli–12 Oktober 2026), 38 siswa, dan tanggal absensi pada periode sumber. PM telah membandingkan 1.900 pasangan melalui API aplikasi, seluruhnya cocok. Detail pada reports/LAB002-LOCAL-DATA-001-pm-review.md.
+
+Pada 28 Juli dan 2 Oktober dipakai kiriman dengan Timestamp terbaru, sesuai pilihan Ardy; formula tabel bulanan file sumber mungkin memilih kiriman pertama. 90 status kosong tetap belum diisi. Hari rutin Senin–Sabtu, libur nasional belum diatur. Semester tetap aktif; untuk mengisi setelah 12 Oktober, perpanjang periode lewat website. Backup dan cluster percobaan lama dipertahankan. Deployment menunggu perbandingan Ardy.
+
+PID historis di bawah tidak lagi menjadi acuan; gunakan app/.data/local-trial-runtime.json dan listener aktual.
+
 Versi uji lokal berjalan pada http://127.0.0.1:3000. Buka alamat itu di Chrome atau Edge pada komputer ini. Server Node24 PID17520 dan PostgreSQL16 proyek port55432 dibiarkan aktif untuk uji Ardy. Bukan URL online dan tidak dapat diakses dari HP lain memakai127.0.0.1.
 
 ## Masuk dan mencoba

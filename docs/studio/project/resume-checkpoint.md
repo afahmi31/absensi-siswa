@@ -1,5 +1,13 @@
 # Acuan lanjut LAB-002 — uji lokal absensi
 
+## Izin GitHub — 13 Oktober 2026
+
+Ardy menyampaikan data lokal sudah masuk dan aman, lalu meminta commit perubahan serta push ke https://github.com/afahmi31/absensi-siswa.git. Plugin GitHub memverifikasi repo publik, kosong, default branch main dan izin push tersedia. Remote origin diarahkan ke repo tersebut; branch publik main menggunakan riwayat lokal yang sudah ada, tanpa force push. Status operasi aktual diperiksa lewat Git setelah push. Data asli, database, backup, env dan script privat tetap di luar Git. Deployment Vercel/Supabase tetap menunggu pembahasan terpisah.
+
+## Data guru sudah tersedia lokal — 13 Oktober 2026
+
+Task LAB002-LOCAL-DATA-001 READY_FOR_ARDY_REVIEW: database percobaan diganti sesudah backup atas pilihan Ardy, cluster lama dipertahankan di app/.data/postgres-trial-20261013. Aplikasi http://127.0.0.1:3000 kini memakai 38 siswa dan 50 tanggal riwayat guru, 14 Juli–12 Oktober 2026, semester tetap aktif; kalender Senin–Sabtu dan libur diatur guru. PM HTTP membandingkan 1.900 pasangan seluruhnya cocok (1.810 terisi/90 kosong). Lihat reports/LAB002-LOCAL-DATA-001-pm-review.md. Akun sama, masuk ulang bila sesi lama dicabut. Perlu memperpanjang periode jika mengisi sesudah 12 Oktober. Data asli/backup/scripts tetap privat ignored. Runtime PID berubah; baca metadata aktual, jangan memakai PID historis di bawah. Deployment ditunda sampai Ardy membandingkan. Jangan ulang pemindahan atau menghapus titik pemulihan.
+
 Status aktif: Ardy melaporkan alur lokal tanpa kendala pada 13 Oktober 2026 dan mengizinkan commit lokal. Node17520 pada3000 dan managedPG55432 aktif. CAL diterima teknis; ATT PM_VALIDATION dengan browsersebagian. Commit lokal diizinkan; remote/push dan Vercel/Supabase menunggu pembahasan terpisah. Lihat local-trial-guide.md dan reviewATT.
 
 ## Checkpoint SEM sebelumnya (riwayat)
@@ -55,3 +63,7 @@ Jangan mengulangsetup ataufixture lama. Baca hasil ujiArdy, reviewATT dan gitdif
 Ardy: “commit dulu saja. aku sudah coba untuk flow tidak ada masalah”. Ardy melaporkan uji alur lokal tanpa kendala dan memberi izin commit lokal. Tidak ada rincian skenario/perangkat yang dilaporkan, sehingga catatan ini tidak menyatakan setiap kasus konflik409, kegagalan jaringan atau dialog telah diuji satu per satu. Bukti teknis dan batas uji browser PM sebelumnya tetap dipertahankan.
 
 PM memeriksa 18 file runtime yang berubah terhadap snapshot final fixture ATT: semuanya sama. Tidak ada perubahan kode untuk commit ini dan tidak perlu mengulang suite hanya untuk pencatatan/Git. Commit mencakup kalender, absensi harian, migration0004, regresi penambahan siswa/penutupan semester, tes dan dokumentasi. Rahasia, database, backup, log runtime dan hasil build tetap di luar Git. Tidak ada izin remote/push atau deployment dari pesan ini.
+
+## Commit lokal selesai — 13 Oktober 2026
+
+Commit: 682ace90364bcfc7d0b9491ce197268c24fffc7f — feat(attendance): add local calendar and daily attendance flow. Mencakup45file kalender/absensi/tes/dokumentasi dan catatan uji alur Ardy. Repo app bersih setelah commit; tidak ada remote/push/deploy. Nilai privat yang diperiksa tidak ditemukan pada staging. Snapshot dokumentasi di commit dibuat sebelum hash ini ditambahkan pada registry; git log menjadi acuan hash aktual.

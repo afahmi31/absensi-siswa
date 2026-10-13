@@ -1,6 +1,6 @@
 {
-  "copiedAt": "2026-10-13T00:32:23.5050516Z",
-  "task": "LAB002-ATT-001-local-trial-handoff",
+  "copiedAt": "2026-10-13T04:15:55.5611182Z",
+  "task": "LAB002-LOCAL-DATA-001-github-handoff",
   "authority": "Registry studio tetap sumber keputusan aktif. Salinan ini untuk penelusuran development.",
   "transformations": "Selected historic copies keep original sync mappings. Current local-trial snapshots normalize Markdown whitespace and link back to absolute registry sources. Hashes reflect saved copies.",
   "excluded": [
@@ -354,16 +354,28 @@
       "copySha256": "2b54ca398a3224f924f1b4933caf01b845085b74232e9c33517a3918ce64e601"
     },
     {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\tasks\\LAB002-LOCAL-DATA-001.md",
+      "copy": "docs/studio/project/tasks/LAB002-LOCAL-DATA-001.md",
+      "sourceSha256": "fa992ed009b83e161b5e95ca3110b5777b8ecb2d65dbc40328c101e8f999b065",
+      "copySha256": "fa992ed009b83e161b5e95ca3110b5777b8ecb2d65dbc40328c101e8f999b065"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\reports\\LAB002-LOCAL-DATA-001-pm-review.md",
+      "copy": "docs/studio/project/reports/LAB002-LOCAL-DATA-001-pm-review.md",
+      "sourceSha256": "d61b23808084d9fc2966c962487feb0487f29bfb94e334080b927f3f7271a224",
+      "copySha256": "d61b23808084d9fc2966c962487feb0487f29bfb94e334080b927f3f7271a224"
+    },
+    {
       "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\resume-checkpoint.md",
       "copy": "docs/studio/project/resume-checkpoint.md",
-      "sourceSha256": "58b85bfbfe0b4712856b0fb29ea80a4208ed511802895bd20627210ccb3dad4c",
-      "copySha256": "58b85bfbfe0b4712856b0fb29ea80a4208ed511802895bd20627210ccb3dad4c"
+      "sourceSha256": "beaad95ab277afd472642a11232c48824d15671afd82dc980c6230ecc1afd170",
+      "copySha256": "beaad95ab277afd472642a11232c48824d15671afd82dc980c6230ecc1afd170"
     },
     {
       "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\local-trial-guide.md",
       "copy": "docs/studio/project/local-trial-guide.md",
-      "sourceSha256": "0d388e1e59d71e502bff438875c746b60b6862716a94910526d54c2774967748",
-      "copySha256": "aa2a5b63f730a94ea3ab2b248632d6d99e22d4f1a7b7726c5d1136b24c7f2ecb"
+      "sourceSha256": "748fd987926e801fed3de90672652a4eb7dd28a3f875729d2b19330c296e79b8",
+      "copySha256": "748fd987926e801fed3de90672652a4eb7dd28a3f875729d2b19330c296e79b8"
     }
   ]
 }
