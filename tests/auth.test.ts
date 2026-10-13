@@ -8,6 +8,7 @@ import { setTimeout as delay } from 'node:timers/promises'
 import { fileURLToPath } from 'node:url'
 import { test } from 'node:test'
 import postgres from 'postgres'
+import type { H3Event } from 'h3'
 import { Scrypt } from '@adonisjs/hash/drivers/scrypt'
 import { runMigrations } from '../server/database/migrate.mjs'
 import { listMigrationNames } from './support/migration-names.mjs'
@@ -17,11 +18,37 @@ import { shouldUseSecureSessionCookie } from '../server/auth/session-cookie.ts'
 import { createTeacherSession, findTeacherSession } from '../server/database/repositories/teacher-accounts.ts'
 import { databaseConnectionOptions, databaseConnectionUrl } from '../server/database/client.ts'
 import { startTemporaryPostgres } from './support/temporary-postgres.mjs'
+import { getRequestScopedAuthenticatedTeacher } from '../server/auth/teacher-session.ts'
 
 const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const testRoot = path.join(appRoot, '.data', 'tests')
 const passwordHasher = new Scrypt({})
 const requestTimeoutMs = 5_000
+
+test('teacher-session lookup is reused within one H3 request but not across requests', async () => {
+  const fixtureTeacher = {
+    id: 'teacher-fixture',
+    email: 'teacher@example.invalid',
+    sessionVersion: 1,
+    sessionId: 'session-fixture',
+  }
+  const firstEvent = { context: {} } as unknown as H3Event
+  const secondEvent = { context: {} } as unknown as H3Event
+  let lookupCount = 0
+  const lookup = async () => {
+    lookupCount += 1
+    return fixtureTeacher
+  }
+
+  const firstRequest = getRequestScopedAuthenticatedTeacher(firstEvent, lookup)
+  const sameRequest = getRequestScopedAuthenticatedTeacher(firstEvent, lookup)
+  assert.strictEqual(sameRequest, firstRequest)
+  assert.deepEqual(await Promise.all([firstRequest, sameRequest]), [fixtureTeacher, fixtureTeacher])
+  assert.equal(lookupCount, 1, 'a middleware and its handler share one teacher-session lookup')
+
+  assert.deepEqual(await getRequestScopedAuthenticatedTeacher(secondEvent, lookup), fixtureTeacher)
+  assert.equal(lookupCount, 2, 'a new H3 event performs a fresh lookup so reset and logout take effect on the next request')
+})
 
 function fetchLocal(input: string | URL, init: RequestInit = {}): Promise<Response> {
   const headers = new Headers(init.headers)

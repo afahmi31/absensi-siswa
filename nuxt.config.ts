@@ -8,7 +8,7 @@ export default defineNuxtConfig({
   telemetry: false,
   nitro: {
     // Nitro 2.13.4 auto-detection caps Node at 22; this project targets Node 24.
-    vercel: { functions: { runtime: 'nodejs24.x' } },
+    vercel: { functions: { runtime: 'nodejs24.x', regions: ['sin1'] } },
   },
   app: {
     head: {
