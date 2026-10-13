@@ -1,6 +1,6 @@
 {
-  "copiedAt": "2026-10-13T04:15:55.5611182Z",
-  "task": "LAB002-LOCAL-DATA-001-github-handoff",
+  "copiedAt": "2026-10-13T06:39:23.8788658Z",
+  "task": "LAB002-PRE-001-local-review-and-cloud-data-handoff",
   "authority": "Registry studio tetap sumber keputusan aktif. Salinan ini untuk penelusuran development.",
   "transformations": "Selected historic copies keep original sync mappings. Current local-trial snapshots normalize Markdown whitespace and link back to absolute registry sources. Hashes reflect saved copies.",
   "excluded": [
@@ -366,16 +366,46 @@
       "copySha256": "d61b23808084d9fc2966c962487feb0487f29bfb94e334080b927f3f7271a224"
     },
     {
-      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\resume-checkpoint.md",
-      "copy": "docs/studio/project/resume-checkpoint.md",
-      "sourceSha256": "beaad95ab277afd472642a11232c48824d15671afd82dc980c6230ecc1afd170",
-      "copySha256": "beaad95ab277afd472642a11232c48824d15671afd82dc980c6230ecc1afd170"
-    },
-    {
       "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\local-trial-guide.md",
       "copy": "docs/studio/project/local-trial-guide.md",
       "sourceSha256": "748fd987926e801fed3de90672652a4eb7dd28a3f875729d2b19330c296e79b8",
       "copySha256": "748fd987926e801fed3de90672652a4eb7dd28a3f875729d2b19330c296e79b8"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\tasks\\LAB002-PRE-001.md",
+      "copy": "docs/studio/project/tasks/LAB002-PRE-001.md",
+      "sourceSha256": "103a3a06aa8661d8030a74dcb4766dbb3bb223b16e7de0b3c52568020d4b39e7",
+      "copySha256": "103a3a06aa8661d8030a74dcb4766dbb3bb223b16e7de0b3c52568020d4b39e7"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\reports\\LAB002-PRE-001-preflight.md",
+      "copy": "docs/studio/project/reports/LAB002-PRE-001-preflight.md",
+      "sourceSha256": "f56e8876d1a79e1960be0daae8cef0f6edab1d47cf2e6abd9948fd96469b015c",
+      "copySha256": "f56e8876d1a79e1960be0daae8cef0f6edab1d47cf2e6abd9948fd96469b015c"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\reports\\LAB002-PRE-001-pm-validation.md",
+      "copy": "docs/studio/project/reports/LAB002-PRE-001-pm-validation.md",
+      "sourceSha256": "c9aff03045c83fe2faba0c52a1559bdd1565e8d469c12bfbd78c1646760f0ac2",
+      "copySha256": "c9aff03045c83fe2faba0c52a1559bdd1565e8d469c12bfbd78c1646760f0ac2"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\resume-checkpoint.md",
+      "copy": "docs/studio/project/resume-checkpoint.md",
+      "sourceSha256": "b39f1f2957102a065e1d3761196b3e24b699772b63adb9c110699a146ba659fa",
+      "copySha256": "b39f1f2957102a065e1d3761196b3e24b699772b63adb9c110699a146ba659fa"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\cloud-pilot-runbook.md",
+      "copy": "docs/studio/project/cloud-pilot-runbook.md",
+      "sourceSha256": "a271a2fab78f85ac5bb89a87baf4c4fa3588bb4f0ff67f870f369416f73fb2e1",
+      "copySha256": "a271a2fab78f85ac5bb89a87baf4c4fa3588bb4f0ff67f870f369416f73fb2e1"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\tasks\\LAB002-CLOUD-DATA-001.md",
+      "copy": "docs/studio/project/tasks/LAB002-CLOUD-DATA-001.md",
+      "sourceSha256": "a302b380c8f736f727f59887602e3136cfb0c188753300c806d9f9bd88de6fa5",
+      "copySha256": "a302b380c8f736f727f59887602e3136cfb0c188753300c806d9f9bd88de6fa5"
     }
   ]
 }

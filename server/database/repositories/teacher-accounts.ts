@@ -91,8 +91,9 @@ export async function createTeacherSession(
       select session_version as "sessionVersion"
       from teacher_accounts
       where id = ${teacherId} and password_hash is not null
-      for share
     `
+    // Keep teacher_accounts read-only for the runtime role. If a reset commits
+    // after this read, the old version makes the new session immediately inactive.
     if (accounts[0]?.sessionVersion !== sessionVersion) {
       throw new Error('Teacher account changed while login was in progress.')
     }

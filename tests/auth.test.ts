@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { spawn } from 'node:child_process'
 import { randomBytes, randomUUID } from 'node:crypto'
-import { cp, lstat, mkdir, mkdtemp, realpath, rm, symlink, unlink } from 'node:fs/promises'
+import { cp, lstat, mkdir, mkdtemp, readFile, realpath, rm, symlink, unlink, writeFile } from 'node:fs/promises'
 import net from 'node:net'
 import path from 'node:path'
 import { setTimeout as delay } from 'node:timers/promises'
@@ -14,7 +14,8 @@ import { listMigrationNames } from './support/migration-names.mjs'
 import { provisionTeacherAccount, resetTeacherAccountPassword } from '../server/auth/account-admin.ts'
 import { isLoginBlocked, recordLoginFailure } from '../server/auth/login-throttle.ts'
 import { shouldUseSecureSessionCookie } from '../server/auth/session-cookie.ts'
-import { findTeacherSession } from '../server/database/repositories/teacher-accounts.ts'
+import { createTeacherSession, findTeacherSession } from '../server/database/repositories/teacher-accounts.ts'
+import { databaseConnectionOptions, databaseConnectionUrl } from '../server/database/client.ts'
 import { startTemporaryPostgres } from './support/temporary-postgres.mjs'
 
 const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -23,7 +24,10 @@ const passwordHasher = new Scrypt({})
 const requestTimeoutMs = 5_000
 
 function fetchLocal(input: string | URL, init: RequestInit = {}): Promise<Response> {
-  return fetch(input, { ...init, signal: AbortSignal.timeout(requestTimeoutMs) })
+  const headers = new Headers(init.headers)
+  // This local test adapter exercises the trusted Vercel-header branch through the actual HTTP login route.
+  headers.set('x-vercel-forwarded-for', '198.51.100.42')
+  return fetch(input, { ...init, headers, signal: AbortSignal.timeout(requestTimeoutMs) })
 }
 
 async function createIsolatedNuxtRoot(): Promise<string> {
@@ -42,6 +46,31 @@ async function createIsolatedNuxtRoot(): Promise<string> {
     await removeIsolatedNuxtRoot(root)
     throw error
   }
+}
+
+/** Replace the copied connector only in disposable Nuxt roots used by local HTTP tests. */
+async function useLoopbackPostgresInIsolatedRoot(root: string): Promise<void> {
+  const clientPath = path.join(root, 'server/database/client.ts')
+  const source = await readFile(clientPath, 'utf8')
+  const start = source.indexOf('export function databaseConnectionOptions(')
+  const end = source.indexOf('\n/** Create the lazy, server-only database connection', start)
+  assert.ok(start >= 0 && end > start, 'test-only connector patch should match the copied production connector')
+  const fixtureConnector = `export function databaseConnectionOptions(mode: string, databaseUrl: string, _caCertificate: string) {
+  let target: URL
+  try { target = new URL(databaseUrl) } catch { throw new Error('Fixture database configuration is invalid.') }
+  if (mode !== 'supabase' || !['127.0.0.1', 'localhost', '[::1]'].includes(target.hostname.toLowerCase())) {
+    throw new Error('The isolated HTTP test only accepts its local fixture PostgreSQL server.')
+  }
+  return {
+    max: 1,
+    idle_timeout: 20,
+    connect_timeout: 5,
+    prepare: false,
+    connection: { application_name: 'lab002-website-absensi-siswa-test-fixture' },
+  }
+}
+`
+  await writeFile(clientPath, `${source.slice(0, start)}${fixtureConnector}${source.slice(end)}`, 'utf8')
 }
 
 async function removeIsolatedNuxtRoot(root: string): Promise<void> {
@@ -74,6 +103,28 @@ test('local login throttle counts five failures and releases the client after th
   assert.equal(isLoginBlocked(ip, startedAt + 4), true)
   assert.equal(isLoginBlocked(ip, startedAt + 15 * 60 * 1000 + 3), true)
   assert.equal(isLoginBlocked(ip, startedAt + 15 * 60 * 1000 + 5), false)
+})
+
+test('Supabase connection options require the fixed role, project, Session pooler, and verified CA TLS', () => {
+  const databaseUrl = 'postgres://lab002_app.jkiewjlohgmsujcwerpi:fixture-password@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=verify-full'
+  const ca = '-----BEGIN CERTIFICATE-----\nfixture-only\n-----END CERTIFICATE-----'
+  const normalizedUrl = databaseConnectionUrl('supabase', databaseUrl)
+  assert.equal(new URL(normalizedUrl).search, '')
+  const options = databaseConnectionOptions('supabase', databaseUrl, ca)
+  assert.equal(options.max, 1)
+  assert.equal(options.prepare, false)
+  assert.deepEqual(options.ssl, {
+    ca,
+    rejectUnauthorized: true,
+    servername: 'aws-0-ap-southeast-1.pooler.supabase.com',
+  })
+  assert.throws(() => databaseConnectionUrl('supabase', databaseUrl.replace('verify-full', 'no-verify')))
+  assert.throws(() => databaseConnectionUrl('supabase', `${databaseUrl}&ssl=false`))
+  assert.throws(() => databaseConnectionOptions('supabase', databaseUrl.replace('lab002_app.', 'postgres.'), ca))
+  assert.throws(() => databaseConnectionOptions('supabase', databaseUrl.replace('jkiewjlohgmsujcwerpi', 'wrongprojectref00000'), ca))
+  assert.throws(() => databaseConnectionOptions('supabase', databaseUrl.replace('pooler.supabase.com', 'example.invalid'), ca))
+  assert.throws(() => databaseConnectionOptions('supabase', databaseUrl, ''))
+  assert.throws(() => databaseConnectionOptions('supabase-test', databaseUrl, ca))
 })
 
 async function availablePort(): Promise<number> {
@@ -114,7 +165,8 @@ async function waitForHttpServer(
     } catch {}
     await delay(300)
   }
-  throw new Error('Nuxt authentication test server did not become ready within 60 seconds.')
+  const diagnostics = sanitizeServerOutput(serverOutput(), secrets)
+  throw new Error(`Nuxt authentication test server did not become ready within 60 seconds.${diagnostics ? `\n${diagnostics}` : ''}`)
 }
 
 async function stopOwnedProcess(child: ReturnType<typeof spawn>): Promise<void> {
@@ -146,12 +198,15 @@ test('teacher login, sealed session, same-origin requests, reset revocation, and
   assert.equal(shouldUseSecureSessionCookie('production', 'http:', '127.0.0.1'), false)
   assert.equal(shouldUseSecureSessionCookie('development', 'http:', 'attendance.example.com'), false)
 
-    const temporary = await startTemporaryPostgres()
+  const temporary = await startTemporaryPostgres()
   const migrator = postgres(temporary.migrationUrl, { max: 1, connect_timeout: 5 })
   const appDatabase = postgres(temporary.runtimeUrl, { max: 3, connect_timeout: 5 })
   let server: ReturnType<typeof spawn> | undefined
+  let secondServer: ReturnType<typeof spawn> | undefined
   let serverOutput = ''
+  let secondServerOutput = ''
   let isolatedNuxtRoot: string | undefined
+  let secondIsolatedNuxtRoot: string | undefined
 
   try {
     const migrations = await runMigrations(migrator, 'up')
@@ -162,41 +217,63 @@ test('teacher login, sealed session, same-origin requests, reset revocation, and
     const email = `auth-${randomUUID()}@example.invalid`
     const oldPassword = randomBytes(24).toString('base64url')
     const oldHash = await passwordHasher.make(oldPassword)
-    const account = await provisionTeacherAccount(appDatabase, email, oldHash)
+    const account = await provisionTeacherAccount(migrator, email, oldHash)
 
-    const port = await availablePort()
-    const baseUrl = `http://127.0.0.1:${port}`
     const sessionPassword = randomBytes(48).toString('base64url')
-    isolatedNuxtRoot = await createIsolatedNuxtRoot()
-    server = spawn(process.execPath, [
-      path.join(appRoot, 'node_modules/nuxt/bin/nuxt.mjs'),
-      'dev',
-      '--host', '127.0.0.1',
-      '--port', String(port),
-      '--no-fork',
-      '--no-tui',
-      '--strictPort',
-      isolatedNuxtRoot,
-    ], {
-      cwd: isolatedNuxtRoot,
-      env: {
-        ...process.env,
-        NODE_ENV: 'development',
-        NUXT_DATABASE_URL: temporary.runtimeUrl,
-        NUXT_SESSION_PASSWORD: sessionPassword,
-        NUXT_TELEMETRY_DISABLED: '1',
-        PORT: String(port),
-        HOST: '127.0.0.1',
-      },
-      stdio: ['ignore', 'pipe', 'pipe'],
-      windowsHide: true,
-    })
-    const collectOutput = (chunk: Buffer) => {
-      serverOutput = `${serverOutput}${chunk.toString('utf8')}`.slice(-16_000)
+    const throttleHmacKey = randomBytes(48).toString('base64url')
+    const localRuntimeUrl = new URL(temporary.runtimeUrl)
+    localRuntimeUrl.search = ''
+    const fixtureRuntimeUrl = localRuntimeUrl.toString()
+    const baseUrls: string[] = []
+    for (let instance = 0; instance < 2; instance += 1) {
+      const port = await availablePort()
+      const baseUrl = `http://127.0.0.1:${port}`
+      const isolatedRoot = await createIsolatedNuxtRoot()
+      await useLoopbackPostgresInIsolatedRoot(isolatedRoot)
+      const child = spawn(process.execPath, [
+        path.join(appRoot, 'node_modules/nuxt/bin/nuxt.mjs'),
+        'dev',
+        '--host', '127.0.0.1',
+        '--port', String(port),
+        '--no-fork',
+        '--no-tui',
+        '--strictPort',
+        isolatedRoot,
+      ], {
+        cwd: isolatedRoot,
+        env: {
+          ...process.env,
+          NODE_ENV: 'development',
+          NUXT_DATABASE_URL: fixtureRuntimeUrl,
+          NUXT_DATABASE_MODE: 'supabase',
+          NUXT_LOGIN_THROTTLE_HMAC_KEY: throttleHmacKey,
+          NUXT_SESSION_PASSWORD: sessionPassword,
+          VERCEL: '1',
+          NUXT_TELEMETRY_DISABLED: '1',
+          PORT: String(port),
+          HOST: '127.0.0.1',
+        },
+        stdio: ['ignore', 'pipe', 'pipe'],
+        windowsHide: true,
+      })
+      const collectOutput = (chunk: Buffer) => {
+        if (instance === 0) serverOutput = `${serverOutput}${chunk.toString('utf8')}`.slice(-16_000)
+        else secondServerOutput = `${secondServerOutput}${chunk.toString('utf8')}`.slice(-16_000)
+      }
+      child.stdout?.on('data', collectOutput)
+      child.stderr?.on('data', collectOutput)
+      if (instance === 0) {
+        isolatedNuxtRoot = isolatedRoot
+        server = child
+      } else {
+        secondIsolatedNuxtRoot = isolatedRoot
+        secondServer = child
+      }
+      const output = () => instance === 0 ? serverOutput : secondServerOutput
+      await waitForHttpServer(child, baseUrl, output, [sessionPassword, throttleHmacKey, fixtureRuntimeUrl, temporary.migrationUrl])
+      baseUrls.push(baseUrl)
     }
-    server.stdout?.on('data', collectOutput)
-    server.stderr?.on('data', collectOutput)
-    await waitForHttpServer(server, baseUrl, () => serverOutput, [sessionPassword, temporary.runtimeUrl, temporary.migrationUrl])
+    const baseUrl = baseUrls[0]!
 
     await t.test('unauthenticated pages redirect and future API routes are protected by default', async () => {
       const page = await fetchLocal(`${baseUrl}/`, { redirect: 'manual' })
@@ -324,9 +401,22 @@ test('teacher login, sealed session, same-origin requests, reset revocation, and
     await t.test('owner reset increases the account version, carries audit actor, and revokes the old cookie', async () => {
       newPassword = randomBytes(24).toString('base64url')
       const newHash = await passwordHasher.make(newPassword)
-      const reset = await resetTeacherAccountPassword(appDatabase, newHash)
+      const reset = await resetTeacherAccountPassword(migrator, newHash)
       assert.equal(reset.id, account.id)
       assert.equal(reset.sessionVersion, account.sessionVersion + 1)
+
+      await assert.rejects(
+        createTeacherSession(appDatabase, account.id, randomUUID(), account.sessionVersion, new Date(Date.now() + 60_000)),
+        /Teacher account changed while login was in progress\./,
+        'A login that reaches session creation after a password reset must reject its stale version.',
+      )
+      const lateStaleSessionId = randomUUID()
+      await migrator`
+        insert into teacher_sessions (id, teacher_id, session_version, expires_at)
+        values (${lateStaleSessionId}, ${account.id}, ${account.sessionVersion}, ${new Date(Date.now() + 60_000)})
+      `
+      const lateStaleSession = await findTeacherSession(appDatabase, account.id, lateStaleSessionId)
+      assert.equal(lateStaleSession?.isSessionActive, false, 'A session inserted with a pre-reset version must be inactive on the protected-session lookup path.')
 
       const auditRows = await migrator<{
         actor_teacher_id: string | null
@@ -434,11 +524,30 @@ test('teacher login, sealed session, same-origin requests, reset revocation, and
         message: 'Terlalu banyak percobaan. Coba lagi nanti.',
       })
     })
+
+    await t.test('concurrent shared-throttle login requests admit only five and return the 429 copy for the rest', async () => {
+      await migrator`delete from private.login_throttle_attempts`
+      const responses = await Promise.all(Array.from({ length: 8 }, (_, index) => fetchLocal(`${baseUrls[index % 2]}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', origin: baseUrls[index % 2] },
+        body: JSON.stringify({ email, password: randomBytes(24).toString('base64url') }),
+      })))
+      assert.equal(responses.filter((response) => response.status === 401).length, 5)
+      assert.equal(responses.filter((response) => response.status === 429).length, 3)
+      for (const response of responses.filter((item) => item.status === 429)) {
+        assert.deepEqual(await jsonResponse(response), {
+          ok: false,
+          message: 'Terlalu banyak percobaan. Coba lagi nanti.',
+        })
+      }
+    })
   } finally {
+    if (secondServer) await stopOwnedProcess(secondServer)
     if (server) await stopOwnedProcess(server)
     await appDatabase.end({ timeout: 3 })
     await migrator.end({ timeout: 3 })
     await temporary.cleanup()
     if (isolatedNuxtRoot) await removeIsolatedNuxtRoot(isolatedNuxtRoot)
+    if (secondIsolatedNuxtRoot) await removeIsolatedNuxtRoot(secondIsolatedNuxtRoot)
   }
 })

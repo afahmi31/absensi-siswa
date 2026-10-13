@@ -19,6 +19,7 @@
     "db:stop": "node scripts/local-db.mjs stop",
     "db:status": "node scripts/local-db.mjs status",
     "db:migrate": "node scripts/db-migrate.mjs up",
+    "db:supabase:migrate": "node scripts/supabase-migrate.mjs",
     "db:smoke": "node scripts/db-smoke.mjs",
     "db:rollback": "node scripts/db-migrate.mjs down",
     "test:data": "node scripts/test-data.mjs",

@@ -19,6 +19,9 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     databaseUrl: '',
+    databaseMode: 'local',
+    databaseCa: '',
+    loginThrottleHmacKey: '',
     supabaseUrl: '',
     session: {
       name: 'lab002-session',

@@ -66,6 +66,11 @@ export async function startTemporaryPostgres() {
   const bootstrapPassword = randomBytes(32).toString('hex')
   const migrationPassword = randomBytes(32).toString('hex')
   const runtimePassword = randomBytes(32).toString('hex')
+  const apiPasswords = {
+    anon: randomBytes(32).toString('hex'),
+    authenticated: randomBytes(32).toString('hex'),
+    service_role: randomBytes(32).toString('hex'),
+  }
   const passwordPath = path.join(testRoot, `bootstrap-${randomUUID()}.txt`)
   let started = false
 
@@ -110,6 +115,9 @@ export async function startTemporaryPostgres() {
       }
       await admin.unsafe(`CREATE ROLE lab002_migrator LOGIN PASSWORD '${migrationPassword}'`)
       await admin.unsafe(`CREATE ROLE lab002_app LOGIN PASSWORD '${runtimePassword}'`)
+      await admin.unsafe(`CREATE ROLE anon LOGIN PASSWORD '${apiPasswords.anon}'`)
+      await admin.unsafe(`CREATE ROLE authenticated LOGIN PASSWORD '${apiPasswords.authenticated}'`)
+      await admin.unsafe(`CREATE ROLE service_role LOGIN BYPASSRLS PASSWORD '${apiPasswords.service_role}'`)
       await admin.unsafe('CREATE DATABASE lab002_test OWNER lab002_migrator')
       await admin.unsafe('ALTER ROLE postgres NOLOGIN PASSWORD NULL')
     } finally {
@@ -117,11 +125,13 @@ export async function startTemporaryPostgres() {
     }
 
     const connectionUrl = (user, password) => `postgres://${user}:${password}@127.0.0.1:${port}/lab002_test?sslmode=disable`
+    const apiUrls = Object.fromEntries(Object.entries(apiPasswords).map(([role, password]) => [role, connectionUrl(role, password)]))
     return {
       clusterPath,
       port,
       migrationUrl: connectionUrl('lab002_migrator', migrationPassword),
       runtimeUrl: connectionUrl('lab002_app', runtimePassword),
+      apiUrls,
       async cleanup() {
         if (started) runPg('pg_ctl', ['-D', clusterPath, '-m', 'fast', '-w', 'stop'])
         await removeOwnedCluster(clusterPath, true)

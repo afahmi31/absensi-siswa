@@ -30,10 +30,10 @@ export function addDays(date: string, offset: number): string {
 
 export async function createSchoolFixture(
   database: postgres.Sql,
-  options: { firstMembershipEnd?: string | null } = {},
+  options: { firstMembershipEnd?: string | null; teacherAccountDatabase?: postgres.Sql } = {},
 ): Promise<SchoolFixture> {
   const token = randomUUID()
-  const teacher = await createTeacherAccount(database, `fixture-${token}@example.invalid`)
+  const teacher = await createTeacherAccount(options.teacherAccountDatabase ?? database, `fixture-${token}@example.invalid`)
   const school = await createSchool(database, {
     teacherId: teacher.id,
     name: 'Sekolah Contoh',

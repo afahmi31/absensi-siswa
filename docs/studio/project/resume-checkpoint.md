@@ -67,3 +67,15 @@ PM memeriksa 18 file runtime yang berubah terhadap snapshot final fixture ATT: s
 ## Commit lokal selesai — 13 Oktober 2026
 
 Commit: 682ace90364bcfc7d0b9491ce197268c24fffc7f — feat(attendance): add local calendar and daily attendance flow. Mencakup45file kalender/absensi/tes/dokumentasi dan catatan uji alur Ardy. Repo app bersih setelah commit; tidak ada remote/push/deploy. Nilai privat yang diperiksa tidak ditemukan pada staging. Snapshot dokumentasi di commit dibuat sebelum hash ini ditambahkan pada registry; git log menjadi acuan hash aktual.
+
+## Titik lanjut online — 13 Oktober 2026
+
+Bagian ini menggantikan batas/status historis di atas untuk pekerjaan sekarang. Data guru sudah dipindahkan ke database lokal dan diterima secara umum oleh Ardy; acuan rinci LOCAL-DATA-001 beserta review/panduan. Baseline Git terbaru main 2ac5cdb4b3f8ff365b57235c6417d8a5754b2f09; remote yang disetujui https://github.com/afahmi31/absensi-siswa.git. Ardy sudah mengizinkan commit/push. Jangan mengulang impor Excel atau memindahkan sesi perangkat ke cloud.
+
+Ardy meminta persiapan Supabase/Vercel dilanjutkan. Project Supabase absensi-siswa/jkiewjlohgmsujcwerpi terverifikasi sehat PG17.11, publictables dan migrationhistory masih kosong pada pemeriksaan terbaru. Credential owner privat dan sertifikat CA tersedia; TLS/password serta transaksi/savepoint Session pooler berhasil diuji. Ardy memilih Session pooler satu koneksi per instance. Role aplikasi/migrator khusus belum dibuat. Jangan menaruh owner credential pada runtime/Vercel atau mencetak nilainya.
+
+PRE-001: implementasi lokal diserahkan Executor dan pemeriksaan lokal PM PASS, status PM_VALIDATION. PM mengulang data13/13 dan auth14/14; typecheck/build staging dilaporkan PASS dan metadata nodejs24.x diperiksa. Source masih WIP belum commit. Runtime lokal login HTTP200 pada pemeriksaan terakhir dan masih build sebelumnya; jangan mengganti output aktif. Acuan reports/LAB002-PRE-001-pm-validation.md dan addendum reports/LAB002-PRE-001-preflight.md.
+
+Task aktif CLOUD-DATA-001 ASSIGNED kepada handle online_preflight, Codex GPT-6-luna/MAX, tahap alat transfer/rehearsal lokal saja. Ownership scripts/tests/docs alat transfer; PM menangani registry/sync/Git. Tidak ada write cloud, transfer data nyata, deploy atau commit/push oleh Executor. Baca task dan delta laporan terlebih dahulu; jangan menduplikasi worker atau mengulang PRE-001 jika source tidak berubah. Setelah alat diserahkan, PM review guards/atomisitas/preservasi audit dan seluruh baris sebelum operasi PG17/transfer aktual.
+
+Deployment Vercel tetap menunggu versi dan target konkret sesuai workflow. Project Vercel belum dibuat/tertaut dalam tahap ini. Source lokal/backup tetap dipertahankan sampai penerimaan data dan URL online; jangan menjalankan dua sumber data aktif tanpa keputusan cutover. Checkpoint ini mencatat posisi, bukan permintaan menghentikan pekerjaan yang sedang diizinkan.

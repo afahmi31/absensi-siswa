@@ -9,6 +9,7 @@ import { setCalendarException, setCalendarHoliday, setRoutineSchoolDay } from '.
 import { closeSemester, copyRosterFromPreviousSemester, createSemester, getSemesterClosurePreview } from '../server/database/repositories/semesters.ts'
 import { addStudentToSemester, endStudentMembership, createStudent, updateStudentIdentity } from '../server/database/repositories/students.ts'
 import { withAuditActor } from '../server/database/audit-context.ts'
+import { hashLoginThrottleAddress, isSharedLoginBlocked, recordSharedLoginFailure, withSharedLoginAttempt } from '../server/auth/shared-login-throttle.ts'
 import { listMigrationNames } from './support/migration-names.mjs'
 
 async function expectSqlState(operation: PromiseLike<unknown>, code: string, message: string): Promise<void> {
@@ -67,6 +68,7 @@ test('local PostgreSQL schema preserves school, roster, attendance, calendar, an
   const temporary = await startTemporaryPostgres()
   const migrator = postgres(temporary.migrationUrl, { max: 1, connect_timeout: 5 })
   const app = postgres(temporary.runtimeUrl, { max: 4, connect_timeout: 5 })
+  const appSecondConnectionPool = postgres(temporary.runtimeUrl, { max: 2, connect_timeout: 5 })
 
   try {
     await t.test('migration runs up, down, and up again with a stable ledger', async () => {
@@ -85,10 +87,97 @@ test('local PostgreSQL schema preserves school, roster, attendance, calendar, an
       assert.deepEqual(finalUp.map((migration) => migration.applied), expectedNames.map(() => true))
       const ledger = await migrator`select name from public.schema_migrations order by name`
       assert.deepEqual(ledger.map((migration) => migration.name), expectedNames)
+      await expectSqlState(app`select name from public.schema_migrations limit 1`, '42501', 'The runtime role must not read the migration ledger.')
+    })
+
+    await t.test('runtime authentication grants stay scoped to accounts and device sessions', async () => {
+      const [rights] = await migrator`
+        select
+          has_table_privilege('lab002_app', 'public.teacher_accounts', 'SELECT') as account_read,
+          has_table_privilege('lab002_app', 'public.teacher_accounts', 'INSERT') as account_insert,
+          has_table_privilege('lab002_app', 'public.teacher_accounts', 'UPDATE') as account_update,
+          has_table_privilege('lab002_app', 'public.teacher_accounts', 'DELETE') as account_delete,
+          has_table_privilege('lab002_app', 'public.teacher_sessions', 'SELECT') as session_read,
+          has_table_privilege('lab002_app', 'public.teacher_sessions', 'INSERT') as session_insert,
+          has_table_privilege('lab002_app', 'public.teacher_sessions', 'UPDATE') as session_update,
+          has_table_privilege('lab002_app', 'public.teacher_sessions', 'DELETE') as session_delete,
+          has_table_privilege('lab002_app', 'public.audit_events', 'SELECT') as audit_read,
+          has_table_privilege('lab002_app', 'public.audit_events', 'INSERT') as audit_insert,
+          has_table_privilege('lab002_app', 'public.schema_migrations', 'SELECT') as ledger_read
+      `
+      assert.deepEqual(rights, {
+        account_read: true,
+        account_insert: false,
+        account_update: false,
+        account_delete: false,
+        session_read: true,
+        session_insert: true,
+        session_update: true,
+        session_delete: false,
+        audit_read: true,
+        audit_insert: false,
+        ledger_read: false,
+      })
+    })
+
+    await t.test('runtime RLS keeps API roles out and online login throttle is shared and expires', async () => {
+      for (const role of ['anon', 'authenticated', 'service_role']) {
+        const api = postgres(temporary.apiUrls[role as keyof typeof temporary.apiUrls], { max: 1, connect_timeout: 5 })
+        try {
+          await expectSqlState(api`select id from public.students limit 1`, '42501', `${role} must not read student records.`)
+          await expectSqlState(api`select id from public.effective_attendance limit 1`, '42501', `${role} must not read the attendance view.`)
+          await expectSqlState(api`select key_hash from private.login_throttle_attempts limit 1`, '42501', `${role} must not read private throttle records.`)
+        } finally {
+          await api.end({ timeout: 3 })
+        }
+      }
+
+      const hmacKey = 'test-only-hmac-key-not-a-production-secret-0001'
+      const address = '192.0.2.44'
+      const keyHash = hashLoginThrottleAddress(address, hmacKey)
+      assert.match(keyHash, /^[0-9a-f]{64}$/)
+      assert.notEqual(keyHash, address)
+      assert.notEqual(hashLoginThrottleAddress(address, `${hmacKey}-other`), keyHash)
+
+      const start = new Date('2026-10-13T10:00:00.000Z')
+      const outcomes = await Promise.all(Array.from({ length: 8 }, (_, index) => {
+        const database = index % 2 === 0 ? app : appSecondConnectionPool
+        return withSharedLoginAttempt(database, keyHash, async (transaction) => {
+          await recordSharedLoginFailure(transaction, keyHash, new Date(start.getTime() + index))
+          return 'authenticated-check-admitted'
+        })
+      }))
+      assert.equal(outcomes.filter((outcome) => !outcome.blocked).length, 5)
+      assert.equal(outcomes.filter((outcome) => outcome.blocked).length, 3)
+      assert.equal(await isSharedLoginBlocked(app, keyHash, new Date(start.getTime() + 100)), true)
+      const [counter] = await migrator`
+        select failure_count, blocked_until, expires_at
+        from private.login_throttle_attempts where key_hash = ${keyHash}
+      `
+      assert.equal(counter.failure_count, 5)
+      assert.ok(counter.blocked_until instanceof Date)
+      assert.ok(counter.expires_at.getTime() > counter.blocked_until.getTime())
+
+      const resetAt = new Date(start.getTime() + 16 * 60 * 1000)
+      await recordSharedLoginFailure(app, keyHash, resetAt)
+      assert.equal(await isSharedLoginBlocked(app, keyHash, resetAt), false)
+      const [resetCounter] = await migrator`
+        select failure_count, blocked_until from private.login_throttle_attempts where key_hash = ${keyHash}
+      `
+      assert.equal(resetCounter.failure_count, 1)
+      assert.equal(resetCounter.blocked_until, null)
+
+      const expiredKeyHash = hashLoginThrottleAddress('192.0.2.45', hmacKey)
+      await recordSharedLoginFailure(app, expiredKeyHash, start)
+      await isSharedLoginBlocked(app, keyHash, new Date(start.getTime() + 2 * 60 * 60 * 1000))
+      const [expired] = await migrator`
+        select count(*)::int as count from private.login_throttle_attempts where key_hash = ${expiredKeyHash}
+      `
+      assert.equal(expired.count, 0)
     })
 
     await t.test('duplicate names and blank student numbers stay separate; attendance has inclusive dates and one effective record', async () => {
-      const fixture = await createSchoolFixture(app)
+      const fixture = await createSchoolFixture(app, { teacherAccountDatabase: migrator })
       await expectSqlState(
         createSemester(app, {
           schoolId: fixture.schoolId,
@@ -191,7 +280,7 @@ test('local PostgreSQL schema preserves school, roster, attendance, calendar, an
     })
 
     await t.test('past rules can initialize dates without history; confirmed holidays exclude without deleting history or restoring it', async () => {
-      const fixture = await createSchoolFixture(app)
+      const fixture = await createSchoolFixture(app, { teacherAccountDatabase: migrator })
       const ruleDate = addDays(fixture.today, -2)
       const weekday = new Date(`${ruleDate}T00:00:00Z`).getUTCDay()
       await setRoutineSchoolDay(app, {
@@ -343,7 +432,7 @@ test('local PostgreSQL schema preserves school, roster, attendance, calendar, an
     })
 
     await t.test('identity snapshots update only in the active semester; closure and roster copy preserve history', async () => {
-      const fixture = await createSchoolFixture(app, { firstMembershipEnd: null })
+      const fixture = await createSchoolFixture(app, { firstMembershipEnd: null, teacherAccountDatabase: migrator })
       for (let weekday = 0; weekday < 7; weekday += 1) {
         await setRoutineSchoolDay(app, {
           schoolId: fixture.schoolId,
@@ -512,7 +601,7 @@ test('local PostgreSQL schema preserves school, roster, attendance, calendar, an
     })
 
     await t.test('audit records identify the actor, are immutable, redact auth secrets, and roll back with data', async () => {
-      const fixture = await createSchoolFixture(app)
+      const fixture = await createSchoolFixture(app, { teacherAccountDatabase: migrator })
       const actorCreatedStudent = await withAuditActor(app, fixture.teacherId, (transaction) =>
         createStudent(transaction, { fullName: 'Siswa Audit Sintetis' }))
       const [actorEvent] = await app`
@@ -540,6 +629,10 @@ test('local PostgreSQL schema preserves school, roster, attendance, calendar, an
         create trigger audit_secret_probe_audit
           after insert or update or delete on public.audit_secret_probe
           for each row execute function public.append_row_audit_event();
+        grant select, insert, update on public.audit_secret_probe to lab002_app;
+        alter table public.audit_secret_probe enable row level security;
+        create policy lab002_app_access on public.audit_secret_probe
+          for all to lab002_app using (true) with check (true);
       `).simple()
       const dummyPasswordHash = 'synthetic-password-hash-value'
       const dummySessionSecret = 'synthetic-session-secret-value'
@@ -602,7 +695,7 @@ test('local PostgreSQL schema preserves school, roster, attendance, calendar, an
     })
 
     await t.test('unset calendar differs from seven explicitly off days and a complete semester still requires closure confirmation', async () => {
-      const fixture = await createSchoolFixture(app)
+      const fixture = await createSchoolFixture(app, { teacherAccountDatabase: migrator })
       const unsetPreview = await getSemesterClosurePreview(app, {
         semesterId: fixture.semesterId,
         teacherId: fixture.teacherId,
@@ -647,7 +740,7 @@ test('local PostgreSQL schema preserves school, roster, attendance, calendar, an
 
     await t.test('semester closure serializes against attendance, new students, and calendar changes', async (t) => {
       await t.test('attendance is included in a fresh preview or rejected after closure', async () => {
-        const fixture = await createSchoolFixture(app)
+        const fixture = await createSchoolFixture(app, { teacherAccountDatabase: migrator })
         await prepareExplicitAllOffCalendar(app, fixture)
         const race = await raceClosureWithWrite(app, fixture, () => withAuditActor(app, fixture.teacherId, (transaction) =>
           recordAttendance(transaction, {
@@ -669,7 +762,7 @@ test('local PostgreSQL schema preserves school, roster, attendance, calendar, an
       })
 
       await t.test('new memberships are included before closure or rejected from the closed semester', async () => {
-        const fixture = await createSchoolFixture(app)
+        const fixture = await createSchoolFixture(app, { teacherAccountDatabase: migrator })
         await prepareExplicitAllOffCalendar(app, fixture)
         const student = await createStudent(app, { fullName: 'Uji Balapan Siswa Baru' })
         const race = await raceClosureWithWrite(app, fixture, () => withAuditActor(app, fixture.teacherId, (transaction) =>
@@ -688,7 +781,7 @@ test('local PostgreSQL schema preserves school, roster, attendance, calendar, an
       })
 
       await t.test('calendar changes update the preview or are rejected after closure', async () => {
-        const fixture = await createSchoolFixture(app)
+        const fixture = await createSchoolFixture(app, { teacherAccountDatabase: migrator })
         await prepareExplicitAllOffCalendar(app, fixture)
         const changedDate = addDays(fixture.today, -2)
         const race = await raceClosureWithWrite(app, fixture, () => withAuditActor(app, fixture.teacherId, (transaction) =>
@@ -707,7 +800,7 @@ test('local PostgreSQL schema preserves school, roster, attendance, calendar, an
       })
     })
   } finally {
-    await Promise.all([app.end({ timeout: 3 }), migrator.end({ timeout: 3 })])
+    await Promise.all([app.end({ timeout: 3 }), appSecondConnectionPool.end({ timeout: 3 }), migrator.end({ timeout: 3 })])
     await temporary.cleanup()
   }
 })
