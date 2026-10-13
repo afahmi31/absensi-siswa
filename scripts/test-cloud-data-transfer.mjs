@@ -537,8 +537,11 @@ try {
   assert.equal(manifest.rowCounts.teacher_accounts, 1)
   assert.ok(manifest.rowCounts.audit_events > 0)
 
-  assert.throws(() => validateCloudTargetUrl('postgres://lab002_migrator.wrongref:synthetic@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=require'))
-  assert.throws(() => validateCloudTargetUrl('postgres://lab002_migrator.jkiewjlohgmsujcwerpi:synthetic@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable'))
+  const acceptedCloudUrl = validateCloudTargetUrl('postgres://lab002_migrator.jkiewjlohgmsujcwerpi:synthetic@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=require')
+  assert.equal(acceptedCloudUrl.hostname, 'aws-1-ap-southeast-1.pooler.supabase.com')
+  assert.throws(() => validateCloudTargetUrl('postgres://lab002_migrator.wrongref:synthetic@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=require'))
+  assert.throws(() => validateCloudTargetUrl('postgres://lab002_migrator.jkiewjlohgmsujcwerpi:synthetic@aws-1-us-east-1.pooler.supabase.com:5432/postgres?sslmode=require'))
+  assert.throws(() => validateCloudTargetUrl('postgres://lab002_migrator.jkiewjlohgmsujcwerpi:synthetic@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable'))
   assert.deepEqual(await inspectTargetDatabase(targetDatabase, manifest, { kind: 'synthetic', synthetic: true }), {
     database: 'lab002_test',
     role: 'lab002_migrator',

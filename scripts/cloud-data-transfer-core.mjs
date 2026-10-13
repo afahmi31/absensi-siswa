@@ -98,7 +98,7 @@ export function validateCloudTargetUrl(connectionUrl) {
   const username = decodeURIComponent(url.username)
   if (
     url.hostname !== url.hostname.toLowerCase()
-    || !/^[a-z0-9-]+\.ap-southeast-1\.pooler\.supabase\.com$/.test(url.hostname)
+    || !/^aws-[0-9]+-ap-southeast-1\.pooler\.supabase\.com$/.test(url.hostname)
     || url.port !== '5432'
     || url.pathname !== '/postgres'
     || username !== cloudUsername

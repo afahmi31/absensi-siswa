@@ -9,7 +9,7 @@ Panduan untuk alat transfer yang disiapkan di `scripts/cloud-data-transfer.mjs`.
 - File snapshot, manifest, dan SQL sementara disimpan di `app/.data/cloud-transfer/`, yang diberi ACL Windows privat dan diabaikan Git. Jangan salin ke folder bersama atau tempel isi manifest/backup ke chat.
 - Masukkan URI database dan path sertifikat melalui environment privat sesi lokal. Jangan taruh credential pada argumen perintah, shell history, log, atau dokumen.
 - `LAB002_TRANSFER_SOURCE_DATABASE_URL` harus menunjuk ke database lokal terkelola: loopback `127.0.0.1:55432`, database `lab002_local`, role `lab002_migrator`, dengan `sslmode=disable`.
-- Untuk pemeriksaan/transfer cloud, `SUPABASE_MIGRATION_DATABASE_URL` harus memakai role migrasi khusus project melalui Supabase Session Pooler. `SUPABASE_CA_CERT_PATH` menunjuk CA resmi yang telah diverifikasi. Koneksi cloud memeriksa sertifikat dan nama host; opsi URI tidak dapat mematikan verifikasi TLS.
+- Untuk pemeriksaan/transfer cloud, `SUPABASE_MIGRATION_DATABASE_URL` harus memakai role migrasi khusus project melalui Supabase Session Pooler Singapore, dengan hostname `aws-<angka>-ap-southeast-1.pooler.supabase.com` dan port `5432`. Username tetap harus terikat pada project yang disetujui. `SUPABASE_CA_CERT_PATH` menunjuk CA resmi yang telah diverifikasi. Koneksi cloud memeriksa sertifikat dan nama host; opsi URI tidak dapat mematikan verifikasi TLS.
 
 ## Tahapan alat
 
