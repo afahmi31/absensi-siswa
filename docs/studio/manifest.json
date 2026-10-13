@@ -1,6 +1,6 @@
 {
-  "copiedAt": "2026-10-13T07:05:31.9697648Z",
-  "task": "LAB002-PRE-001-approved-cloud-schema",
+  "copiedAt": "2026-10-13T07:54:09.4662553Z",
+  "task": "LAB002-CLOUD-DATA-001-revision-pm-review",
   "authority": "Registry studio tetap sumber keputusan aktif. Salinan ini untuk penelusuran development.",
   "transformations": "Selected historic copies keep original sync mappings. Current local-trial snapshots normalize Markdown whitespace and link back to absolute registry sources. Hashes reflect saved copies.",
   "excluded": [
@@ -390,28 +390,46 @@
       "copySha256": "c9aff03045c83fe2faba0c52a1559bdd1565e8d469c12bfbd78c1646760f0ac2"
     },
     {
-      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\resume-checkpoint.md",
-      "copy": "docs/studio/project/resume-checkpoint.md",
-      "sourceSha256": "b39f1f2957102a065e1d3761196b3e24b699772b63adb9c110699a146ba659fa",
-      "copySha256": "b39f1f2957102a065e1d3761196b3e24b699772b63adb9c110699a146ba659fa"
-    },
-    {
       "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\cloud-pilot-runbook.md",
       "copy": "docs/studio/project/cloud-pilot-runbook.md",
       "sourceSha256": "a271a2fab78f85ac5bb89a87baf4c4fa3588bb4f0ff67f870f369416f73fb2e1",
       "copySha256": "a271a2fab78f85ac5bb89a87baf4c4fa3588bb4f0ff67f870f369416f73fb2e1"
     },
     {
-      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\tasks\\LAB002-CLOUD-DATA-001.md",
-      "copy": "docs/studio/project/tasks/LAB002-CLOUD-DATA-001.md",
-      "sourceSha256": "a302b380c8f736f727f59887602e3136cfb0c188753300c806d9f9bd88de6fa5",
-      "copySha256": "a302b380c8f736f727f59887602e3136cfb0c188753300c806d9f9bd88de6fa5"
-    },
-    {
       "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\reports\\LAB002-PRE-001-cloud-schema.md",
       "copy": "docs/studio/project/reports/LAB002-PRE-001-cloud-schema.md",
       "sourceSha256": "51d7a8cfe1cb829e1b4cf4a26a1311ac6c1f539d046b32f64f9f8529f72dad04",
       "copySha256": "51d7a8cfe1cb829e1b4cf4a26a1311ac6c1f539d046b32f64f9f8529f72dad04"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\tasks\\LAB002-CLOUD-DATA-001.md",
+      "copy": "docs/studio/project/tasks/LAB002-CLOUD-DATA-001.md",
+      "sourceSha256": "a68494b2437a14b94ccbbdf97a5df234369359826dd40228d373ce63bfdd2808",
+      "copySha256": "a68494b2437a14b94ccbbdf97a5df234369359826dd40228d373ce63bfdd2808"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\tasks\\LAB002-SEC-001.md",
+      "copy": "docs/studio/project/tasks/LAB002-SEC-001.md",
+      "sourceSha256": "3229d501dca39f3ae38ee0b2b08f551bdce252ba20a841f20b2ec9c8c9c65bd1",
+      "copySha256": "3229d501dca39f3ae38ee0b2b08f551bdce252ba20a841f20b2ec9c8c9c65bd1"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\reports\\LAB002-CLOUD-DATA-001-report.md",
+      "copy": "docs/studio/project/reports/LAB002-CLOUD-DATA-001-report.md",
+      "sourceSha256": "e8c8cc12350dbb61c27cea434ff907af2548c7ea4845c13ac4834beb47cd8987",
+      "copySha256": "e8c8cc12350dbb61c27cea434ff907af2548c7ea4845c13ac4834beb47cd8987"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\reports\\LAB002-CLOUD-DATA-001-pm-review.md",
+      "copy": "docs/studio/project/reports/LAB002-CLOUD-DATA-001-pm-review.md",
+      "sourceSha256": "7ae125421e96e024feca69ab762d94c2da751945b1fff09dd5ea8bc332509e56",
+      "copySha256": "7ae125421e96e024feca69ab762d94c2da751945b1fff09dd5ea8bc332509e56"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\resume-checkpoint.md",
+      "copy": "docs/studio/project/resume-checkpoint.md",
+      "sourceSha256": "b2a72951957b4de7840b08b51e61b7c6fc24df99128586399c6e798d6993b89c",
+      "copySha256": "b2a72951957b4de7840b08b51e61b7c6fc24df99128586399c6e798d6993b89c"
     }
   ]
 }

@@ -1,6 +1,6 @@
 # LAB002-CLOUD-DATA-001 — Pemindahan data lokal ke Supabase
 
-Tanggal: 13 Oktober 2026. Status: ASSIGNED untuk persiapan alat lokal kepada online_preflight, Codex GPT-6-luna/MAX; perubahan cloud menunggu review alat dan otorisasi operasional yang berlaku.
+Tanggal: 13 Oktober 2026. Status: PM_VALIDATION; alat dan revisi R1 lulus pemeriksaan lokal PM, operasi nyata PG17/transfer tetap menunggu pemeriksaan serta izin tersendiri. Next owner PM.
 
 Sumber: Ardy meminta persiapan kompatibilitas, koneksi, serta pemindahan data dilanjutkan setelah koneksi plugin Supabase berhasil. Target tetap project absensi-siswa/jkiewjlohgmsujcwerpi di Singapore. Source aplikasi lokal app/.data/postgres, bukan file Excel diimpor ulang. Jangan mencetak identitas/kredensial/payload audit.
 

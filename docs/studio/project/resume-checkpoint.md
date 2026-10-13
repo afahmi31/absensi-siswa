@@ -79,3 +79,21 @@ PRE-001: implementasi lokal diserahkan Executor dan pemeriksaan lokal PM PASS, s
 Task aktif CLOUD-DATA-001 ASSIGNED kepada handle online_preflight, Codex GPT-6-luna/MAX, tahap alat transfer/rehearsal lokal saja. Ownership scripts/tests/docs alat transfer; PM menangani registry/sync/Git. Tidak ada write cloud, transfer data nyata, deploy atau commit/push oleh Executor. Baca task dan delta laporan terlebih dahulu; jangan menduplikasi worker atau mengulang PRE-001 jika source tidak berubah. Setelah alat diserahkan, PM review guards/atomisitas/preservasi audit dan seluruh baris sebelum operasi PG17/transfer aktual.
 
 Deployment Vercel tetap menunggu versi dan target konkret sesuai workflow. Project Vercel belum dibuat/tertaut dalam tahap ini. Source lokal/backup tetap dipertahankan sampai penerimaan data dan URL online; jangan menjalankan dua sumber data aktif tanpa keputusan cutover. Checkpoint ini mencatat posisi, bukan permintaan menghentikan pekerjaan yang sedang diizinkan.
+
+## Snapshot Git dan keputusan cloud yang menunggu
+
+Commit PRE-001: 6569819cd8463b644d14bca679643c6c94cfb587, sudah push main; hash remote diverifikasi melalui plugin GitHub. Snapshot mencakup fondasi Supabase/throttle, tes, dokumen/handoff dan .gitattributes agar newline migrasi konsisten. Salinan dokumentasi 66 berkas mempunyai hash copy yang cocok. Ini belum mencakup alat CLOUD-DATA-001 yang sedang dikerjakan.
+
+Dialog menunggu keputusan Ardy untuk membuat role aplikasi/migrator, membatasi akses public/API dan menerapkan migration0001–0006 pada target Supabase yang ditetapkan dari commit tersebut. Belum izin transfer data nyata atau deployment Vercel. Executor tetap mengerjakan alat lokal sambil menunggu; PM belum menjalankan write cloud. Baca jawaban dialog dan delta worker sebelum tindakan berikutnya.
+
+## Persiapan Supabase yang diizinkan berhasil
+
+Ardy menyetujui role/skema0001–0006 dari commit6569819 melalui dialog. Bootstrap berhasil; migrator/app khusus dengan kredensial privat dan APIpublic dibatasi. CLI precheck42883 diperbaiki oleh Executor melalui helper JSONB; PM menguji positif/negatif padaPG17 dan check/up berhasil. Keenam migrasi diterapkan sebagai migrator, SQL tetap byte-identik dengan commit diizinkan. Seluruh tabel aplikasi/view dapat dibaca oleh app-role dan kosong; ledger ditolak42501. Tidak ada transferdata/deployment.
+
+Commit koreksi dan laporan cloud d559e45348887ad83fb435683521539f60921224 sudah push main. Source report reports/LAB002-PRE-001-cloud-schema.md mencatat hasil dan advisors. Securityadvisor menyisakan19fungsi search_path unset; append_row_audit_event sudah pinned, sehingga20fungsi total. Perbaikan forward0007 belum dibuat/diizinkan untuk cloud. INFO ledgerRLS/no-policy disengaja. Platform rls_auto_enable EXECUTEAPI sudahdicabut, warningterkait hilang. Alat CLOUD-DATA masih WIP milik online_preflight, jangan commit/menjalankannya sebelum laporan dan PMreview. Sourceguru lokal dipertahankan.
+
+## Revisi transfer lulus pemeriksaan PM
+
+CLOUD-DATA-001 status PM_VALIDATION, tahap alat lokal PASS. PM mengulang Node24 rehearsal6→6 dan4→6: sebelas tabel/49baris sintetis setiap jalur, exit0. R1 pemisahan source/target ledger selesai; jangan mengubah database guru untuk menyamakan ledger. Report PM mencatat batas operasi nyata PG17/backup/data belum dilakukan.
+
+SEC-001 disiapkan READY tahap lokal untuk migration0007, pin19fungsi search_path dan regresi TEMP relation; fungsi audit sudahpinned tetap. Sesuaikan guardtransfer target7 dan rehearsal4→7 tanpa source nyata/cloudwrite. Pilihan Luna/MAX mengikuti delegasi lokal, actualassignment dicatat ketika dikirim. Izin cloud lama hanya0001–0006; perlu izin terpisah setelah SQL7/commit konkret diperiksa. Jangan ulang PREbootstrap atau importExcel, jangan menulis cloud/teacherdata dari tools WIP.
