@@ -458,6 +458,11 @@ button:disabled { cursor: wait; }
   .closure-dialog-actions .secondary-button, .closure-dialog-actions .close-semester-button { width: 100%; min-width: 0; padding-inline: 9px; font-size: 13px; }
 }
 
+@media (max-width: 380px) {
+  .main-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px 8px; }
+  .main-nav a { padding: 8px 3px; line-height: 1.25; white-space: normal; }
+}
+
 @media (max-width: 760px) {
   .login-shell { display: block; }
   .login-story { min-height: 118px; padding: 36px 24px 0; background: #f4f7f6; }

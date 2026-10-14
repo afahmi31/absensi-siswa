@@ -47,11 +47,19 @@
         </span>
         <span class="home-link-arrow" aria-hidden="true">→</span>
       </NuxtLink>
+      <NuxtLink class="home-link-card" to="/reports">
+        <span class="home-link-icon" aria-hidden="true">06</span>
+        <span>
+          <strong>Laporan absensi</strong>
+          <small>Lihat rekap bulanan atau satu semester</small>
+        </span>
+        <span class="home-link-arrow" aria-hidden="true">→</span>
+      </NuxtLink>
     </section>
 
     <section class="notice-panel" aria-labelledby="attendance-notice-title">
-      <h2 id="attendance-notice-title">Absensi harian sudah tersedia</h2>
-      <p>Absensi dapat diisi dan dikoreksi setelah kalender hari sekolah diatur. Impor Excel dan laporan belum tersedia.</p>
+      <h2 id="attendance-notice-title">Absensi dan laporan</h2>
+      <p>Absensi dapat diisi dan dikoreksi setelah kalender hari sekolah diatur. Lihat rekap bulanan atau semester melalui menu Laporan.</p>
     </section>
   </main>
 </template>

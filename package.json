@@ -30,6 +30,7 @@
     "test:calendar": "node scripts/test-calendar.mjs",
     "test:attendance": "node scripts/test-attendance.mjs",
     "test:reports": "node scripts/test-reports.mjs",
+    "fixture:reports": "node --experimental-strip-types scripts/fixture-reports.mjs",
     "test": "node scripts/test-all.mjs",
     "postinstall": "nuxt prepare"
   },
