@@ -1,5 +1,7 @@
 # Acuan lanjut LAB-002 — uji lokal absensi
 
+Checkpoint aktif terbaru berada pada bagian “Checkpoint aktif — 15 Oktober 2026” di akhir dokumen. Bagian bertanggal sebelumnya adalah riwayat.
+
 ## Izin GitHub — 13 Oktober 2026
 
 Ardy menyampaikan data lokal sudah masuk dan aman, lalu meminta commit perubahan serta push ke https://github.com/afahmi31/absensi-siswa.git. Plugin GitHub memverifikasi repo publik, kosong, default branch main dan izin push tersedia. Remote origin diarahkan ke repo tersebut; branch publik main menggunakan riwayat lokal yang sudah ada, tanpa force push. Status operasi aktual diperiksa lewat Git setelah push. Data asli, database, backup, env dan script privat tetap di luar Git. Deployment Vercel/Supabase tetap menunggu pembahasan terpisah.
@@ -101,3 +103,20 @@ SEC-001 disiapkan READY tahap lokal untuk migration0007, pin19fungsi search_path
 ## Snapshot alat transfer dan assignment penguatan
 
 Commit1629d92f8038afbbf35eba5b2b426084a9a0146e sudahpushmain danhashGitHubdiverifikasi. Alat/revisiR1/panduan/tes/report PM tersimpan, tidakada transferguru/cloudwrite. SEC-001 kiniASSIGNEDonline_preflight Luna/MAX lokalonly, baselinecommit1629d92, newmigration7 danrehearsal4→7. PMreviewsebelumizincloud7; janganmengulang tooltransfer6yangsudahPASSkecuali guardtargetbaru/regresiyangdiminta. Owner Executor source/tests, PMregistry/sync/Git. Rootwaitinghasilpreflight/laporan, bukanberhentiatauclosuretask.
+
+## Transfer nyata selesai
+Ardy mengizinkan restore rehearsal snapshot nyata lalu transfer jika lulus. Rehearsal privat PG16 dan pembandingan penuh11tabel source PASS; targetPG17check/import atomik dan pembandingan penuhcloud PASS. Supabase kini38siswa1810absensi1947audit,sesi0. Backup/source tetap. Report reports/LAB002-CLOUD-DATA-001-transfer-result.md. Jangan importulang atau lanjutdeploy tanpa target/versi konkret. Periksa delta source sebelum cutover online; tidak ada deployment.
+
+
+## Main bersih / develop lengkap
+Ardy menyetujui polaGit mainrilisbersih developlengkap. Remote main7bf0dd3928ac0ead865cf9ce42bde0722103fae7 berisi64file runtime/build, remote developf114192c0f69734be0d5d3323db5320cc36f945c menyimpan docs/tes/alat/generator. Checkoutapp tetapdevelop, workingtreebersih. Config npm10.9.3wrapper install/builddiMain, cleaninstall/buildstagingPASS runtimeNode24. RemoteVercelretrybelumdiverifikasi, oldlog16167b9npm11tidakmewakilibaru. Report REL-CLEANPMreview. Jangan merge developlangsungmain atau checkoutmain diapp.data. TransferSupabase sudah38/1810/1947, envVercelbelumdipasang.
+
+# Checkpoint aktif — 15 Oktober 2026
+
+Ardy meminta melanjutkan task setelah konfirmasi penggunaan absensi online oleh guru pada 14 Oktober. Pilot tetap pada versi online terakhir yang tercatat c16bd4f. Tidak ada push/deploy/data cloud yang diubah pada kelanjutan ini.
+
+PM menerima preflight REP-001. Executor /root/lab002_rep_preflight, Codex worker gpt-6-luna/max, mengerjakan model/API REP-001A pada develop. Suite laporan Executor dan PM independen 6/6; Executor melaporkan kalender5/5, absensi7/7, typecheck dan build Vercel PASS. PM memeriksa source read-only/owner/metadata dan output rute laporan runtime24/sin1. Lihat reports/LAB002-REP-001A-pm-review.md dan laporan Executor.
+
+Next owner PM: lanjutkan kesiapan REP-001B (UI/pratinjau/cetak) dari model yang sudah diperiksa; draft tersedia. PDF nyata dan logo privat/snapshot arsip tetap dependency yang perlu dirinci, bukan fitur selesai. Jangan mengulang transfer data guru atau checkout main pada direktori app. Implementasi berikutnya tetap lokal/data sintetis sesuai delegasi; deployment memerlukan target/versi yang disetujui terpisah.
+
+Catatan checkpoint lama di bawah dipertahankan sebagai riwayat, bukan instruksi aktif bila berbeda dari checkpoint ini.

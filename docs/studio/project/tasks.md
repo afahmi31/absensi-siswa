@@ -1,9 +1,17 @@
 # Backlog Delivery LAB-002 v1
 
+## Kelanjutan aktif — 15 Oktober 2026
+
+Ardy menyatakan guru sudah melakukan absensi online pada 14 Oktober tanpa masalah yang dilaporkan; lihat [catatan bukti](reports/teacher-pilot-confirmation-2026-10-14.md). Ini tidak menggantikan bukti per AC seluruh task historis.
+
+Ardy meminta kelanjutan pada 15 Oktober. Prioritas PM: laporan bulanan/semester sesuai PRD. [Preflight REP-001](tasks/LAB002-REP-001-preflight.md) dan [REP-001A](tasks/LAB002-REP-001A.md) CLOSED melalui delegasi lokal setelah hasil Executor /root/lab002_rep_preflight, gpt-6-luna/max diperiksa. Model/API read-only lulus suite REP PM independen6/6, typecheck/build kode final; regresi Executor kalender5/5 dan absensi7/7. [Review PM](reports/LAB002-REP-001A-pm-review.md). [REP-001B](tasks/LAB002-REP-001B.md) masih ANALYSIS untuk UI/cetak. Task induk tetap mencakup UI, logo, cetak browser dan PDF, tidak dianggap selesai oleh model saja.
+
+Checkout kerja develop; main rilis bersih tidak diubah. Pengembangan memakai data sintetis dan lingkungan lokal. Tidak ada izin deployment versi baru dari permintaan kelanjutan ini. Catatan status tanggal 12 Oktober di bawah adalah riwayat dan harus dibaca bersama laporan/task yang lebih baru.
+
 Status aktif 12 Oktober 2026: UI001, UI002, SET001, DATA001 dan AUTH001 CLOSED. AUTH diterima PM berdasarkan delegasi lokal Ardy setelah pengujian independen dan browser. Bagian aktivitas lama di bawah dipertahankan sebagai riwayat; status aktif ini dan tabel menjadi acuan. STUD CLOSED; SEM CLOSED melalui delegasi PM; target terbaru uji lokal, CAL diterima teknis dan ATT PM_VALIDATION; runtime lokal aktif menunggu uji Ardy; task fitur setelahnya belum didispatch.
 
 Pemilik: Project Manager. Tanggal: 2026-10-11.
-Acuan: [rencana](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/development-plan-v1.md>), [PRD](<D:/ayaa-wae-studio/products/PROD-002-product-prd-v1.md>), [keputusan terbuka](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/decisions-and-confirmations.md>).
+Acuan: [rencana](development-plan-v1.md), [PRD](../../products/PROD-002-product-prd-v1.md), [keputusan terbuka](decisions-and-confirmations.md).
 
 Status merupakan lifecycle protokol. Belum dipilih Executor berarti belum ASSIGNED. AC di bawah merupakan kriteria yang dibuktikan per task; evidence task CLOSED ada pada laporan/review dan local-progress. Uraian planning awal yang belum diperbarui adalah riwayat, bukan status aktif. Task ANALYSIS adalah breakdown konkret awal; PM melengkapi kontrak, path, dependency dan readiness sesudah keputusan yang disebut terpenuhi.
 
@@ -140,23 +148,23 @@ Verification: inspect package/build dan simulasi non-production sesuai target; P
 
 Aktivitas berikut belum task Executor READY dan tidak didispatch otomatis:
 
-- Uji Ardy/guru: jalankan [skenario](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/verification-plan.md>), rekam perangkat/browser/versi/expected-observed serta cetak fisik. Task fitur yang menunggu bukti wajib tetap PM_VALIDATION. PM memeriksa hasil/revisi lalu menyiapkan final review.
+- Uji Ardy/guru: jalankan [skenario](verification-plan.md), rekam perangkat/browser/versi/expected-observed serta cetak fisik. Task fitur yang menunggu bukti wajib tetap PM_VALIDATION. PM memeriksa hasil/revisi lalu menyiapkan final review.
 - Review Product Manager: cocokkan goal, flow, UX/copy dan bukti PRD; kesimpulan perlu revisi/bukti belum cukup/layak uji publik bukan izin publish. Temuan kembali kepada PM.
 - Keputusan Ardy: approval hasil/closure/deployment/publikasi terpisah. Brief branding baru disiapkan bila hasil review memadai dan diminta; tidak menjadi fitur aplikasi atau kewajiban publish otomatis.
 
 ## Readiness dan rekomendasi sekarang
 
-UI-001 memenuhi Definition of Ready untuk **artefak desain saja** pada folder docs yang diketahui. Task ini tidak perlu stack/database/production/codebase. AC, verification, constraint/area dan dependency ada pada [spec](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/tasks/LAB002-UI-001.md>). Ardy telah memilih Codex subagent gpt-6.1-sol/high; task ASSIGNED dengan handle /root/lab002_ui001. ACK dan preflight diterima PM; hasil desain dan verification belum tersedia.
+UI-001 memenuhi Definition of Ready untuk **artefak desain saja** pada folder docs yang diketahui. Task ini tidak perlu stack/database/production/codebase. AC, verification, constraint/area dan dependency ada pada [spec](tasks/LAB002-UI-001.md). Ardy telah memilih Codex subagent gpt-6.1-sol/high; task ASSIGNED dengan handle /root/lab002_ui001. ACK dan preflight diterima PM; hasil desain dan verification belum tersedia.
 
 Task lain berstatus ANALYSIS karena dependency/keputusan belum selesai. Belum ada task selesai, approval desain, test lulus, code atau environment siap. PM akan meninjau readiness lagi setelah C01–C08 dan evidence dependency terkait tersedia.
 
-Pembaruan UI-001: sembilan visual diterima dan diperiksa PM; READY_FOR_ARDY_REVIEW, approval Ardy belum tersedia. [Review PM](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/reports/LAB002-UI-001-pm-review.md>). Tidak ada task implementasi didispatch.
+Pembaruan UI-001: sembilan visual diterima dan diperiksa PM; READY_FOR_ARDY_REVIEW, approval Ardy belum tersedia. [Review PM](reports/LAB002-UI-001-pm-review.md). Tidak ada task implementasi didispatch.
 
 Approval terbaru: UI-001 APPROVED oleh Ardy dan CLOSED setelah validation PM; Sumber: jawaban dialog Ardy “Setujui arah desain”, 11 Oktober 2026. Persetujuan hanya arah login dan absensi harian HP/laptop; bukan assignment implementasi. Task lain tetap ANALYSIS; belum didispatch.
 
 ## Target Vercel dan evaluasi stack — 11 Oktober 2026
 
-Vercel ditetapkan Ardy sebagai hosting. C01 sedang dievaluasi ulang melalui [perbandingan Nuxt/Vue dan Laravel](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/stack-vercel-comparison.md>); Laravel belum digantikan. Setup/implementation yang bergantung pada stack tetap menunggu keputusan. UI-001 sudah CLOSED dengan approval desain; tidak terpengaruh evaluasi ini. Provider database/storage, paket, biaya dan izin deploy belum ditetapkan.
+Vercel ditetapkan Ardy sebagai hosting. C01 sedang dievaluasi ulang melalui [perbandingan Nuxt/Vue dan Laravel](stack-vercel-comparison.md); Laravel belum digantikan. Setup/implementation yang bergantung pada stack tetap menunggu keputusan. UI-001 sudah CLOSED dengan approval desain; tidak terpengaruh evaluasi ini. Provider database/storage, paket, biaya dan izin deploy belum ditetapkan.
 
 ## Keputusan aktif setelah perbandingan
 
@@ -167,13 +175,13 @@ Keputusan aktif: Nuxt/Vue full-stack dalam satu aplikasi, hosting Vercel. Sumber
 Sumber: dua dialog lokasi/database, kemudian penyedia/baseline. Ardy menyetujui root app di folder registry, salinan terarah docs development dalam repo dan Git init lokal; commit/push tetap terpisah. App belum ada saat diperiksa PM.
 Nuxt 4 stabil + TypeScript, Node 24, npm/lockfile dan aplikasi minimal tanpa login/absensi/Excel/PDF disetujui. Rekomendasi patch Nuxt 4.6.1 diperiksa sumber resmi; preflight wajib kompatibilitas.
 Supabase dipilih untuk PostgreSQL; pemilihan Auth/Storage, provisioning/reset/akses C04 dan backup C08 tetap terbuka. Tidak ada layanan dibuat, region/plan/biaya/kredensial ditetapkan.
-[SET-001](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/tasks/LAB002-SET-001.md>) READY untuk fondasi lokal/config placeholders tanpa koneksi DB nyata. Tidak ASSIGNED. Provider credentials/ORM/schema bukan dependency scope ini, tetap dependency DATA/AUTH/OPS terkait. C02 path/Git lokal APPROVED; remote/branch strategy/commit/push belum diotorisasi.
+[SET-001](tasks/LAB002-SET-001.md) READY untuk fondasi lokal/config placeholders tanpa koneksi DB nyata. Tidak ASSIGNED. Provider credentials/ORM/schema bukan dependency scope ini, tetap dependency DATA/AUTH/OPS terkait. C02 path/Git lokal APPROVED; remote/branch strategy/commit/push belum diotorisasi.
 
 ## Approval dan closure SET-001 — 11 Oktober 2026
 
 Ardy menjawab dialog “Setujui hasil setup lokal”. APPROVED untuk hasil fondasi lokal yang diperiksa PM. Task CLOSED karena seluruh deliverable/AC setup selesai dan tidak ada delivery action tersisa. Tidak memberi izin commit/push/deploy, koneksi layanan, atau assignment task berikutnya. Next owner PM untuk merinci readiness DATA-001/AUTH-001 dan keputusan terkait. Pernyataan pending review sebelumnya merupakan riwayat sebelum approval ini.
 
-Aktif 12 Oktober: DATA-001 ASSIGNED /root/lab002_data001 gpt-6-luna/max. [Kontrak lokal](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/local-delivery-contract-v1.md>) memutuskan C03–C08 melalui delegasi PM. Root repo app lokal saja.
+Aktif 12 Oktober: DATA-001 ASSIGNED /root/lab002_data001 gpt-6-luna/max. [Kontrak lokal](local-delivery-contract-v1.md) memutuskan C03–C08 melalui delegasi PM. Root repo app lokal saja.
 
 Pengerjaan lokal ditahan atas permintaan Ardy12Oktober. UI002/DATA001 CLOSED dengan acceptance PM; AUTH001 ON_HOLD, belum selesai/commit. Task berikut tetap ANALYSIS dan tidak didispatch.
 

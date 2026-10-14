@@ -29,6 +29,7 @@
     "test:students": "node scripts/test-students.mjs",
     "test:calendar": "node scripts/test-calendar.mjs",
     "test:attendance": "node scripts/test-attendance.mjs",
+    "test:reports": "node scripts/test-reports.mjs",
     "test": "node scripts/test-all.mjs",
     "postinstall": "nuxt prepare"
   },
