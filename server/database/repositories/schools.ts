@@ -14,15 +14,40 @@ export interface SchoolClass {
   name: string
 }
 
+export interface SchoolLogoAsset {
+  id: string
+  school_id: string
+  mime_type: 'image/png' | 'image/jpeg'
+  byte_size: number
+  width: number
+  height: number
+  sha256: string
+  uploaded_by: string
+}
+
+export async function lockTeacherSchoolSave(database: DatabaseExecutor, teacherId: string): Promise<void> {
+  await database`select pg_advisory_xact_lock(1729, hashtext(${teacherId}::text))`
+}
+
+export async function lockSchoolProfileSave(database: DatabaseExecutor, schoolId: string): Promise<void> {
+  await database`select pg_advisory_xact_lock(1728, hashtext(${schoolId}::text))`
+}
+
 export async function createSchool(
   database: DatabaseExecutor,
-  input: { teacherId: string; name: string; timeZone?: string; logoPath?: string | null },
+  input: { id?: string; teacherId: string; name: string; timeZone?: string; logoPath?: string | null },
 ): Promise<School> {
-  const [school] = await database<School[]>`
-    insert into schools (teacher_id, name, time_zone, logo_path)
-    values (${input.teacherId}, ${input.name}, ${input.timeZone ?? 'Asia/Jakarta'}, ${input.logoPath ?? null})
-    returning id, teacher_id, name, time_zone, logo_path
-  `
+  const [school] = input.id
+    ? await database<School[]>`
+      insert into schools (id, teacher_id, name, time_zone, logo_path)
+      values (${input.id}, ${input.teacherId}, ${input.name}, ${input.timeZone ?? 'Asia/Jakarta'}, ${input.logoPath ?? null})
+      returning id, teacher_id, name, time_zone, logo_path
+    `
+    : await database<School[]>`
+      insert into schools (teacher_id, name, time_zone, logo_path)
+      values (${input.teacherId}, ${input.name}, ${input.timeZone ?? 'Asia/Jakarta'}, ${input.logoPath ?? null})
+      returning id, teacher_id, name, time_zone, logo_path
+    `
   if (!school) throw new Error('School was not created.')
   return school
 }
@@ -46,6 +71,79 @@ export async function updateSchoolForTeacher(
   `
   if (!school) throw new Error('School was not found.')
   return school
+}
+
+export async function updateSchoolProfile(
+  database: DatabaseExecutor,
+  input: { teacherId: string; schoolId: string; name: string; timeZone: string; activeLogoAssetId: string | null },
+): Promise<Pick<School, 'id' | 'name' | 'time_zone'>> {
+  const [school] = await database<Pick<School, 'id' | 'name' | 'time_zone'>[]>`
+    update schools
+    set name = ${input.name}, time_zone = ${input.timeZone}, active_logo_asset_id = ${input.activeLogoAssetId}, updated_at = clock_timestamp()
+    where id = ${input.schoolId} and teacher_id = ${input.teacherId}
+    returning id, name, time_zone
+  `
+  if (!school) throw new Error('School was not found.')
+  return school
+}
+
+export async function createSchoolLogoAsset(
+  database: DatabaseExecutor,
+  input: {
+    assetId: string
+    schoolId: string
+    mimeType: SchoolLogoAsset['mime_type']
+    byteSize: number
+    width: number
+    height: number
+    sha256: string
+    uploadedBy: string
+  },
+): Promise<void> {
+  await database`
+    insert into school_logo_assets (id, school_id, mime_type, byte_size, width, height, sha256, uploaded_by)
+    values (${input.assetId}, ${input.schoolId}, ${input.mimeType}, ${input.byteSize}, ${input.width}, ${input.height}, ${input.sha256}, ${input.uploadedBy})
+  `
+}
+
+export async function setActiveSchoolLogo(
+  database: DatabaseExecutor,
+  input: { schoolId: string; assetId: string | null },
+): Promise<void> {
+  const result = await database<{ id: string }[]>`
+    update schools set active_logo_asset_id = ${input.assetId}, updated_at = clock_timestamp()
+    where id = ${input.schoolId}
+    returning id
+  `
+  if (!result[0]) throw new Error('School logo reference was not updated.')
+}
+
+export async function findSchoolLogoForTeacher(
+  database: DatabaseExecutor,
+  input: { teacherId: string; assetId: string },
+): Promise<Pick<SchoolLogoAsset, 'id' | 'mime_type' | 'byte_size' | 'sha256'> | null> {
+  const rows = await database<Pick<SchoolLogoAsset, 'id' | 'mime_type' | 'byte_size' | 'sha256'>[]>`
+    select asset.id, asset.mime_type, asset.byte_size, asset.sha256
+    from school_logo_assets as asset
+    where asset.id = ${input.assetId}
+      and (
+        exists (
+          select 1 from schools as school
+          where school.id = asset.school_id
+            and school.teacher_id = ${input.teacherId}
+            and school.active_logo_asset_id = asset.id
+        )
+        or exists (
+          select 1
+          from semester_archive_snapshots as snapshot
+          join semesters as semester on semester.id = snapshot.semester_id
+          join schools as school on school.id = semester.school_id
+          where snapshot.logo_asset_id = asset.id and school.teacher_id = ${input.teacherId}
+        )
+      )
+    limit 1
+  `
+  return rows[0] ?? null
 }
 
 export async function createSchoolClass(

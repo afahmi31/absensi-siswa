@@ -6,7 +6,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
-const dataRoot = path.join(appRoot, '.data')
+const dataRoot = path.join(appRoot, '.cache')
 const testRoot = path.join(dataRoot, 'tests')
 const pgBin = 'C:\\Program Files\\PostgreSQL\\16\\bin'
 
@@ -22,7 +22,7 @@ function protectDataRoot() {
   const sid = output.match(/S-\d-\d+(?:-\d+)+/)?.[0]
   if (!sid) throw new Error('Could not secure the local test directory.')
   execFileSync('icacls.exe', [
-    dataRoot,
+    testRoot,
     '/inheritance:r',
     '/grant:r',
     `*${sid}:(OI)(CI)F`,

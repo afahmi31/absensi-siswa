@@ -1,6 +1,6 @@
 # Backlog Delivery LAB-002 v1
 
-Status aktif — 16 Oktober 2026: REP-001C CLOSED, diterima PM melalui delegasi lokal Ardy sesudah review source, browser, unduhan PDF dan runtime hasil build. Laporan PDF bulanan/semester A4/F4/Letter tersedia pada source develop. Lihat [review PM](reports/LAB002-REP-001C-pm-review.md) dan [laporan Executor](reports/LAB002-REP-001C-report.md). Tidak push/deploy atau mengubah website online/data guru. Parent REP-001 tetap terbuka untuk logo privat/arsip logo dan bukti printer fisik. Next owner PM untuk menyiapkan dependency OPS; jangan mengulang task A/B/C atau memulihkan snapshot stop.
+Status aktif — 16 Oktober 2026: OPS-001A CLOSED melalui penerimaan PM lokal setelah resume dengan GPT-6.1 Sol/low sesuai pilihan Ardy. Logo sekolah privat dan snapshot logo arsip selesai diuji lokal; lihat reports/LAB002-OPS-001A-pm-review.md. Tidak push/deploy atau perubahan data guru/cloud. Parent OPS masih terbuka untuk cadangan/pemulihan aset; integrasi logo laporan adalah tahap REP berikut. Provider storage production dan runtime Linux Vercel belum disiapkan/diverifikasi. Checkpoint STOP sebelumnya adalah riwayat; jangan restore atau mengulang A.
 
 ## Riwayat kelanjutan — 15 Oktober 2026
 

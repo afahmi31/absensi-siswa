@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import { onBeforeUnmount, onMounted } from 'vue'
 import { getApiFieldErrors, getApiMessage } from '../utils/api-errors.ts'
 
 interface SchoolResponse {
-  school: { id: string; name: string; className: string; timeZone: string } | null
+  school: { id: string; name: string; className: string; timeZone: string; logoAssetId: string | null } | null
 }
 
 const requestFetch = useRequestFetch()
@@ -15,27 +16,60 @@ const form = reactive({
 const hasLoaded = ref(initial !== null)
 const isConfigured = ref(Boolean(initial?.school))
 const isSaving = ref(false)
+const isClientReady = ref(false)
 const pageError = ref(initial === null ? 'Data sekolah belum dapat dimuat. Coba muat ulang halaman.' : '')
 const successMessage = ref('')
 const fieldErrors = ref<Record<string, string>>({})
+const logoAssetId = ref(initial?.school?.logoAssetId ?? null)
+const logoAction = ref<'keep' | 'replace' | 'clear'>('keep')
+const selectedLogo = ref<File | null>(null)
+const selectedLogoPreview = ref('')
+const selectedLogoPreviewUnavailable = ref(false)
+const logoImageUnavailable = ref(false)
+const logoFileInput = ref<HTMLInputElement | null>(null)
+const logoError = computed(() => fieldErrors.value.logo ?? '')
+const displayedLogoUrl = computed(() => {
+  if (logoAction.value === 'clear') return ''
+  if (selectedLogoPreview.value && !selectedLogoPreviewUnavailable.value) return selectedLogoPreview.value
+  if (logoAssetId.value && !logoImageUnavailable.value) return `/api/school/logo/${encodeURIComponent(logoAssetId.value)}`
+  return ''
+})
 
 async function saveSchool() {
+  if (!isClientReady.value || isSaving.value) return
   pageError.value = ''
   successMessage.value = ''
   fieldErrors.value = {}
   isSaving.value = true
   try {
+    const metadata = {
+      name: form.name,
+      className: form.className,
+      timeZone: form.timeZone,
+      logoAction: logoAction.value,
+    }
+    const body = logoAction.value === 'keep'
+      ? { name: metadata.name, className: metadata.className, timeZone: metadata.timeZone }
+      : createLogoFormData(metadata, selectedLogo.value)
     const result = await $fetch<{ ok: boolean; school: SchoolResponse['school'] }>('/api/school', {
       method: 'PUT',
-      body: { name: form.name, className: form.className, timeZone: form.timeZone },
+      body,
     })
     isConfigured.value = true
     if (result.school) {
       form.name = result.school.name
       form.className = result.school.className
       form.timeZone = result.school.timeZone
+      logoAssetId.value = result.school.logoAssetId
     }
-    successMessage.value = 'Data sekolah tersimpan.'
+    clearSelectedLogo()
+    logoAction.value = 'keep'
+    logoImageUnavailable.value = false
+    successMessage.value = metadata.logoAction === 'clear'
+      ? 'Logo sekolah dihapus. Data sekolah tersimpan.'
+      : metadata.logoAction === 'replace'
+        ? 'Data sekolah dan logo tersimpan.'
+        : 'Data sekolah tersimpan.'
   } catch (error) {
     fieldErrors.value = getApiFieldErrors(error)
     pageError.value = getApiMessage(error, 'Data sekolah belum tersimpan. Periksa kembali isian lalu coba lagi.')
@@ -56,7 +90,65 @@ async function reloadSchool() {
   form.name = result.school?.name ?? ''
   form.className = result.school?.className ?? ''
   form.timeZone = result.school?.timeZone ?? 'Asia/Jakarta'
+  logoAssetId.value = result.school?.logoAssetId ?? null
+  logoImageUnavailable.value = false
 }
+
+function createLogoFormData(metadata: Record<string, string>, file: File | null): FormData {
+  const body = new FormData()
+  body.append('metadata', JSON.stringify(metadata))
+  if (metadata.logoAction === 'replace' && file) body.append('logo', file, file.name)
+  return body
+}
+
+function chooseLogo() {
+  logoFileInput.value?.click()
+}
+
+function handleLogoSelection(event: Event) {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file) return
+  selectedLogo.value = file
+  revokeSelectedLogoPreview()
+  selectedLogoPreviewUnavailable.value = false
+  selectedLogoPreview.value = URL.createObjectURL(file)
+  logoAction.value = 'replace'
+  logoImageUnavailable.value = false
+  delete fieldErrors.value.logo
+  pageError.value = ''
+  successMessage.value = ''
+}
+
+function clearLogo() {
+  clearSelectedLogo()
+  logoAction.value = 'clear'
+  logoImageUnavailable.value = false
+  delete fieldErrors.value.logo
+  pageError.value = ''
+  successMessage.value = ''
+}
+
+function clearSelectedLogo() {
+  selectedLogo.value = null
+  selectedLogoPreviewUnavailable.value = false
+  revokeSelectedLogoPreview()
+  if (logoFileInput.value) logoFileInput.value.value = ''
+}
+
+function revokeSelectedLogoPreview() {
+  if (!selectedLogoPreview.value) return
+  URL.revokeObjectURL(selectedLogoPreview.value)
+  selectedLogoPreview.value = ''
+}
+
+function handleLogoImageError() {
+  if (selectedLogoPreview.value) selectedLogoPreviewUnavailable.value = true
+  else logoImageUnavailable.value = true
+}
+
+onMounted(() => { isClientReady.value = true })
+onBeforeUnmount(revokeSelectedLogoPreview)
 </script>
 
 <template>
@@ -90,7 +182,7 @@ async function reloadSchool() {
           autocomplete="organization"
           maxlength="120"
           required
-          :disabled="isSaving"
+          :disabled="isSaving || !isClientReady"
           :aria-invalid="Boolean(fieldErrors.name)"
           :aria-describedby="fieldErrors.name ? 'school-name-error' : undefined"
         >
@@ -105,7 +197,7 @@ async function reloadSchool() {
           maxlength="80"
           placeholder="Contoh: Kelas 1A"
           required
-          :disabled="isSaving"
+          :disabled="isSaving || !isClientReady"
           :aria-invalid="Boolean(fieldErrors.className)"
           :aria-describedby="fieldErrors.className ? 'class-name-error' : undefined"
         >
@@ -121,7 +213,7 @@ async function reloadSchool() {
           maxlength="100"
           placeholder="Asia/Jakarta"
           required
-          :disabled="isSaving"
+          :disabled="isSaving || !isClientReady"
           :aria-invalid="Boolean(fieldErrors.timeZone)"
           :aria-describedby="fieldErrors.timeZone ? 'school-time-zone-error' : 'school-time-zone-help'"
         >
@@ -129,12 +221,45 @@ async function reloadSchool() {
         <p v-else id="school-time-zone-help" class="field-help">Contoh: Asia/Jakarta, Asia/Makassar, atau Asia/Jayapura.</p>
       </div>
 
-      <div class="logo-placeholder" aria-label="Pengaturan logo belum tersedia">
-        <span class="logo-placeholder-mark" aria-hidden="true">S</span>
-        <span><strong>Logo sekolah</strong><small>Pengaturan logo belum tersedia.</small></span>
+      <div class="school-logo-card">
+        <div class="school-logo-preview" aria-hidden="true">
+          <img
+            v-if="displayedLogoUrl"
+            :key="displayedLogoUrl"
+            :src="displayedLogoUrl"
+            alt=""
+            @error="handleLogoImageError"
+          >
+          <span v-else class="logo-placeholder-mark">S</span>
+        </div>
+        <div class="school-logo-copy">
+          <strong>Logo sekolah</strong>
+          <small v-if="logoAction === 'clear'">Logo akan dilepas saat perubahan disimpan.</small>
+          <small v-else-if="selectedLogo && selectedLogoPreviewUnavailable">Pratinjau tidak tersedia. Pilihan tetap menunggu disimpan.</small>
+          <small v-else-if="selectedLogo">Pilihan baru belum disimpan.</small>
+          <small v-else-if="logoAssetId && !logoImageUnavailable">Logo tersimpan.</small>
+          <small v-else-if="logoAssetId">Logo belum dapat ditampilkan di lingkungan ini.</small>
+          <small v-else>Belum ada logo.</small>
+          <div class="school-logo-actions">
+            <button class="secondary-button" type="button" :disabled="isSaving || !isClientReady" @click="chooseLogo">Pilih logo</button>
+            <button class="text-button" type="button" :disabled="isSaving || !isClientReady" @click="clearLogo">Hapus logo</button>
+          </div>
+          <p class="field-help">PNG atau JPEG, maksimal 2 MB dan 4096 × 4096 piksel.</p>
+          <p v-if="logoError" class="field-error" role="alert">{{ logoError }}</p>
+        </div>
+        <input
+          ref="logoFileInput"
+          class="visually-hidden"
+          type="file"
+          accept="image/png,image/jpeg"
+          tabindex="-1"
+          aria-label="Pilih logo sekolah"
+          :disabled="isSaving || !isClientReady"
+          @change="handleLogoSelection"
+        >
       </div>
 
-      <button class="primary-button form-submit" type="submit" :disabled="isSaving">
+      <button class="primary-button form-submit" type="submit" :disabled="isSaving || !isClientReady">
         {{ isSaving ? 'Menyimpan…' : isConfigured ? 'Simpan perubahan' : 'Simpan data sekolah' }}
       </button>
     </form>

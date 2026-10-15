@@ -139,7 +139,8 @@ test('local PostgreSQL schema preserves school, roster, attendance, calendar, an
       assert.notEqual(keyHash, address)
       assert.notEqual(hashLoginThrottleAddress(address, `${hmacKey}-other`), keyHash)
 
-      const start = new Date('2026-10-13T10:00:00.000Z')
+      // The admission gate reads the real clock; failures must use that same window.
+      const start = new Date()
       const outcomes = await Promise.all(Array.from({ length: 8 }, (_, index) => {
         const database = index % 2 === 0 ? app : appSecondConnectionPool
         return withSharedLoginAttempt(database, keyHash, async (transaction) => {

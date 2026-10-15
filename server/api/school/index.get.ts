@@ -11,8 +11,9 @@ export default defineEventHandler(async (event) => {
       name: string
       time_zone: string
       class_name: string | null
+      active_logo_asset_id: string | null
     }[]>`
-      select school.id, school.name, school.time_zone, school_class.name as class_name
+      select school.id, school.name, school.time_zone, school_class.name as class_name, school.active_logo_asset_id
       from schools as school
       left join school_classes as school_class on school_class.school_id = school.id
       where school.teacher_id = ${teacher.id}
@@ -20,7 +21,7 @@ export default defineEventHandler(async (event) => {
     const school = rows[0]
     return {
       school: school
-        ? { id: school.id, name: school.name, timeZone: school.time_zone, className: school.class_name ?? '' }
+        ? { id: school.id, name: school.name, timeZone: school.time_zone, className: school.class_name ?? '', logoAssetId: school.active_logo_asset_id }
         : null,
     }
   } catch {

@@ -1,20 +1,22 @@
 import assert from 'node:assert/strict'
 import { spawn, execFileSync } from 'node:child_process'
-import { randomBytes, randomUUID } from 'node:crypto'
-import { cp, lstat, mkdir, mkdtemp, realpath, rm, symlink, unlink } from 'node:fs/promises'
+import { createHash, randomBytes, randomUUID } from 'node:crypto'
+import { cp, lstat, mkdir, mkdtemp, readFile, readdir, realpath, rm, symlink, unlink } from 'node:fs/promises'
 import net from 'node:net'
 import path from 'node:path'
 import { setTimeout as delay } from 'node:timers/promises'
 import { fileURLToPath } from 'node:url'
 import { test } from 'node:test'
 import postgres from 'postgres'
+import sharp from 'sharp'
 import { Scrypt } from '@adonisjs/hash/drivers/scrypt'
 import { runMigrations } from '../server/database/migrate.mjs'
 import { provisionTeacherAccount } from '../server/auth/account-admin.ts'
 import { withAuditActor } from '../server/database/audit-context.ts'
 import { closeSemester, createSemester, getSemesterClosurePreview } from '../server/database/repositories/semesters.ts'
 import { addStudentToSemester, createStudent } from '../server/database/repositories/students.ts'
-import { createSchool, createSchoolClass } from '../server/database/repositories/schools.ts'
+import { createSchool, createSchoolClass, createSchoolLogoAsset, setActiveSchoolLogo } from '../server/database/repositories/schools.ts'
+import { LocalSchoolLogoStorage } from '../server/utils/school-logo-storage.ts'
 import { createTeacherAccount } from '../server/database/repositories/teacher-accounts.ts'
 import { setCalendarException, setCalendarHoliday, setRoutineSchoolDay } from '../server/database/repositories/calendar.ts'
 import { recordAttendance } from '../server/database/repositories/attendance.ts'
@@ -22,12 +24,33 @@ import { startTemporaryPostgres } from './support/temporary-postgres.mjs'
 import { listMigrationNames } from './support/migration-names.mjs'
 
 const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-const testRoot = path.join(appRoot, '.data', 'tests')
+const testRoot = path.join(appRoot, '.cache', 'tests')
 const passwordHasher = new Scrypt({})
 const requestTimeoutMs = 5_000
 
 function fetchLocal(input: string | URL, init: RequestInit = {}): Promise<Response> {
   return fetch(input, { ...init, signal: AbortSignal.timeout(requestTimeoutMs) })
+}
+
+function rawSocketRequest(baseUrl: string, request: Buffer): Promise<string> {
+  const address = new URL(baseUrl)
+  return new Promise((resolve, reject) => {
+    const socket = net.createConnection({ host: address.hostname, port: Number(address.port) })
+    let response = ''
+    const timeout = setTimeout(() => {
+      socket.destroy()
+      reject(new Error('Raw HTTP test request timed out.'))
+    }, requestTimeoutMs)
+    const finish = (error?: Error) => {
+      clearTimeout(timeout)
+      if (error && !response) reject(error)
+      else resolve(response)
+    }
+    socket.once('connect', () => socket.write(request))
+    socket.on('data', (chunk) => { response += chunk.toString('latin1') })
+    socket.once('error', (error) => finish(error))
+    socket.once('close', () => finish())
+  })
 }
 
 async function availablePort(): Promise<number> {
@@ -68,6 +91,20 @@ async function removeIsolatedNuxtRoot(root: string): Promise<void> {
   if (modulesInfo) {
     if (!modulesInfo.isSymbolicLink()) throw new Error('Refusing to remove an isolated Nuxt project with an unexpected node_modules path.')
     await unlink(modulesPath)
+  }
+  await rm(resolved, { recursive: true, force: false })
+}
+
+async function removeGeneratedLogoStorageRoot(root: string): Promise<void> {
+  const generated = await lstat(root).catch((error) => error?.code === 'ENOENT' ? null : Promise.reject(error))
+  if (!generated) return
+  if (!generated.isDirectory() || generated.isSymbolicLink() || !/^school-logo-http-[A-Za-z0-9]+$/.test(path.basename(root))) {
+    throw new Error('Refusing to remove an unexpected logo test storage root.')
+  }
+  const resolved = await realpath(root)
+  const parent = await realpath(path.join(appRoot, '.cache', 'tests'))
+  if (path.dirname(resolved).toLowerCase() !== parent.toLowerCase() || resolved.toLowerCase() !== path.resolve(root).toLowerCase()) {
+    throw new Error('Refusing to remove logo test storage outside its generated cache directory.')
   }
   await rm(resolved, { recursive: true, force: false })
 }
@@ -121,7 +158,7 @@ async function jsonResponse(response: Response): Promise<Record<string, unknown>
 
 async function waitForAdvisoryLockState(
   database: postgres.Sql,
-  lockClass: 1727 | 1728,
+  lockClass: 1727 | 1728 | 1729,
   minimumGranted: number,
   minimumWaiting: number,
 ): Promise<void> {
@@ -145,6 +182,36 @@ function dateShift(date: string, days: number): string {
   return `${shifted.getUTCFullYear()}-${String(shifted.getUTCMonth() + 1).padStart(2, '0')}-${String(shifted.getUTCDate()).padStart(2, '0')}`
 }
 
+test('migration 0008 leaves pre-existing archive logos null and supports down/up without backfill', { timeout: 60_000 }, async () => {
+  const temporary = await startTemporaryPostgres()
+  const migrator = postgres(temporary.migrationUrl, { max: 1, connect_timeout: 5 })
+  const runtime = postgres(temporary.runtimeUrl, { max: 2, connect_timeout: 5 })
+  try {
+    const names = await listMigrationNames()
+    await migrator`create table public.schema_migrations (name text primary key, checksum text not null, applied_at timestamptz not null default clock_timestamp())`
+    for (const name of names.filter((name) => !name.startsWith('0008_'))) {
+      await migrator.unsafe(await readFile(path.join(appRoot, 'server/database/migrations', `${name}.up.sql`), 'utf8')).simple()
+    }
+    const teacher = await createTeacherAccount(migrator, `legacy-${randomUUID()}@example.invalid`)
+    const school = await createSchool(runtime, { teacherId: teacher.id, name: 'Legacy synthetic school' })
+    await createSchoolClass(runtime, { schoolId: school.id, name: 'Legacy fixture' })
+    const fixture = await createSchoolFixtureForOwner(runtime, teacher.id, school.id)
+    const up = await readFile(path.join(appRoot, 'server/database/migrations/0008_school_logo_assets.up.sql'), 'utf8')
+    const down = await readFile(path.join(appRoot, 'server/database/migrations/0008_school_logo_assets.down.sql'), 'utf8')
+    await migrator.unsafe(up).simple()
+    const [archive] = await runtime`select logo_asset_id from semester_archive_snapshots where semester_id = ${fixture.archiveSemesterId}`
+    assert.equal(archive.logo_asset_id, null)
+    await migrator.unsafe(down).simple()
+    await migrator.unsafe(up).simple()
+    const [reapplied] = await runtime`select logo_asset_id from semester_archive_snapshots where semester_id = ${fixture.archiveSemesterId}`
+    assert.equal(reapplied.logo_asset_id, null)
+  } finally {
+    await runtime.end({ timeout: 3 })
+    await migrator.end({ timeout: 3 })
+    await temporary.cleanup()
+  }
+})
+
 test('STUD school setup and semester roster APIs preserve ownership, snapshots, dates, audit and transactions over HTTP', { timeout: 240_000 }, async (t) => {
   const temporary = await startTemporaryPostgres()
   const migrator = postgres(temporary.migrationUrl, { max: 1, connect_timeout: 5 })
@@ -152,10 +219,14 @@ test('STUD school setup and semester roster APIs preserve ownership, snapshots, 
   let server: ReturnType<typeof spawn> | undefined
   let serverOutput = ''
   let isolatedNuxtRoot: string | undefined
+  let logoStorageRoot = ''
   let baseUrl = ''
   let ownerCookie = ''
   let ownerTeacherId = ''
   let schoolId = ''
+  let schoolLogoAssetId = ''
+  let replacementLogoAssetId = ''
+  let archiveLogoBytes = Buffer.alloc(0)
   let activeSemesterId = ''
   let archiveSemesterId = ''
   let foreignSemesterId = ''
@@ -178,6 +249,9 @@ test('STUD school setup and semester roster APIs preserve ownership, snapshots, 
     const port = await availablePort()
     baseUrl = `http://127.0.0.1:${port}`
     const sessionPassword = randomBytes(48).toString('base64url')
+    const cacheTestRoot = path.join(appRoot, '.cache', 'tests')
+    await mkdir(cacheTestRoot, { recursive: true })
+    logoStorageRoot = await mkdtemp(path.join(cacheTestRoot, 'school-logo-http-'))
     isolatedNuxtRoot = await createIsolatedNuxtRoot()
     server = spawn(process.execPath, [
       path.join(appRoot, 'node_modules/nuxt/bin/nuxt.mjs'),
@@ -190,6 +264,8 @@ test('STUD school setup and semester roster APIs preserve ownership, snapshots, 
         NUXT_DATABASE_URL: temporary.runtimeUrl,
         NUXT_SESSION_PASSWORD: sessionPassword,
         NUXT_TELEMETRY_DISABLED: '1',
+        LAB002_FIXTURE: '1',
+        LAB002_SCHOOL_LOGO_ROOT: logoStorageRoot,
         PORT: String(port),
         HOST: '127.0.0.1',
       },
@@ -242,14 +318,32 @@ test('STUD school setup and semester roster APIs preserve ownership, snapshots, 
       const [beforeSetup] = await appDatabase`select count(*)::int as count from schools where teacher_id = ${ownerTeacherId}`
       assert.equal(beforeSetup.count, 0, 'Invalid metadata must not partially create a school.')
 
+      archiveLogoBytes = await sharp({ create: { width: 3, height: 2, channels: 3, background: { r: 31, g: 120, b: 88 } } }).png().toBuffer()
+      await migrator.unsafe(`CREATE FUNCTION public.reject_initial_logo_class() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'synthetic initial create rollback'; END $$`)
+      await migrator.unsafe('CREATE TRIGGER reject_initial_logo_class BEFORE INSERT ON public.school_classes FOR EACH ROW EXECUTE FUNCTION public.reject_initial_logo_class()')
+      try {
+        const rejectedCreate = new FormData()
+        rejectedCreate.append('metadata', JSON.stringify({ name: 'Must rollback initial school', className: 'Must rollback', timeZone: 'Asia/Jakarta', logoAction: 'replace' }))
+        rejectedCreate.append('logo', new Blob([new Uint8Array(archiveLogoBytes)], { type: 'image/png' }), 'initial-failure.png')
+        assert.equal((await fetchLocal(`${baseUrl}/api/school`, { method: 'PUT', headers: { origin: baseUrl, cookie: ownerCookie }, body: rejectedCreate })).status, 503)
+        const [partial] = await appDatabase`select (select count(*)::int from schools where teacher_id = ${ownerTeacherId}) as schools, (select count(*)::int from school_logo_assets where uploaded_by = ${ownerTeacherId}) as assets`
+        assert.deepEqual(partial, { schools: 0, assets: 0 })
+        assert.deepEqual(await readdir(logoStorageRoot), [])
+      } finally {
+        await migrator.unsafe('DROP TRIGGER reject_initial_logo_class ON public.school_classes')
+        await migrator.unsafe('DROP FUNCTION public.reject_initial_logo_class()')
+      }
+      const initialLogoForm = new FormData()
+      initialLogoForm.append('metadata', JSON.stringify({ name: 'Sekolah Uji', className: 'Kelas A', timeZone: 'Asia/Jakarta', logoAction: 'replace' }))
+      initialLogoForm.append('logo', new Blob([new Uint8Array(archiveLogoBytes)], { type: 'image/png' }), 'initial-logo.png')
       const created = await fetchLocal(`${baseUrl}/api/school`, {
-        method: 'PUT', headers: { 'content-type': 'application/json', origin: baseUrl, cookie: ownerCookie },
-        body: JSON.stringify({ name: 'Sekolah Uji', className: 'Kelas A', timeZone: 'Asia/Jakarta' }),
+        method: 'PUT', headers: { origin: baseUrl, cookie: ownerCookie }, body: initialLogoForm,
       })
       assert.equal(created.status, 200)
       const createdBody = await jsonResponse(created)
       schoolId = ((createdBody.school as Record<string, unknown>).id as string)
       assert.equal((createdBody.school as Record<string, unknown>).timeZone, 'Asia/Jakarta')
+      schoolLogoAssetId = (createdBody.school as Record<string, unknown>).logoAssetId as string
 
       const override = await fetchLocal(`${baseUrl}/api/school`, {
         method: 'PUT', headers: { 'content-type': 'application/json', origin: baseUrl, cookie: ownerCookie },
@@ -273,6 +367,85 @@ test('STUD school setup and semester roster APIs preserve ownership, snapshots, 
       assert.equal(fetched.status, 200)
       const schoolBody = await jsonResponse(fetched)
       assert.equal((schoolBody.school as Record<string, unknown>).className, 'Kelas B')
+
+      const uploadMetadata = { name: 'Sekolah Baru', className: 'Kelas B', timeZone: 'Asia/Makassar', logoAction: 'replace' }
+      assert.match(schoolLogoAssetId, /^[0-9a-f-]{36}$/i)
+      const logoResponse = await fetchLocal(`${baseUrl}/api/school/logo/${schoolLogoAssetId}`, { headers: { cookie: ownerCookie } })
+      assert.equal(logoResponse.status, 200)
+      assert.equal(logoResponse.headers.get('content-type'), 'image/png')
+      assert.match(logoResponse.headers.get('cache-control') ?? '', /no-store/)
+      assert.equal(logoResponse.headers.get('x-content-type-options'), 'nosniff')
+      assert.deepEqual(Buffer.from(await logoResponse.arrayBuffer()), archiveLogoBytes)
+
+      const malformedForm = new FormData()
+      malformedForm.append('metadata', JSON.stringify(uploadMetadata))
+      malformedForm.append('logo', new Blob([Buffer.from('not an image')], { type: 'image/png' }), 'broken.png')
+      const malformed = await fetchLocal(`${baseUrl}/api/school`, {
+        method: 'PUT', headers: { origin: baseUrl, cookie: ownerCookie }, body: malformedForm,
+      })
+      assert.equal(malformed.status, 422)
+      const stillCurrent = await fetchLocal(`${baseUrl}/api/school`, { headers: { cookie: ownerCookie } })
+      assert.equal(((await jsonResponse(stillCurrent)).school as Record<string, unknown>).logoAssetId, schoolLogoAssetId)
+
+      const oversizedForm = new FormData()
+      oversizedForm.append('metadata', JSON.stringify(uploadMetadata))
+      oversizedForm.append('logo', new Blob([new Uint8Array(2 * 1024 * 1024 + 1)], { type: 'image/png' }), 'oversized.png')
+      const oversized = await fetchLocal(`${baseUrl}/api/school`, {
+        method: 'PUT', headers: { origin: baseUrl, cookie: ownerCookie }, body: oversizedForm,
+      })
+      assert.equal(oversized.status, 413)
+
+      for (const [label, bytes, mime] of [
+        ['dimension', await sharp({ create: { width: 4097, height: 1, channels: 3, background: 'white' } }).png().toBuffer(), 'image/png'],
+        ['truncated', archiveLogoBytes.subarray(0, Math.floor(archiveLogoBytes.length / 2)), 'image/png'],
+        ['mime mismatch', archiveLogoBytes, 'image/jpeg'],
+        ['svg', Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"/>'), 'image/svg+xml'],
+      ] as const) {
+        const form = new FormData()
+        form.append('metadata', JSON.stringify(uploadMetadata))
+        form.append('logo', new Blob([new Uint8Array(bytes)], { type: mime }), 'edge.png')
+        assert.equal((await fetchLocal(`${baseUrl}/api/school`, {
+          method: 'PUT', headers: { origin: baseUrl, cookie: ownerCookie }, body: form,
+        })).status, 422, label)
+      }
+
+      for (const fieldKind of ['duplicate', 'unknown', 'oversized', 'extra-file', 'missing-file', 'keep-file']) {
+        const form = new FormData()
+        form.append('metadata', JSON.stringify({ ...uploadMetadata, ...(fieldKind === 'keep-file' ? { logoAction: 'keep' } : {}) }))
+        if (fieldKind !== 'missing-file') form.append('logo', new Blob([new Uint8Array(archiveLogoBytes)], { type: 'image/png' }), 'logo.png')
+        if (fieldKind === 'duplicate') form.append('metadata', '{}')
+        if (fieldKind === 'unknown') form.append('unknown', 'x')
+        if (fieldKind === 'oversized') { form.delete('metadata'); form.append('metadata', 'x'.repeat(2049)) }
+        if (fieldKind === 'extra-file') form.append('logo', new Blob([new Uint8Array(archiveLogoBytes)], { type: 'image/png' }), 'other.png')
+        assert.equal((await fetchLocal(`${baseUrl}/api/school`, {
+          method: 'PUT', headers: { origin: baseUrl, cookie: ownerCookie }, body: form,
+        })).status, 422, fieldKind)
+      }
+
+      const hugeBody = Buffer.from('x'.repeat(2 * 1024 * 1024 + 64 * 1024 + 1))
+      for (const contentType of ['application/json', 'multipart/form-data; boundary=edge']) {
+        const headers = `PUT /api/school HTTP/1.1\r\nHost: ${new URL(baseUrl).host}\r\nOrigin: ${baseUrl}\r\nCookie: ${ownerCookie}\r\nContent-Type: ${contentType}\r\nTransfer-Encoding: chunked\r\nConnection: close\r\n\r\n`
+        const chunked = Buffer.concat([Buffer.from(headers), Buffer.from(`${hugeBody.length.toString(16)}\r\n`), hugeBody, Buffer.from('\r\n0\r\n\r\n')])
+        assert.match(await rawSocketRequest(baseUrl, chunked), /^HTTP\/1\.1 413 /, contentType)
+      }
+
+      const filesBeforeRollback = await readdir(logoStorageRoot)
+      await migrator.unsafe(`CREATE FUNCTION public.reject_logo_test_save() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'synthetic rollback'; END $$`)
+      await migrator.unsafe('CREATE TRIGGER reject_logo_test_save BEFORE UPDATE ON public.schools FOR EACH ROW EXECUTE FUNCTION public.reject_logo_test_save()')
+      try {
+        const form = new FormData()
+        form.append('metadata', JSON.stringify({ ...uploadMetadata, name: 'Must rollback' }))
+        form.append('logo', new Blob([new Uint8Array(archiveLogoBytes)], { type: 'image/png' }), 'rollback.png')
+        const failed = await fetchLocal(`${baseUrl}/api/school`, { method: 'PUT', headers: { origin: baseUrl, cookie: ownerCookie }, body: form })
+        assert.equal(failed.status, 503)
+        assert.deepEqual(await readdir(logoStorageRoot), filesBeforeRollback, 'Only the newly written asset is removed on transaction failure.')
+        const [unchanged] = await appDatabase`select name, active_logo_asset_id from schools where id = ${schoolId}`
+        assert.equal(unchanged.name, 'Sekolah Baru')
+        assert.equal(unchanged.active_logo_asset_id, schoolLogoAssetId)
+      } finally {
+        await migrator.unsafe('DROP TRIGGER reject_logo_test_save ON public.schools')
+        await migrator.unsafe('DROP FUNCTION public.reject_logo_test_save()')
+      }
     })
 
     await t.test('owner-scoped semester options include active and archive; fixture roster uses historical snapshots', async () => {
@@ -283,9 +456,107 @@ test('STUD school setup and semester roster APIs preserve ownership, snapshots, 
       archiveMembershipId = school.archiveMembershipId
       attendanceDate = school.attendanceDate
 
+      const [archiveSnapshotBeforeReplace] = await appDatabase<{ logo_asset_id: string | null }[]>`
+        select logo_asset_id from semester_archive_snapshots where semester_id = ${archiveSemesterId}
+      `
+      assert.equal(archiveSnapshotBeforeReplace.logo_asset_id, schoolLogoAssetId)
+      const replacementBytes = await sharp({ create: { width: 4, height: 3, channels: 3, background: { r: 188, g: 81, b: 45 } } }).jpeg().toBuffer()
+      const replacementForm = new FormData()
+      replacementForm.append('metadata', JSON.stringify({ name: 'Sekolah Baru', className: 'Kelas B', timeZone: 'Asia/Makassar', logoAction: 'replace' }))
+      replacementForm.append('logo', new Blob([new Uint8Array(replacementBytes)], { type: 'image/jpeg' }), 'second-logo.jpg')
+      const replacement = await fetchLocal(`${baseUrl}/api/school`, {
+        method: 'PUT', headers: { origin: baseUrl, cookie: ownerCookie }, body: replacementForm,
+      })
+      assert.equal(replacement.status, 200)
+      replacementLogoAssetId = ((await jsonResponse(replacement)).school as Record<string, unknown>).logoAssetId as string
+      assert.notEqual(replacementLogoAssetId, schoolLogoAssetId)
+      const [activeAfterReplace] = await appDatabase<{ active_logo_asset_id: string | null }[]>`
+        select active_logo_asset_id from schools where id = ${schoolId}
+      `
+      const [archiveAfterReplace] = await appDatabase<{ logo_asset_id: string | null }[]>`
+        select logo_asset_id from semester_archive_snapshots where semester_id = ${archiveSemesterId}
+      `
+      assert.equal(activeAfterReplace.active_logo_asset_id, replacementLogoAssetId)
+      assert.equal(archiveAfterReplace.logo_asset_id, schoolLogoAssetId)
+      const replacementLogo = await fetchLocal(`${baseUrl}/api/school/logo/${replacementLogoAssetId}`, { headers: { cookie: ownerCookie } })
+      assert.equal(replacementLogo.status, 200)
+      assert.equal(replacementLogo.headers.get('content-type'), 'image/jpeg')
+      assert.deepEqual(Buffer.from(await replacementLogo.arrayBuffer()), replacementBytes)
+      const historicalLogo = await fetchLocal(`${baseUrl}/api/school/logo/${schoolLogoAssetId}`, { headers: { cookie: ownerCookie } })
+      assert.equal(historicalLogo.status, 200)
+      assert.deepEqual(Buffer.from(await historicalLogo.arrayBuffer()), archiveLogoBytes)
+
+      let signalHeldLock: () => void = () => undefined
+      let releaseHeldLock: () => void = () => undefined
+      const lockReady = new Promise<void>((resolve) => { signalHeldLock = resolve })
+      const heldLock = appDatabase.begin(async (transaction) => {
+        await transaction`select pg_advisory_xact_lock(1728, hashtext(${schoolId}::text))`
+        signalHeldLock()
+        await new Promise<void>((resolve) => { releaseHeldLock = resolve })
+      })
+      await lockReady
+      const concurrentSave = (name: string) => fetchLocal(`${baseUrl}/api/school`, {
+        method: 'PUT',
+        headers: { 'content-type': 'application/json', origin: baseUrl, cookie: ownerCookie },
+        body: JSON.stringify({ name, className: 'Kelas B', timeZone: 'Asia/Makassar' }),
+      })
+      const firstSave = concurrentSave('Sekolah Serentak 1')
+      const secondSave = concurrentSave('Sekolah Serentak 2')
+      try {
+        await waitForAdvisoryLockState(appDatabase, 1728, 1, 1)
+        await waitForAdvisoryLockState(appDatabase, 1729, 1, 1)
+      } finally {
+        releaseHeldLock()
+      }
+      await heldLock
+      const [firstSaveResponse, secondSaveResponse] = await Promise.all([firstSave, secondSave])
+      assert.equal(firstSaveResponse.status, 200)
+      assert.equal(secondSaveResponse.status, 200)
+
+      const clearForm = new FormData()
+      clearForm.append('metadata', JSON.stringify({ name: 'Sekolah Baru', className: 'Kelas B', timeZone: 'Asia/Makassar', logoAction: 'clear' }))
+      const clearResponse = await fetchLocal(`${baseUrl}/api/school`, {
+        method: 'PUT', headers: { origin: baseUrl, cookie: ownerCookie }, body: clearForm,
+      })
+      assert.equal(clearResponse.status, 200)
+      const [clearedSchool] = await appDatabase<{ active_logo_asset_id: string | null }[]>`
+        select active_logo_asset_id from schools where id = ${schoolId}
+      `
+      assert.equal(clearedSchool.active_logo_asset_id, null)
+      assert.equal((await fetchLocal(`${baseUrl}/api/school/logo/${replacementLogoAssetId}`, { headers: { cookie: ownerCookie } })).status, 404)
+      assert.equal((await fetchLocal(`${baseUrl}/api/school/logo/${schoolLogoAssetId}`, { headers: { cookie: ownerCookie } })).status, 200)
+
       const foreignTeacher = await createTeacherAccount(migrator, `foreign-${randomUUID()}@example.invalid`)
       const foreignSchool = await createSchool(appDatabase, { teacherId: foreignTeacher.id, name: 'Sekolah Lain' })
       const foreignClass = await createSchoolClass(appDatabase, { schoolId: foreignSchool.id, name: 'Kelas Asing' })
+      const foreignLogoAssetId = randomUUID()
+      const foreignLogoBytes = await sharp({ create: { width: 2, height: 2, channels: 3, background: { r: 20, g: 50, b: 110 } } }).jpeg().toBuffer()
+      await new LocalSchoolLogoStorage(logoStorageRoot).write(foreignLogoAssetId, 'image/jpeg', foreignLogoBytes)
+      await withAuditActor(appDatabase, foreignTeacher.id, async (transaction) => {
+        await createSchoolLogoAsset(transaction, {
+          assetId: foreignLogoAssetId,
+          schoolId: foreignSchool.id,
+          mimeType: 'image/jpeg',
+          byteSize: foreignLogoBytes.length,
+          width: 2,
+          height: 2,
+          sha256: createHash('sha256').update(foreignLogoBytes).digest('hex'),
+          uploadedBy: foreignTeacher.id,
+        })
+        await setActiveSchoolLogo(transaction, { schoolId: foreignSchool.id, assetId: foreignLogoAssetId })
+      })
+      await assert.rejects(appDatabase`update schools set active_logo_asset_id = ${foreignLogoAssetId} where id = ${schoolId}`, (error: unknown) => (error as { code: string }).code === '23503')
+      await assert.rejects(appDatabase`update school_logo_assets set width = 1 where id = ${schoolLogoAssetId}`, (error: unknown) => (error as { code: string }).code === '42501')
+      await assert.rejects(appDatabase`delete from school_logo_assets where id = ${schoolLogoAssetId}`, (error: unknown) => (error as { code: string }).code === '42501')
+      await assert.rejects(migrator`update school_logo_assets set width = 1 where id = ${schoolLogoAssetId}`, (error: unknown) => (error as { code: string }).code === '55000')
+      await assert.rejects(appDatabase`update semester_archive_snapshots set logo_asset_id = ${foreignLogoAssetId} where semester_id = ${archiveSemesterId}`, (error: unknown) => ['55000', '42501'].includes((error as { code: string }).code))
+      const [assetPrivileges] = await migrator`select has_table_privilege('lab002_app', 'school_logo_assets', 'SELECT') as can_read, has_table_privilege('lab002_app', 'school_logo_assets', 'INSERT') as can_insert, has_table_privilege('anon', 'school_logo_assets', 'SELECT') as anon_read, has_table_privilege('authenticated', 'school_logo_assets', 'SELECT') as authenticated_read, has_table_privilege('service_role', 'school_logo_assets', 'SELECT') as service_read`
+      assert.deepEqual(assetPrivileges, { can_read: true, can_insert: true, anon_read: false, authenticated_read: false, service_read: false })
+      const foreignLogoResponse = await fetchLocal(`${baseUrl}/api/school/logo/${foreignLogoAssetId}`, { headers: { cookie: ownerCookie } })
+      const missingLogoResponse = await fetchLocal(`${baseUrl}/api/school/logo/${randomUUID()}`, { headers: { cookie: ownerCookie } })
+      assert.equal(foreignLogoResponse.status, 404)
+      assert.equal(missingLogoResponse.status, 404)
+      assert.equal((await jsonResponse(foreignLogoResponse)).statusMessage, (await jsonResponse(missingLogoResponse)).statusMessage)
       const [todayRow] = await appDatabase`select school_local_today(${foreignSchool.id})::text as today`
       foreignSemesterId = (await createSemester(appDatabase, {
         schoolId: foreignSchool.id,
@@ -774,6 +1045,7 @@ test('STUD school setup and semester roster APIs preserve ownership, snapshots, 
 
       let closeRace: Promise<Response> | undefined
       let membershipEditRace: Promise<Response> | undefined
+      let logoSaveRace: Promise<Response> | undefined
       let raceSetupError: unknown
       try {
         closeRace = fetchLocal(`${baseUrl}/api/semesters/${emptySemesterId}/close`, {
@@ -787,6 +1059,13 @@ test('STUD school setup and semester roster APIs preserve ownership, snapshots, 
           body: JSON.stringify({ endsOn: raceSemesterStart }),
         })
         await waitForAdvisoryLockState(appDatabase, 1728, 1, 1)
+        const raceLogoForm = new FormData()
+        raceLogoForm.append('metadata', JSON.stringify({ name: 'Sekolah Setelah Arsip', className: 'Kelas C', timeZone: 'Asia/Makassar', logoAction: 'replace' }))
+        raceLogoForm.append('logo', new Blob([new Uint8Array(archiveLogoBytes)], { type: 'image/png' }), 'race-logo.png')
+        logoSaveRace = fetchLocal(`${baseUrl}/api/school`, {
+          method: 'PUT', headers: { origin: baseUrl, cookie: ownerCookie }, body: raceLogoForm,
+        })
+        await waitForAdvisoryLockState(appDatabase, 1728, 1, 2)
       } catch (error) {
         raceSetupError = error
       } finally {
@@ -794,7 +1073,7 @@ test('STUD school setup and semester roster APIs preserve ownership, snapshots, 
       }
       await calendarGate
       if (raceSetupError) {
-        await Promise.allSettled([closeRace, membershipEditRace].filter((request): request is Promise<Response> => Boolean(request)))
+        await Promise.allSettled([closeRace, membershipEditRace, logoSaveRace].filter((request): request is Promise<Response> => Boolean(request)))
         throw raceSetupError
       }
       assert.ok(closeRace)
@@ -802,6 +1081,13 @@ test('STUD school setup and semester roster APIs preserve ownership, snapshots, 
       const [raceCloseResponse, raceMembershipEditResponse] = await Promise.all([closeRace, membershipEditRace])
       assert.equal(raceCloseResponse.status, 200, 'Closure must proceed after the calendar lock is released without a deadlock.')
       assert.equal(raceMembershipEditResponse.status, 409, 'A membership edit queued behind closure must observe the archived semester.')
+      assert.ok(logoSaveRace)
+      const raceLogoResponse = await logoSaveRace
+      assert.equal(raceLogoResponse.status, 200, 'Logo save queued behind closure completes without deadlock.')
+      const raceLogoId = ((await jsonResponse(raceLogoResponse)).school as Record<string, unknown>).logoAssetId
+      assert.ok(raceLogoId)
+      const [raceArchive] = await appDatabase`select logo_asset_id from semester_archive_snapshots where semester_id = ${emptySemesterId}`
+      assert.equal(raceArchive.logo_asset_id, null, 'Closure preserves the pre-save null logo, not the queued replacement.')
       const [raceMembershipAfterClose] = await appDatabase`
         select ends_on::text as ends_on from semester_memberships where id = ${raceMembershipId}
       `
@@ -823,6 +1109,7 @@ test('STUD school setup and semester roster APIs preserve ownership, snapshots, 
     await migrator.end({ timeout: 3 })
     await temporary.cleanup()
     if (isolatedNuxtRoot) await removeIsolatedNuxtRoot(isolatedNuxtRoot)
+    if (logoStorageRoot) await removeGeneratedLogoStorageRoot(logoStorageRoot)
   }
 })
 

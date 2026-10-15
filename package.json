@@ -30,20 +30,25 @@
     "test:calendar": "node scripts/test-calendar.mjs",
     "test:attendance": "node scripts/test-attendance.mjs",
     "test:reports": "node scripts/test-reports.mjs",
+    "test:school-logos": "node scripts/test-school-logos.mjs",
     "fixture:reports": "node --experimental-strip-types scripts/fixture-reports.mjs",
+    "fixture:school-logos": "node --experimental-strip-types scripts/fixture-school-logos.mjs",
     "test": "node scripts/test-all.mjs",
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
     "@adonisjs/hash": "9.1.1",
+    "busboy": "1.6.0",
     "nuxt": "4.6.1",
     "nuxt-auth-utils": "0.5.31",
     "pdfkit": "0.20.2",
     "postgres": "3.4.9",
+    "sharp": "0.35.5",
     "vue": "3.5.43",
     "vue-router": "5.4.0"
   },
   "devDependencies": {
+    "@types/busboy": "1.5.5",
     "@types/node": "24.19.2",
     "@types/pdfkit": "0.17.6",
     "typescript": "5.9.3",
