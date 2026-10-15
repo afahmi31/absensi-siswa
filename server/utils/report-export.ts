@@ -11,7 +11,7 @@ import type {
   AttendanceReportRow,
 } from '../../app/types/attendance-report.ts'
 
-export const ATTENDANCE_REPORT_LAYOUT_VERSION = 'rep-001c-v1'
+export const ATTENDANCE_REPORT_LAYOUT_VERSION = 'rep-001d-v1'
 export const ATTENDANCE_REPORT_EMPTY_MESSAGE = 'Tidak ada siswa pada periode ini.'
 
 const POINTS_PER_MM = 72 / 25.4
@@ -231,8 +231,17 @@ function makePaperPlan(metrics: PDFKit.PDFDocument, report: AttendanceReport, pa
 
   for (const [monthIndex, month] of report.months.entries()) {
     if (month.days.length !== 31) throw new AttendanceReportLayoutError('invalid_model')
-    const headingParts = createHeadingParts(metrics, report, month.month, contentWidthPt)
-    const headingHeightPt = headingHeight(headingParts)
+    const descriptor = report.semester.logo
+    const headingTextOffsetPt = descriptor ? 44 : 0
+    const headingTextWidthPt = contentWidthPt - headingTextOffsetPt
+    const headingParts = createHeadingParts(metrics, report, month.month, headingTextWidthPt)
+    const headingHeightPt = Math.max(headingHeight(headingParts), descriptor ? 36 : 0)
+    const scale = descriptor ? Math.min(36 / descriptor.width, 36 / descriptor.height) : 0
+    const logo = descriptor ? {
+      xPt: roundPoints((36 - descriptor.width * scale) / 2),
+      yPt: roundPoints((36 - descriptor.height * scale) / 2),
+      widthPt: roundPoints(descriptor.width * scale), heightPt: roundPoints(descriptor.height * scale),
+    } : null
     const availableRowsHeightPt = roundPoints(contentHeightPt - headingHeightPt - TABLE_HEADER_HEIGHT_PT)
     const rows = layoutRows(metrics, month.rows, widths)
     const monthPages = pageRows(rows, availableRowsHeightPt)
@@ -246,6 +255,9 @@ function makePaperPlan(metrics: PDFKit.PDFDocument, report: AttendanceReport, pa
         pagesInMonth: monthPages.length,
         headingParts,
         headingHeightPt,
+        headingTextOffsetPt,
+        headingTextWidthPt,
+        logo,
         tableHeaderRowHeightsPt: TABLE_HEADER_ROW_HEIGHTS_PT,
         rows: pageRowsLayout,
       })
@@ -278,7 +290,7 @@ export function buildAttendanceReportLayoutBundle(report: AttendanceReport): Att
     const revision = createHash('sha256')
       .update(JSON.stringify({ version: ATTENDANCE_REPORT_LAYOUT_VERSION, report, plans }))
       .digest('hex')
-    return { version: ATTENDANCE_REPORT_LAYOUT_VERSION, revision, report, plans }
+    return { version: ATTENDANCE_REPORT_LAYOUT_VERSION, revision, report, plans, logoStatus: report.semester.logo ? 'unavailable' : 'none' }
   } finally {
     metrics.end()
   }
@@ -307,9 +319,13 @@ function drawTextLine(
   document.restore()
 }
 
-function drawPageHeading(document: PDFKit.PDFDocument, page: AttendanceReportLayoutPage, plan: AttendanceReportPaperPlan): void {
-  const x = plan.marginPt
-  const width = plan.contentWidthPt
+function drawPageHeading(document: PDFKit.PDFDocument, page: AttendanceReportLayoutPage, plan: AttendanceReportPaperPlan, logoBytes?: Buffer | null): void {
+  const x = plan.marginPt + page.headingTextOffsetPt
+  const width = page.headingTextWidthPt
+  if (page.logo) {
+    if (!logoBytes) throw new Error('Report logo unavailable.')
+    document.image(logoBytes, plan.marginPt + page.logo.xPt, plan.marginPt + page.logo.yPt, { width: page.logo.widthPt, height: page.logo.heightPt })
+  }
   let y = plan.marginPt
   for (const part of page.headingParts) {
     y += part.gapBeforePt
@@ -429,7 +445,7 @@ function drawBodyRow(
   simple(37, String(row.totals.A))
 }
 
-export function renderAttendanceReportPdf(bundle: AttendanceReportLayoutBundle, paper: AttendanceReportPaper): Promise<Buffer> {
+export function renderAttendanceReportPdf(bundle: AttendanceReportLayoutBundle, paper: AttendanceReportPaper, logoBytes?: Buffer | null): Promise<Buffer> {
   const plan = bundle.plans[paper]
   return new Promise((resolve, reject) => {
     const document = new PDFDocument({ autoFirstPage: false, compress: true, info: { Title: 'Laporan Absensi' } })
@@ -451,7 +467,7 @@ export function renderAttendanceReportPdf(bundle: AttendanceReportLayoutBundle, 
           size: [plan.widthPt, plan.heightPt],
           margins: { top: plan.marginPt, right: plan.marginPt, bottom: plan.marginPt, left: plan.marginPt },
         })
-        drawPageHeading(document, page, plan)
+        drawPageHeading(document, page, plan, logoBytes)
         const tableTop = plan.marginPt + page.headingHeightPt
         drawTableHeader(document, bundle.report, page, plan, plan.marginPt, tableTop)
         let y = tableTop + page.tableHeaderRowHeightsPt[0] + page.tableHeaderRowHeightsPt[1]

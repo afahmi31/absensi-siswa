@@ -1,5 +1,6 @@
 import type { DatabaseExecutor } from '../transaction.ts'
 import type { AttendanceStatus } from './attendance.ts'
+import type { AttendanceReportLogo } from '../../../app/types/attendance-report.ts'
 
 export type AttendanceReportMode = 'month' | 'semester'
 
@@ -36,6 +37,7 @@ export interface AttendanceReport {
     status: 'active' | 'closed'
     schoolName: string
     className: string
+    logo: AttendanceReportLogo | null
   }
   months: AttendanceReportMonth[]
 }
@@ -54,6 +56,7 @@ interface ReportQueryRow {
   status: 'active' | 'closed'
   school_name: string
   class_name: string
+  logo: AttendanceReportLogo | null
   month_start: string | null
   calendar_days: unknown
   membership_id: string | null
@@ -87,6 +90,7 @@ export async function getAttendanceReport(
              coalesce(archive.school_name, school.name) as school_name,
              archive.class_name as archive_class_name,
              semester.school_id,
+             case when semester.status = 'closed' then archive.logo_asset_id else school.active_logo_asset_id end as logo_asset_id,
              coalesce(archive.starts_on, semester.starts_on) as semester_start,
              coalesce(archive.ends_on, semester.ends_on) as semester_end
       from semesters as semester
@@ -210,6 +214,10 @@ export async function getAttendanceReport(
            scope.status,
            scope.school_name,
            scope.class_name,
+           case when logo.id is not null then jsonb_build_object(
+             'assetId', logo.id, 'mimeType', logo.mime_type, 'width', logo.width,
+             'height', logo.height, 'byteSize', logo.byte_size, 'sha256', logo.sha256
+           ) else null end as logo,
            report_months.month_start::text as month_start,
            calendar_days.days as calendar_days,
            report_memberships.membership_id,
@@ -222,6 +230,7 @@ export async function getAttendanceReport(
            member_cells.total_i,
            member_cells.total_a
     from scope
+    left join school_logo_assets as logo on logo.id = scope.logo_asset_id and logo.school_id = scope.school_id
     left join report_months on true
     left join calendar_days on calendar_days.month_start = report_months.month_start
     left join report_memberships on report_memberships.month_start = report_months.month_start
@@ -276,6 +285,7 @@ export async function getAttendanceReport(
         status: first.status,
         schoolName: first.school_name,
         className: first.class_name,
+        logo: first.logo,
       },
       months: [...monthsByKey.values()],
     },

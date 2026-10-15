@@ -1,6 +1,7 @@
 import { execFileSync, spawn } from 'node:child_process'
-import { randomBytes, randomUUID } from 'node:crypto'
-import { cp, lstat, mkdtemp, mkdir, realpath, rm, symlink, unlink, writeFile } from 'node:fs/promises'
+import { createHash, randomBytes, randomUUID } from 'node:crypto'
+import { cp, lstat, mkdtemp, mkdir, readFile, readdir, realpath, rm, symlink, unlink, writeFile } from 'node:fs/promises'
+import assert from 'node:assert/strict'
 import net from 'node:net'
 import path from 'node:path'
 import { setTimeout as delay } from 'node:timers/promises'
@@ -13,7 +14,9 @@ import { withAuditActor } from '../server/database/audit-context.ts'
 import { getAttendanceDayView, saveAttendanceDay } from '../server/database/repositories/attendance-days.ts'
 import { createSemester, closeSemester, getSemesterClosurePreview } from '../server/database/repositories/semesters.ts'
 import { addStudentToSemester, createStudent } from '../server/database/repositories/students.ts'
-import { createSchool, createSchoolClass } from '../server/database/repositories/schools.ts'
+import { createSchool, createSchoolClass, createSchoolLogoAsset, setActiveSchoolLogo } from '../server/database/repositories/schools.ts'
+import { LocalSchoolLogoStorage } from '../server/utils/school-logo-storage.ts'
+import sharp from 'sharp'
 import { saveSchoolRoutine } from '../server/database/repositories/calendar.ts'
 
 const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -135,7 +138,7 @@ async function closeSemesterForFixture(database, teacherId, semesterId) {
   }))
 }
 
-async function createFixtureData(runtimeUrl, migrationUrl) {
+async function createFixtureData(runtimeUrl, migrationUrl, logoRoot) {
   const migrator = postgres(migrationUrl, { max: 1, connect_timeout: 5 })
   const database = postgres(runtimeUrl, { max: 5, connect_timeout: 5 })
   const email = `laporan-${randomUUID().slice(0, 8)}@example.invalid`
@@ -147,6 +150,10 @@ async function createFixtureData(runtimeUrl, migrationUrl) {
     const teacher = await provisionTeacherAccount(migrator, email, await passwordHasher.make(password))
     const school = await createSchool(database, { teacherId: teacher.id, name: 'Sekolah Contoh Uji Laporan', timeZone: 'Asia/Jakarta' })
     const schoolClass = await createSchoolClass(database, { schoolId: school.id, name: 'Kelas Sintetis 45+' })
+    const legacy = await createSemester(database, { schoolId: school.id, academicYear: '2024/2025', term: 'ganjil', startsOn: '2024-08-01', endsOn: '2024-12-01' })
+    const legacyStudent = await createStudent(database, { fullName: 'Siswa Arsip Tanpa Logo' })
+    await addStudentToSemester(database, { semesterId: legacy.id, schoolId: school.id, schoolClassId: schoolClass.id, studentId: legacyStudent.id, startsOn: '2024-08-01' })
+    await closeSemesterForFixture(database, teacher.id, legacy.id)
 
     const emptySemester = await withAuditActor(database, teacher.id, (transaction) => createSemester(transaction, {
       schoolId: school.id,
@@ -196,7 +203,21 @@ async function createFixtureData(runtimeUrl, migrationUrl) {
       syntheticStudents.push({ student, archivedMembership })
     }
 
+    const storage = new LocalSchoolLogoStorage(logoRoot)
+    async function seedLogo(mimeType, width, height, color) {
+      const assetId = randomUUID()
+      const image = sharp({ create: { width, height, channels: 3, background: color } })
+      const bytes = await (mimeType === 'image/png' ? image.png() : image.jpeg()).toBuffer()
+      await storage.write(assetId, mimeType, bytes)
+      await withAuditActor(database, teacher.id, async (transaction) => {
+        await createSchoolLogoAsset(transaction, { assetId, schoolId: school.id, mimeType, byteSize: bytes.length, width, height, sha256: createHash('sha256').update(bytes).digest('hex'), uploadedBy: teacher.id })
+        await setActiveSchoolLogo(transaction, { schoolId: school.id, assetId })
+      })
+      return { assetId, path: path.join(logoRoot, `${assetId}${mimeType === 'image/png' ? '.png' : '.jpg'}`) }
+    }
+    const archiveLogo = await seedLogo('image/png', 240, 80, '#167c59')
     await closeSemesterForFixture(database, teacher.id, archivedSemester.id)
+    const activeLogo = await seedLogo('image/jpeg', 80, 240, '#c78223')
 
     const activeSemester = await withAuditActor(database, teacher.id, (transaction) => createSemester(transaction, {
       schoolId: school.id,
@@ -245,6 +266,7 @@ async function createFixtureData(runtimeUrl, migrationUrl) {
       archivedSemesterId: archivedSemester.id,
       emptySemesterId: emptySemester.id,
       studentCount: memberships.length,
+      archiveLogo, activeLogo, legacySemesterId: legacy.id,
     }
   } finally {
     await Promise.all([
@@ -315,6 +337,8 @@ async function stopOwnedProcess(child) {
 }
 
 async function runFixture() {
+  const compiledSmoke = process.argv.includes('--compiled-smoke')
+  if (!process.stdin.isTTY && !compiledSmoke) throw new Error('Fixture laporan memerlukan TTY agar STOP dapat dipakai.')
   const fixtureParent = path.join(appRoot, '.cache')
   await mkdir(fixtureParent, { recursive: true })
   const privateRoot = await mkdtemp(path.join(fixtureParent, 'reports-fixture-'))
@@ -335,26 +359,54 @@ async function runFixture() {
 
   try {
     temporary = await startPostgres(privateRoot)
-    const credentials = await createFixtureData(temporary.runtimeUrl, temporary.migrationUrl)
+    const logoRoot = path.join(privateRoot, 'logo-store')
+    const credentials = await createFixtureData(temporary.runtimeUrl, temporary.migrationUrl, logoRoot)
     const sessionPassword = randomBytes(48).toString('base64url')
     const httpPort = await availablePort()
     const baseUrl = `http://127.0.0.1:${httpPort}`
     isolatedNuxtRoot = await createIsolatedNuxtRoot(privateRoot)
-    server = spawn(process.execPath, [
-      path.join(appRoot, 'node_modules/nuxt/bin/nuxt.mjs'),
-      'dev', '--host', '127.0.0.1', '--port', String(httpPort), '--no-fork', '--no-tui', '--strictPort', isolatedNuxtRoot,
-    ], {
-      cwd: isolatedNuxtRoot,
-      env: {
+    const sourceManifest = {}
+    if (compiledSmoke) {
+      for (const entry of ['app', 'server', 'shared', 'nuxt.config.ts', 'package.json']) {
+        const info = await lstat(path.join(appRoot, entry))
+        const files = info.isDirectory() ? (await readdir(path.join(appRoot, entry), { recursive: true, withFileTypes: true })).filter((item) => item.isFile()).map((item) => path.relative(appRoot, path.join(item.parentPath, item.name))) : [entry]
+        for (const file of files) {
+          const hash = createHash('sha256').update(await readFile(path.join(appRoot, file))).digest('hex')
+          assert.equal(createHash('sha256').update(await readFile(path.join(isolatedNuxtRoot, file))).digest('hex'), hash)
+          sourceManifest[file.replaceAll('\\', '/')] = hash
+        }
+      }
+      for (const preset of ['vercel', 'node-server']) {
+        await new Promise((resolve, reject) => {
+          const child = spawn(process.execPath, [path.join(appRoot, 'node_modules/nuxt/bin/nuxt.mjs'), 'build', '--preset', preset, isolatedNuxtRoot], { cwd: isolatedNuxtRoot, env: { ...process.env, NUXT_TELEMETRY_DISABLED: '1' }, stdio: 'inherit', windowsHide: true })
+          child.once('error', reject)
+          child.once('exit', (code) => code === 0 ? resolve() : reject(new Error(`Build ${preset} failed (${code}).`)))
+        })
+        if (preset === 'vercel') assert.equal(JSON.parse(await readFile(path.join(isolatedNuxtRoot, '.vercel/output/functions/__fallback.func/.vc-config.json'), 'utf8')).runtime, 'nodejs24.x')
+        console.log(`PASS isolated ${preset} build`)
+      }
+    }
+    const childEnvironment = {
         ...process.env,
-        NODE_ENV: 'development',
+        NODE_ENV: compiledSmoke ? 'production' : 'development',
         NUXT_DATABASE_URL: temporary.runtimeUrl,
         NUXT_DATABASE_MODE: 'local',
         NUXT_SESSION_PASSWORD: sessionPassword,
         NUXT_TELEMETRY_DISABLED: '1',
-        PORT: String(httpPort),
-        HOST: '127.0.0.1',
-      },
+        LAB002_FIXTURE: '1',
+        LAB002_SCHOOL_LOGO_LOCAL_STORAGE: '1',
+        LAB002_SCHOOL_LOGO_ROOT: logoRoot,
+        PORT: String(httpPort), HOST: '127.0.0.1',
+    }
+    delete childEnvironment.VERCEL
+    delete childEnvironment.VERCEL_ENV
+    const serverArgs = compiledSmoke ? [path.join(isolatedNuxtRoot, '.output/server/index.mjs')] : [
+      path.join(appRoot, 'node_modules/nuxt/bin/nuxt.mjs'),
+      'dev', '--host', '127.0.0.1', '--port', String(httpPort), '--no-fork', '--no-tui', '--strictPort', isolatedNuxtRoot,
+    ]
+    server = spawn(process.execPath, serverArgs, {
+      cwd: isolatedNuxtRoot,
+      env: childEnvironment,
       stdio: ['ignore', 'pipe', 'pipe'],
       windowsHide: true,
     })
@@ -362,11 +414,41 @@ async function runFixture() {
     server.stderr?.on('data', (chunk) => { serverOutput = `${serverOutput}${chunk.toString('utf8')}`.slice(-16_000) })
     await waitForServer(server, baseUrl, () => serverOutput, [credentials.password, sessionPassword, temporary.runtimeUrl, temporary.migrationUrl])
 
+    if (compiledSmoke) {
+      const request = (route, options = {}) => fetch(`${baseUrl}${route}`, { ...options, signal: AbortSignal.timeout(10000) })
+      const login = await request('/api/auth/login', { method: 'POST', headers: { origin: baseUrl, 'content-type': 'application/json' }, body: JSON.stringify({ email: credentials.email, password: credentials.password }) })
+      assert.equal(login.status, 200)
+      const cookie = login.headers.get('set-cookie')?.split(';', 1)[0]
+      assert.ok(cookie)
+      const layoutResponse = await request(`/api/reports/${credentials.activeSemesterId}/layout?mode=semester`, { headers: { cookie } })
+      assert.equal(layoutResponse.status, 200)
+      const bundle = await layoutResponse.json()
+      assert.equal(bundle.logoStatus, 'ready')
+      assert.equal(bundle.report.semester.logo.assetId, credentials.activeLogo.assetId)
+      const pdfResponse = await request(`/api/reports/${credentials.activeSemesterId}/pdf?mode=semester&paper=f4&revision=${bundle.revision}`, { headers: { cookie } })
+      assert.equal(pdfResponse.status, 200)
+      assert.match(pdfResponse.headers.get('content-type'), /application\/pdf/)
+      assert.match(pdfResponse.headers.get('content-disposition'), /^attachment;/)
+      assert.equal(pdfResponse.headers.get('cache-control'), 'no-store')
+      assert.equal(pdfResponse.headers.get('x-content-type-options'), 'nosniff')
+      const pdf = Buffer.from(await pdfResponse.arrayBuffer())
+      assert.equal(pdf.subarray(0, 5).toString(), '%PDF-')
+      assert.match(pdf.toString('latin1'), /\/Subtype\s*\/Image\b/)
+      await writeFile(path.join(fixtureParent, 'REP001D-compiled.pdf'), pdf)
+      for (const [file, hash] of Object.entries(sourceManifest)) assert.equal(createHash('sha256').update(await readFile(path.join(appRoot, file))).digest('hex'), hash, `source stability ${file}`)
+      await writeFile(path.join(fixtureParent, 'REP001D-compiled-evidence.json'), JSON.stringify({ node: process.version, platform: process.platform, presets: ['vercel', 'node-server'], runtime: 'nodejs24.x', login: 200, layout: 200, pdf: 200, image: true, pageCount: bundle.plans.f4.pages.length, sourceManifest }, null, 2))
+      console.log('PASS compiled HTTP login200 layout200 PDF200 with embedded logo and stable source hashes.')
+      return
+    }
+
     console.log('Fixture absensi sintetis siap hanya di loopback.')
     console.log(`URL: ${baseUrl}`)
     console.log(`Akun uji: ${credentials.email}`)
     console.log(`Kata sandi uji: ${credentials.password}`)
     console.log(`Data: ${credentials.studentCount} siswa, semester aktif parsial, semester arsip, dan satu arsip tanpa siswa.`)
+    console.log(`Logo arsip PNG lebar: ${credentials.archiveLogo.path}`)
+    console.log(`Logo aktif JPEG tinggi: ${credentials.activeLogo.path}`)
+    console.log(`Arsip tanpa logo dengan siswa: ${credentials.legacySemesterId}`)
     console.log(`Untuk berhenti aman: ketik STOP lalu Enter pada sesi ini (atau kirim Ctrl+C). Folder sementara akan dibersihkan.`)
     console.log('Server Nuxt dan PostgreSQL hanya bind ke 127.0.0.1; tidak memakai database .data proyek.')
 

@@ -2,6 +2,15 @@ export type AttendanceReportMode = 'month' | 'semester'
 export type AttendanceStatus = 'H' | 'S' | 'I' | 'A'
 export type AttendanceReportPaper = 'a4' | 'f4' | 'letter'
 
+export interface AttendanceReportLogo {
+  assetId: string
+  mimeType: 'image/png' | 'image/jpeg'
+  width: number
+  height: number
+  byteSize: number
+  sha256: string
+}
+
 export interface AttendanceReportDay {
   day: number
   date: string | null
@@ -36,6 +45,7 @@ export interface AttendanceReport {
     status: 'active' | 'closed'
     schoolName: string
     className: string
+    logo?: AttendanceReportLogo | null
   }
   months: AttendanceReportMonth[]
 }
@@ -67,6 +77,9 @@ export interface AttendanceReportLayoutPage {
   pagesInMonth: number
   headingParts: AttendanceReportLayoutHeadingPart[]
   headingHeightPt: number
+  headingTextOffsetPt: number
+  headingTextWidthPt: number
+  logo: { xPt: number; yPt: number; widthPt: number; heightPt: number } | null
   tableHeaderRowHeightsPt: [number, number]
   rows: AttendanceReportLayoutRow[]
 }
@@ -88,4 +101,5 @@ export interface AttendanceReportLayoutBundle {
   revision: string
   report: AttendanceReport
   plans: Record<AttendanceReportPaper, AttendanceReportPaperPlan>
+  logoStatus: 'none' | 'ready' | 'unavailable'
 }

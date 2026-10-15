@@ -78,6 +78,17 @@ const downloadError = ref('')
 const downloadStatus = ref('')
 const reportRevisionStale = ref(false)
 let requestGeneration = 0
+const logoObjectUrl = ref('')
+const isLoadingLogo = ref(false)
+const logoError = ref('')
+const logoGeneration = ref(0)
+const loadedLogoPages = ref<string[]>([])
+let logoRequest: AbortController | undefined
+const logoReady = computed(() => !report.value?.semester.logo || (
+  layoutBundle.value?.logoStatus === 'ready' && Boolean(logoObjectUrl.value)
+  && !isLoadingLogo.value && !logoError.value && previewPages.value.length > 0
+  && loadedLogoPages.value.length === previewPages.value.length
+))
 
 onMounted(() => {
   isClientReady.value = true
@@ -119,8 +130,8 @@ const hasCurrentReport = computed(() => Boolean(layoutBundle.value && reportSele
 const hasStudents = computed(() => Boolean(hasCurrentReport.value && report.value?.months.some((month) => month.rows.length > 0)))
 const selectedPlan = computed(() => layoutBundle.value?.plans[paperSize.value] ?? null)
 const canLoadReport = computed(() => isClientReady.value && hasLoaded.value && !isDownloading.value && Boolean(selectedSemester.value) && (mode.value === 'semester' || monthOptions.value.includes(selectedMonth.value)))
-const canPrint = computed(() => isClientReady.value && hasStudents.value && !isLoadingReport.value)
-const canDownload = computed(() => isClientReady.value && hasStudents.value && !isLoadingReport.value && !isDownloading.value && !reportRevisionStale.value)
+const canPrint = computed(() => isClientReady.value && hasStudents.value && !isLoadingReport.value && logoReady.value)
+const canDownload = computed(() => isClientReady.value && hasStudents.value && !isLoadingReport.value && !isDownloading.value && !reportRevisionStale.value && logoReady.value)
 
 interface PreviewPage {
   page: AttendanceReportLayoutPage
@@ -145,6 +156,69 @@ const previewPages = computed<PreviewPage[]>(() => {
   }
   return pages
 })
+
+function releaseLogo() {
+  logoRequest?.abort()
+  logoRequest = undefined
+  if (logoObjectUrl.value) URL.revokeObjectURL(logoObjectUrl.value)
+  logoObjectUrl.value = ''
+}
+
+watch([layoutBundle, paperSize], async () => {
+  const generation = ++logoGeneration.value
+  loadedLogoPages.value = []
+  logoError.value = ''
+  if (import.meta.server) return
+  releaseLogo()
+  const logo = layoutBundle.value?.report.semester.logo
+  if (!logo) { isLoadingLogo.value = false; return }
+  if (layoutBundle.value?.logoStatus !== 'ready') {
+    isLoadingLogo.value = false
+    logoError.value = 'Logo laporan belum dapat dimuat. Coba lagi sebelum mencetak atau mengunduh PDF.'
+    return
+  }
+  isLoadingLogo.value = true
+  const controller = new AbortController()
+  logoRequest = controller
+  let candidate = ''
+  try {
+    const response = await fetch(`/api/school/logo/${encodeURIComponent(logo.assetId)}`, { credentials: 'same-origin', signal: controller.signal })
+    if (!response.ok || response.headers.get('content-type')?.split(';', 1)[0] !== logo.mimeType) throw new Error('Logo unavailable.')
+    const bytes = await response.arrayBuffer()
+    const hash = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)), (value) => value.toString(16).padStart(2, '0')).join('')
+    if (bytes.byteLength !== logo.byteSize || hash !== logo.sha256) throw new Error('Logo unavailable.')
+    candidate = URL.createObjectURL(new Blob([bytes], { type: logo.mimeType }))
+    const image = new Image()
+    image.src = candidate
+    await image.decode()
+    if (image.naturalWidth !== logo.width || image.naturalHeight !== logo.height) throw new Error('Logo unavailable.')
+    if (generation !== logoGeneration.value || controller.signal.aborted) return
+    logoObjectUrl.value = candidate
+    candidate = ''
+  } catch {
+    if (generation === logoGeneration.value && !controller.signal.aborted) logoError.value = 'Logo laporan belum dapat dimuat. Coba lagi sebelum mencetak atau mengunduh PDF.'
+  } finally {
+    if (candidate) URL.revokeObjectURL(candidate)
+    if (generation === logoGeneration.value) isLoadingLogo.value = false
+  }
+}, { flush: 'post' })
+
+function onLogoImageLoad(event: Event) {
+  const image = event.target as HTMLImageElement
+  const key = image.dataset.logoKey ?? ''
+  if (!key.startsWith(`${logoGeneration.value}:`)) return
+  if (!image.complete || image.naturalWidth < 1) return
+  if (!loadedLogoPages.value.includes(key)) loadedLogoPages.value = [...loadedLogoPages.value, key]
+}
+
+function onLogoImageError(event: Event) {
+  const image = event.target as HTMLImageElement
+  if (image.dataset.logoKey?.startsWith(`${logoGeneration.value}:`)) {
+    logoError.value = 'Logo laporan belum dapat dimuat. Coba lagi sebelum mencetak atau mengunduh PDF.'
+  }
+}
+
+onBeforeUnmount(() => { logoGeneration.value += 1; releaseLogo() })
 
 function formatMonth(value: string): string {
   return new Intl.DateTimeFormat('id-ID', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(monthStart(value))
@@ -311,7 +385,8 @@ async function downloadReport() {
 </script>
 
 <template>
-  <main class="page-content reports-page">
+  <main class="page-content reports-page" :class="{ 'report-assets-not-ready': hasCurrentReport && !logoReady }">
+    <p class="report-print-readiness-notice">Logo laporan belum siap. Muat ulang laporan sebelum mencetak.</p>
     <section class="page-heading report-page-heading">
       <p class="eyebrow">Rekap kehadiran</p>
       <h1>Laporan absensi</h1>
@@ -414,6 +489,11 @@ async function downloadReport() {
       <p v-else-if="!hasCurrentReport" class="report-idle-note" role="status">Pilih periode, lalu tampilkan laporan untuk melihat pratinjau.</p>
 
       <template v-if="hasCurrentReport && report">
+        <p v-if="isLoadingLogo || (report.semester.logo && !logoReady && !logoError)" class="report-loading" role="status">Memuat logo laporan…</p>
+        <div v-if="logoError" class="form-error report-message" role="alert">
+          <span>{{ logoError }}</span>
+          <button class="text-button" type="button" :disabled="isLoadingReport || isDownloading" @click="loadReport">Coba lagi</button>
+        </div>
         <p v-if="!hasStudents" class="content-card report-no-students" role="status">Tidak ada siswa pada periode ini.</p>
 
         <section v-else-if="selectedPlan" class="report-preview" aria-label="Pratinjau laporan">
@@ -427,7 +507,8 @@ async function downloadReport() {
 
           <div v-for="(previewPage, pageIndex) in previewPages" :key="`${previewPage.page.month}-${previewPage.page.pageInMonth}`" class="report-sheet-viewport">
             <article class="report-sheet" :class="{ 'report-sheet-last': pageIndex === previewPages.length - 1 }" :style="sheetStyle(selectedPlan)">
-              <header class="report-sheet-heading">
+              <header class="report-sheet-heading" :style="{ height: `${previewPage.page.headingHeightPt}pt`, paddingLeft: `${previewPage.page.headingTextOffsetPt}pt` }">
+                <img v-if="previewPage.page.logo && logoObjectUrl" :key="`${logoGeneration}:${pageIndex}`" :data-logo-key="`${logoGeneration}:${pageIndex}`" :src="logoObjectUrl" class="report-header-logo" alt="Logo sekolah" :style="{ left: `${previewPage.page.logo.xPt}pt`, top: `${previewPage.page.logo.yPt}pt`, width: `${previewPage.page.logo.widthPt}pt`, height: `${previewPage.page.logo.heightPt}pt` }" @load="onLogoImageLoad" @error="onLogoImageError">
                 <p v-for="(part, partIndex) in previewPage.page.headingParts" :key="`${part.kind}-${partIndex}`" class="report-heading-part" :class="`report-heading-${part.kind}`" :style="{ fontSize: `${part.fontSizePt}pt`, lineHeight: `${part.lineHeightPt}pt`, fontWeight: part.fontWeight, marginTop: `${part.gapBeforePt}pt`, marginBottom: `${part.gapAfterPt}pt` }">
                   <span v-for="(line, lineIndex) in part.lines" :key="lineIndex">{{ line }}</span>
                 </p>
@@ -510,7 +591,9 @@ async function downloadReport() {
 .report-scroll-note { margin: 0; color: #536b65; font-size: 12px; }
 .report-sheet-viewport { max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; margin: 0 0 18px; padding: 2px 0 8px; }
 .report-sheet { box-sizing: border-box; margin: 0 auto; overflow: hidden; color: #111; background: #fff; box-shadow: 0 8px 24px #193c3022; font-family: Helvetica, Arial, sans-serif; }
-.report-sheet-heading { margin: 0; }
+.report-sheet-heading { position: relative; display: flow-root; box-sizing: border-box; margin: 0; }
+.report-header-logo { position: absolute; display: block; object-fit: contain; }
+.report-print-readiness-notice { display: none; }
 .report-heading-part { margin-left: 0; margin-right: 0; white-space: normal; }
 .report-heading-part span, .report-student-name span, .report-student-number span { display: block; white-space: pre; }
 .report-heading-school, .report-heading-title { color: #172d29; }
@@ -551,6 +634,8 @@ async function downloadReport() {
 }
 
 @media print {
+  .report-assets-not-ready .report-preview { display: none !important; }
+  .report-assets-not-ready .report-print-readiness-notice { display: block !important; color: #000; padding: 16px; }
   html, body, #__nuxt { min-width: 0 !important; min-height: 0 !important; background: #fff !important; }
   body { margin: 0 !important; }
   .app-shell { min-height: 0 !important; padding: 0 !important; }

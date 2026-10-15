@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict'
 import { spawn, execFileSync } from 'node:child_process'
-import { randomBytes, randomUUID } from 'node:crypto'
-import { cp, lstat, mkdir, mkdtemp, realpath, rm, symlink, unlink } from 'node:fs/promises'
+import { createHash, randomBytes, randomUUID } from 'node:crypto'
+import { cp, lstat, mkdir, mkdtemp, realpath, rename, rm, symlink, unlink, writeFile } from 'node:fs/promises'
+import sharp from 'sharp'
 import net from 'node:net'
 import path from 'node:path'
 import { setTimeout as delay } from 'node:timers/promises'
@@ -16,7 +17,8 @@ import { withAuditActor } from '../server/database/audit-context.ts'
 import { getAttendanceDayView, saveAttendanceDay } from '../server/database/repositories/attendance-days.ts'
 import { createSemester, closeSemester, getSemesterClosurePreview } from '../server/database/repositories/semesters.ts'
 import { addStudentToSemester, createStudent } from '../server/database/repositories/students.ts'
-import { createSchool, createSchoolClass, updateSchoolForTeacher, updateSchoolClass } from '../server/database/repositories/schools.ts'
+import { createSchool, createSchoolClass, createSchoolLogoAsset, setActiveSchoolLogo, updateSchoolForTeacher, updateSchoolClass } from '../server/database/repositories/schools.ts'
+import { LocalSchoolLogoStorage } from '../server/utils/school-logo-storage.ts'
 import { getAttendanceReport } from '../server/database/repositories/reports.ts'
 import { buildAttendanceReportLayoutBundle, renderAttendanceReportPdf } from '../server/utils/report-export.ts'
 import { createTeacherAccount } from '../server/database/repositories/teacher-accounts.ts'
@@ -25,7 +27,7 @@ import { startTemporaryPostgres } from './support/temporary-postgres.mjs'
 import { listMigrationNames } from './support/migration-names.mjs'
 
 const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-const testRoot = path.join(appRoot, '.data', 'tests')
+const testRoot = path.join(appRoot, '.cache', 'tests')
 const passwordHasher = new Scrypt({})
 const requestTimeoutMs = 5_000
 
@@ -96,6 +98,33 @@ test('REP-001C shared layout plans and PDFKit output cover A4, custom F4, and Le
       assert.ok(mediaBox, 'F4 PDF exposes a page media box')
       assert.ok(Math.abs(Number(mediaBox[1]) - plan.widthPt) < 0.001)
       assert.ok(Math.abs(Number(mediaBox[2]) - plan.heightPt) < 0.001)
+    }
+  }
+  const artifactRoot = path.join(appRoot, '.cache', 'rep001d-pdfs')
+  await mkdir(artifactRoot, { recursive: true })
+  for (const mimeType of ['image/png', 'image/jpeg'] as const) {
+    const width = mimeType === 'image/png' ? 240 : 80
+    const height = mimeType === 'image/png' ? 80 : 240
+    const image = sharp({ create: { width, height, channels: 3, background: mimeType === 'image/png' ? '#167c59' : '#c78223' } })
+    const bytes = await (mimeType === 'image/png' ? image.png() : image.jpeg()).toBuffer()
+    const withLogo = structuredClone(report)
+    withLogo.semester.schoolName = 'Sekolah Sintetis Dengan Nama Panjang untuk Memastikan Judul Membungkus '.repeat(3)
+    withLogo.semester.logo = { assetId: randomUUID(), mimeType, width, height, byteSize: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex') }
+    const logoBundle = buildAttendanceReportLayoutBundle(withLogo)
+    assert.notEqual(logoBundle.revision, bundle.revision)
+    for (const paper of ['a4', 'f4', 'letter'] as const) {
+      const plan = logoBundle.plans[paper]
+      assert.deepEqual(plan.pages.filter((page) => page.monthIndex === 0).flatMap((page) => page.rows.map((row) => row.membershipId)), rows.map((row) => row.membershipId))
+      for (const page of plan.pages) {
+        assert.equal(page.headingTextOffsetPt, 44)
+        assert.ok(page.logo)
+        assert.ok(Math.abs(page.logo.widthPt / page.logo.heightPt - width / height) < 0.0001)
+        assert.ok(page.headingHeightPt >= page.logo.yPt + page.logo.heightPt)
+        assert.ok(page.headingTextWidthPt + 44 <= plan.contentWidthPt + 0.001)
+      }
+      const pdf = await renderAttendanceReportPdf(logoBundle, paper, bytes)
+      assert.match(pdf.toString('latin1'), /\/Subtype\s*\/Image\b/)
+      await writeFile(path.join(artifactRoot, `${mimeType === 'image/png' ? 'wide' : 'tall'}-${paper}.pdf`), pdf)
     }
   }
 })
@@ -229,6 +258,11 @@ test('REP-001A protected report model keeps month cells, totals, archive metadat
   let baseUrl = ''
   let ownerCookie = ''
   let fixture: ReportFixture | undefined
+  await mkdir(testRoot, { recursive: true })
+  const logoRoot = await mkdtemp(path.join(testRoot, 'reports-logo-'))
+  let archivedLogoId = ''
+  let activeLogoId = ''
+  let activeLogoBytes = Buffer.alloc(0)
   const password = randomBytes(24).toString('base64url')
   const sessionPassword = randomBytes(48).toString('base64url')
   const revisionSecret = randomBytes(32).toString('base64url')
@@ -367,6 +401,19 @@ test('REP-001A protected report model keeps month cells, totals, archive metadat
     assert.equal(activeModel.report.semester.status, 'active')
     assert.equal(activeModel.report.months[0]?.rows.length, 2)
 
+    async function seedReportLogo(mimeType: 'image/png' | 'image/jpeg', width: number, height: number) {
+      const id = randomUUID()
+      const image = sharp({ create: { width, height, channels: 3, background: '#167c59' } })
+      const bytes = await (mimeType === 'image/png' ? image.png() : image.jpeg()).toBuffer()
+      await new LocalSchoolLogoStorage(logoRoot).write(id, mimeType, bytes)
+      await withAuditActor(database, teacher.id, async (transaction) => {
+        await createSchoolLogoAsset(transaction, { assetId: id, schoolId: school.id, mimeType, byteSize: bytes.length, width, height, sha256: createHash('sha256').update(bytes).digest('hex'), uploadedBy: teacher.id })
+        await setActiveSchoolLogo(transaction, { schoolId: school.id, assetId: id })
+      })
+      return { id, bytes }
+    }
+    archivedLogoId = (await seedReportLogo('image/png', 240, 80)).id
+
     const mainPreview = await getSemesterClosurePreview(database, { semesterId: semester.id, teacherId: teacher.id })
     assert.ok(mainPreview, 'the synthetic report semester should have a closure preview')
     await withAuditActor(database, teacher.id, (transaction) => closeSemester(transaction, {
@@ -375,6 +422,9 @@ test('REP-001A protected report model keeps month cells, totals, archive metadat
       previewToken: mainPreview.previewToken,
       confirmed: true,
     }))
+    const activeLogo = await seedReportLogo('image/jpeg', 80, 240)
+    activeLogoId = activeLogo.id
+    activeLogoBytes = activeLogo.bytes
     const emptySemester = await withAuditActor(database, teacher.id, (transaction) => createSemester(transaction, {
       schoolId: school.id,
       academicYear: '2024/2025',
@@ -422,6 +472,8 @@ test('REP-001A protected report model keeps month cells, totals, archive metadat
         NUXT_DATABASE_URL: temporary.runtimeUrl,
         NUXT_SESSION_PASSWORD: sessionPassword,
         NUXT_TELEMETRY_DISABLED: '1',
+        LAB002_FIXTURE: '1',
+        LAB002_SCHOOL_LOGO_ROOT: logoRoot,
         PORT: String(port),
         HOST: '127.0.0.1',
       },
@@ -661,11 +713,52 @@ test('REP-001A protected report model keeps month cells, totals, archive metadat
              (select count(*)::int from calendar_exceptions) as calendar_exception_count
     `
     assert.deepEqual(afterReads, beforeReads, 'protected GET report requests must not write attendance, archive, membership, calendar or audit data')
+    await t.test('REP-D preserves archive logo identity, legacy null, revision conflicts and safe partial failure', async () => {
+      const layout = async (id: string) => {
+        const response = await fetchLocal(`${baseUrl}/api/reports/${id}/layout?mode=semester`, { headers: { cookie: ownerCookie } })
+        assert.equal(response.status, 200)
+        return await response.json() as import('../app/types/attendance-report.ts').AttendanceReportLayoutBundle
+      }
+      const pdf = (id: string, revision?: string) => fetchLocal(`${baseUrl}/api/reports/${id}/pdf?mode=semester&paper=a4${revision ? `&revision=${revision}` : ''}`, { headers: { cookie: ownerCookie } })
+      assert.equal((await layout(archiveSemester.id)).report.semester.logo, null, 'legacy archive null does not fall back to active logo')
+      const archived = await layout(semester.id)
+      assert.equal(archived.report.semester.logo?.assetId, archivedLogoId)
+      assert.equal(archived.logoStatus, 'ready')
+      const active = await layout(emptySemester.id)
+      assert.equal(active.report.semester.logo?.assetId, activeLogoId)
+      await addStudentToSemester(database, { semesterId: emptySemester.id, schoolId: school.id, schoolClassId: schoolClass.id, studentId: studentOne.id, startsOn: '2024-07-01' })
+      const current = await layout(emptySemester.id)
+      assert.equal((await pdf(emptySemester.id, current.revision)).status, 200)
+      await setActiveSchoolLogo(database, { schoolId: school.id, assetId: null })
+      assert.equal((await pdf(emptySemester.id, current.revision)).status, 409)
+      assert.equal((await layout(emptySemester.id)).logoStatus, 'none')
+      assert.equal((await layout(semester.id)).report.semester.logo?.assetId, archivedLogoId)
+      await setActiveSchoolLogo(database, { schoolId: school.id, assetId: activeLogoId })
+      const activePath = path.join(logoRoot, `${activeLogoId}.jpg`)
+      await rename(activePath, `${activePath}.held`)
+      try {
+        const unavailable = await layout(emptySemester.id)
+        assert.equal(unavailable.logoStatus, 'unavailable')
+        assert.ok(unavailable.report.months.some((month) => month.rows.length))
+        const failed = await pdf(emptySemester.id)
+        assert.equal(failed.status, 503)
+        assert.equal(failed.headers.get('content-disposition'), null)
+      } finally { await rename(`${activePath}.held`, activePath) }
+      await writeFile(activePath, Buffer.from('tampered synthetic image'))
+      assert.equal((await layout(emptySemester.id)).logoStatus, 'unavailable')
+      assert.equal((await pdf(emptySemester.id)).status, 503)
+      await writeFile(activePath, activeLogoBytes)
+      assert.equal((await layout(emptySemester.id)).logoStatus, 'ready')
+      assert.equal((await pdf(emptySemester.id)).status, 200)
+    })
   } finally {
     if (server) await stopOwnedProcess(server)
     if (isolatedNuxtRoot) await removeIsolatedNuxtRoot(isolatedNuxtRoot)
     await database.end({ timeout: 3 })
     await migrator.end({ timeout: 3 })
     await temporary.cleanup()
+    const resolvedLogoRoot = await realpath(logoRoot)
+    if (path.dirname(resolvedLogoRoot).toLowerCase() !== (await realpath(testRoot)).toLowerCase() || !/^reports-logo-[A-Za-z0-9]+$/.test(path.basename(resolvedLogoRoot))) throw new Error('Unexpected report logo test root.')
+    await rm(resolvedLogoRoot, { recursive: true })
   }
 })

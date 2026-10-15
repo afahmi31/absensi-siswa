@@ -3,6 +3,7 @@ import { getDatabase } from '../../../database/client.ts'
 import { getAttendanceReport, type AttendanceReportMode } from '../../../database/repositories/reports.ts'
 import { buildAttendanceReportLayoutBundle } from '../../../utils/report-export.ts'
 import { isUuid } from '../../../utils/study-api.ts'
+import { readAttendanceReportLogo } from '../../../utils/report-logo.ts'
 
 function reportInputError(message: string): never {
   throw createError({ statusCode: 422, statusMessage: message })
@@ -48,7 +49,16 @@ export default defineEventHandler(async (event) => {
     if (result.kind === 'month_outside_semester') {
       reportInputError('Bulan yang dipilih berada di luar periode semester.')
     }
-    return buildAttendanceReportLayoutBundle(result.report)
+    const bundle = buildAttendanceReportLayoutBundle(result.report)
+    if (result.report.semester.logo) {
+      try {
+        await readAttendanceReportLogo(result.report.semester.logo)
+        bundle.logoStatus = 'ready'
+      } catch {
+        bundle.logoStatus = 'unavailable'
+      }
+    }
+    return bundle
   } catch (error) {
     if (typeof error === 'object' && error !== null && 'statusCode' in error) throw error
     throw createError({ statusCode: 503, statusMessage: 'Laporan belum dapat dimuat. Coba lagi.' })

@@ -1,6 +1,6 @@
 # Acuan lanjut LAB-002 — uji lokal absensi
 
-Status aktif — 16 Oktober 2026: OPS-001A CLOSED melalui penerimaan PM lokal setelah resume dengan GPT-6.1 Sol/low sesuai pilihan Ardy. Logo sekolah privat dan snapshot logo arsip selesai diuji lokal; lihat reports/LAB002-OPS-001A-pm-review.md. Tidak push/deploy atau perubahan data guru/cloud. Parent OPS masih terbuka untuk cadangan/pemulihan aset; integrasi logo laporan adalah tahap REP berikut. Provider storage production dan runtime Linux Vercel belum disiapkan/diverifikasi. Checkpoint STOP sebelumnya adalah riwayat; jangan restore atau mengulang A.
+Status aktif — 16 Oktober 2026: REP-001D CLOSED melalui review dan penerimaan PM lokal. Logo aktif/arsip telah terintegrasi pada pratinjau, cetak dan PDF; bukti pada reports/LAB002-REP-001D-pm-review.md. OPS-001A dan REP A–D tidak perlu diulang. Tidak push/deploy atau perubahan data guru/cloud. Sisa: backup/pemulihan aset OPS, provider storage production/Linux Vercel dan printer fisik, lalu QA/rilis sesuai scope.
 
 Checkpoint STOP historis, sudah di-resume dan diselesaikan: [STOP REP-001C — 15 Oktober2026](reports/LAB002-REP-001C-pause-2026-10-15.md). Status ON_HOLD atas permintaan Ardy; tidak ada proses aktif/kelanjutan otomatis. Empat berkas parsial disimpan tanpa commit, belum diverifikasi. Bagian lain di bawah adalah riwayat dan bukan instruksi melanjutkan selama stop.
 

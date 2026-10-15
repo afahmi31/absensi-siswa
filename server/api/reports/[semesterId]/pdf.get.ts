@@ -9,6 +9,7 @@ import {
 } from '../../../utils/report-export.ts'
 import type { AttendanceReportPaper } from '../../../../app/types/attendance-report.ts'
 import { isUuid } from '../../../utils/study-api.ts'
+import { readAttendanceReportLogo } from '../../../utils/report-logo.ts'
 
 function reportInputError(message: string): never {
   throw createError({ statusCode: 422, statusMessage: message })
@@ -83,7 +84,8 @@ export default defineEventHandler(async (event) => {
 
     let pdf: Buffer
     try {
-      pdf = await renderAttendanceReportPdf(bundle, paper)
+      const logoBytes = await readAttendanceReportLogo(bundle.report.semester.logo)
+      pdf = await renderAttendanceReportPdf(bundle, paper, logoBytes)
     } catch (error) {
       if (error instanceof AttendanceReportLayoutError && error.code === 'row_too_tall') {
         throw createError({ statusCode: 422, statusMessage: 'Nama siswa terlalu panjang untuk ditampilkan pada ukuran kertas ini.' })

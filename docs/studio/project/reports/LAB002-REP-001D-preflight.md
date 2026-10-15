@@ -1,0 +1,35 @@
+# LAB002-REP-001D — Preflight logo laporan
+
+Tanggal16Oktober2026. Executor `/root/ops_logo_sol_resume`, gpt-6.1-sol/low. Tahap **preflight saja**; belum coding/menjalankan tes/build. Root Git `app`, develop baseline `1a54ee7`; working tree bersih saat diperiksa. Next owner PM untuk mengunci usulan berikut.
+
+## Fakta source dan acuan
+
+Mengikuti instruksi workspace dan studio-executor-work yang sudah dibaca, workflow/protokol studio, taskREP-D, kontrakREP-C, laporan/reviewOPS-A dan hasilREP-C. Pencarian tidak menemukan AGENTS/AGENT nested pada registry/app. Tidak mengulang setup/dependency/audit seluruh repo.
+
+`getAttendanceReport` memakai satu SQL statement/MVCC snapshot untuk scope sekolah/arsip, bulan, roster dan sel; belum membaca logo. Model server/client belum punya identitas logo. Builder `report-export.ts` menghasilkan seluruh geometri/header/wrapping/pagination tiga kertas dan revision dari model+plans. PDFKit merender Buffer dari bundle yang sama; belum menerima gambar. EndpointPDF mengecek revision sebelum render; endpointlayout menjadi satu request UI. UI langsung memanggil `window.print()` tanpa menunggu image readiness karena saat ini belum ada gambar.
+
+OPS sudah memiliki active_logo_asset_id, snapshot.logo_asset_id nullable, metadata immutable berisi MIME/dimensi/bytes/hash. Route privat logo memeriksa sesi dan referensi aktif/arsip, membandingkan panjang+SHA256 berkas, lalu mengirim no-store/nosniff. Adapter lokal menolak Vercel; tidak ada provider production. Storage dan decoder Sharp dapat dipakai ulang, tanpa migration/dependency baru. Fixture reports sudah48siswa dan beberapa semester, tetapi belum seed logo dan belum mengatur rootstorage; perlu perluasan terarah.
+
+## Usulan kontrak untuk review PM
+
+1. **Model additive.** Tambahkan `semester.logo` nullable: `{ assetId, mimeType, width, height, byteSize, sha256 }`. Semua field lama dan semantikquery tetap. Ambil ID dengan `CASE WHEN semester.status='closed' THEN archive.logo_asset_id ELSE school.active_logo_asset_id END`, bukan COALESCE yang akan mengisi legacyNULL dengan logoaktif. Join metadata aset dalam statementreport yang sama dan batasi school_id. APIREP-A boleh mendapat field additive yang sama; tidak menambahkan bytes/path/nama asli atau URLpublik.
+
+2. **Bytes privat terpercaya.** Helper server khusus report menerima descriptor hasil query scope tadi, membaca adapter langsung dengan UUID+MIME, mengecek panjang/hash dan decode PNG/JPEG serta dimensi terhadap metadata menggunakan decoderOPS. Tidak menerima URL/pathklien atau fetchHTTP. Tidak perlu query ulang pointer aktif sesudah statementreport; dengan demikian report/logo berasal satu snapshot identitas meskipun sekolah diganti setelah query. File immutable dapat tetap dibaca lewat adapter untuk request yang sudah mengambil snapshot sah. Tidak mengubah OPSpersist/save/closure atau grant.
+
+3. **Revision.** Naikkan layoutversion ke `rep-001d-v1`. Descriptorlogo termasuk model yang dihash sehingga perubahan activeID/hash menyebabkan409 untuk revision lama; archive memakai IDsnapshot dan tidak berubah saat sekolah mengganti logoaktif. Null tetapvalid. PDF membandingkan revision dahulu, kemudian memuat+memvalidasi bytes untuk descriptor yang sama; missing/tampered/unavailable menghasilkan503 aman, tanpa attachmentpartial. Auth/ownership tetap wajib. DirectPDF tanpa revision mengikuti kontrakC, menghasilkan versi terkini.
+
+4. **Layout bersama.** Bila logo ada, sediakan kotak36×36pt pada kiriheader dengan gap8pt; teksheader memakai lebar contentWidth−44pt dan offset44pt, wrap memakai metrikHelvetica existing. Gambar contain menggunakan dimensi tervalidasi, aspectratio utuh, tidakcrop. `headingHeightPt=max(tinggiteks,36pt)`; tabel mulai sesudah tinggi itu. Tambahkan geometri logo/offsetlebarteks pada pageplan yang dipakai browser danPDF. Ulang seluruhheader di setiappage. Bila logoNULL, offset0 dan geometri noLogo tetap sepertiC. Tidakmengubah lebar38kolom, ukuranpaper, sel/totals, urutanbulan atau aturan baris utuh.
+
+5. **Preview sebagian dan kesiapan.** Endpointlayout tetap200 berisi tabel/model/plans meskipun logoID ada tetapi bytes gagal dimuat, dengan field additive `logoStatus: none|ready|unavailable` dan pesan aman pada unavailable. Layout mencoba helper bytes untuk status; tidak mengirim bytes/base64. Browser mengambil satu gambar privat ke Bloblokal, memverifikasi hash yang diharapkan dan `decode()` sebelum memberi statusready; memakai objectURL sama pada header setiappage dan menunggu semua elemen gambar pada pageplan terpilih siap sebelum cetak. Generationguard mencegah hasilrequestlogo lama menempel setelah filter berubah; revoke objectURL saat diganti/unmount. Tidakautoprint.
+
+6. **Kontrol saat belumsiap/gagal.** Usulan: jika logoIDada, disable Cetak dan UnduhPDF sampai statusserverready dan browserdecode selesai. Loading: “Memuat logo laporan…”. Gagal: “Logo laporan belum dapat dimuat. Coba lagi sebelum mencetak atau mengunduh PDF.” Tabel tetapterlihat, disertai tombolCobalagi yang memuatulang bundle/logo dengan pilihanperiode/paper tetap. NoLogo langsungsiap sesuai hasStudents existing. Print native melalui Ctrl+P saatlogo belumsiap dicegah dari menghasilkan tampilan lengkap: printCSS menampilkan notice kegagalan/kesiapan dan menyembunyikan lembar taklengkap; tombolaplikasi tetapblocked. Ini perlu dikunciPM karena kontrakkontrol ditugaskan untuk review.
+
+7. **Ownership file.** Repositoryreports, tipeclient, helperreport-logo baru bila perlu, builder/rendererreport-export, endpointlayout/PDF, reports.vue, tests/reports.test.ts serta fixture/runner terarah dan laporan. PertahankanAPIqueryA selain field additive. Tidakmengubah OPSUI/save/closure/schema, dependency, auth, DBconfig, storageprovider atauPDFpersisten.
+
+## Verification yang diusulkan
+
+Fixture `.cache`, TTY+STOP, PostgreSQL/assetroot sintetis: PNGlebar danJPEGtinggi, noLogo, arsipLogoA/currentLogoB, legacyNULL, missing/tamperedasset danforeign. SeedlogoA sebelumclosure laluBaktif. Expose fixturekepadaPM lebihawal untuk browserHP/laptop/errorretry/readiness; tidakcredential diGit.
+
+Tes model/header/revision danHTTP: seluruhaturanREP-A; layout200partialerror versusPDF503; headernoStore/nosniff; activechange409; archiveA tetapA; nullvalid; foreign/auth; hash/dimensi/decodefail. Purelayout dengan48siswa/nama186karakter dan3paper membuktikan rowcompleteness/pagegrouping/headerbbox/aspectratio. PDFembed diuji decode/render, laluPM membukaPNGhalaman pertama/lanjutan/terakhir danmembandingkan denganbrowserprint. GunakanalatPDFlokal yang tersedia setelah diperiksa, tanpa globalinstall. BuildVercel+typecheck final sertaHTTPPDFcompiled bergambar memakai salinan/hashsource terisolasi. NativeSharpWindows belummembuktikanLinuxVercel; providerproduction/printerfisik tetapbatas.
+
+Tidakada blocker arsitektur/dependency yang ditemukan. Keputusan yang dibutuhkan sekarang adalah penguncian field additive, geometri36pt dan kontrolpartialfailure/readiness di atas sebelum implementasi. **Production Actions: NONE.**
