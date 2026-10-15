@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { getApiMessage } from '../utils/api-errors.ts'
-import type { AttendanceReport, AttendanceReportMode, AttendanceStatus } from '../types/attendance-report.ts'
+import type {
+  AttendanceReportLayoutBundle,
+  AttendanceReportLayoutPage,
+  AttendanceReportMode,
+  AttendanceReportPaper,
+  AttendanceReportPaperPlan,
+  AttendanceStatus,
+} from '../types/attendance-report.ts'
 
 interface SemesterRecord {
   id: string
@@ -22,9 +29,7 @@ interface SchoolResponse {
   school: { id: string; name: string; className: string; timeZone: string } | null
 }
 
-type PaperSize = 'a4' | 'f4' | 'letter'
-
-const paperSizes: Array<{ value: PaperSize; label: string; detail: string }> = [
+const paperSizes: Array<{ value: AttendanceReportPaper; label: string; detail: string }> = [
   { value: 'a4', label: 'A4', detail: '29,7 × 21 cm · mendatar' },
   { value: 'f4', label: 'F4/Folio', detail: '33 × 21,6 cm · mendatar' },
   { value: 'letter', label: 'Letter', detail: '27,94 × 21,59 cm · mendatar' },
@@ -51,7 +56,7 @@ const initialError = ref(hasLoaded.value ? '' : 'Data sekolah dan semester belum
 const selectedSemesterId = ref(preferredSemester(semesters.value)?.id ?? '')
 const selectedMonth = ref(preferredSemester(semesters.value)?.startsOn.slice(0, 7) ?? '')
 const mode = ref<AttendanceReportMode>('month')
-const paperSize = ref<PaperSize>('f4')
+const paperSize = ref<AttendanceReportPaper>('f4')
 const selectedPageSize = computed(() => ({
   a4: 'A4 landscape',
   f4: '33cm 21.6cm',
@@ -60,13 +65,18 @@ const selectedPageSize = computed(() => ({
 useHead(() => ({
   style: [{
     key: 'reports-print-page-size',
-    innerHTML: `@page { size: ${selectedPageSize.value}; margin: 6mm; }`,
+    innerHTML: `@page { size: ${selectedPageSize.value}; margin: 0; }`,
   }],
 }))
-const report = ref<AttendanceReport | null>(null)
+const layoutBundle = ref<AttendanceReportLayoutBundle | null>(null)
+const report = computed(() => layoutBundle.value?.report ?? null)
 const reportSelectionKey = ref('')
 const isLoadingReport = ref(false)
 const reportError = ref('')
+const isDownloading = ref(false)
+const downloadError = ref('')
+const downloadStatus = ref('')
+const reportRevisionStale = ref(false)
 let requestGeneration = 0
 
 onMounted(() => {
@@ -105,10 +115,36 @@ const selectionKey = computed(() => [
   mode.value,
   mode.value === 'month' ? selectedMonth.value : '',
 ].join('|'))
-const hasCurrentReport = computed(() => Boolean(report.value && reportSelectionKey.value === selectionKey.value))
+const hasCurrentReport = computed(() => Boolean(layoutBundle.value && reportSelectionKey.value === selectionKey.value))
 const hasStudents = computed(() => Boolean(hasCurrentReport.value && report.value?.months.some((month) => month.rows.length > 0)))
-const canLoadReport = computed(() => isClientReady.value && hasLoaded.value && Boolean(selectedSemester.value) && (mode.value === 'semester' || monthOptions.value.includes(selectedMonth.value)))
+const selectedPlan = computed(() => layoutBundle.value?.plans[paperSize.value] ?? null)
+const canLoadReport = computed(() => isClientReady.value && hasLoaded.value && !isDownloading.value && Boolean(selectedSemester.value) && (mode.value === 'semester' || monthOptions.value.includes(selectedMonth.value)))
 const canPrint = computed(() => isClientReady.value && hasStudents.value && !isLoadingReport.value)
+const canDownload = computed(() => isClientReady.value && hasStudents.value && !isLoadingReport.value && !isDownloading.value && !reportRevisionStale.value)
+
+interface PreviewPage {
+  page: AttendanceReportLayoutPage
+  month: NonNullable<AttendanceReportLayoutBundle['report']['months'][number]>
+  rows: Array<{
+    layout: AttendanceReportLayoutPage['rows'][number]
+    row: NonNullable<AttendanceReportLayoutBundle['report']['months'][number]['rows'][number]>
+  }>
+}
+
+const previewPages = computed<PreviewPage[]>(() => {
+  if (!hasCurrentReport.value || !report.value || !selectedPlan.value) return []
+  const pages: PreviewPage[] = []
+  for (const page of selectedPlan.value.pages) {
+    const month = report.value.months[page.monthIndex]
+    if (!month) continue
+    const rows = page.rows.flatMap((layout) => {
+      const row = month.rows[layout.rowIndex]
+      return row && row.membershipId === layout.membershipId ? [{ layout, row }] : []
+    })
+    pages.push({ page, month, rows })
+  }
+  return pages
+})
 
 function formatMonth(value: string): string {
   return new Intl.DateTimeFormat('id-ID', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(monthStart(value))
@@ -120,11 +156,19 @@ function onSemesterChange() {
 
 watch(selectionKey, () => {
   requestGeneration += 1
-  report.value = null
+  layoutBundle.value = null
   reportSelectionKey.value = ''
   reportError.value = ''
+  downloadError.value = ''
+  downloadStatus.value = ''
+  reportRevisionStale.value = false
   isLoadingReport.value = false
 }, { flush: 'sync' })
+
+watch(paperSize, () => {
+  downloadError.value = ''
+  downloadStatus.value = ''
+})
 
 async function reloadInitialData() {
   if (isInitialLoading.value) return
@@ -159,16 +203,19 @@ async function loadReport() {
   const generation = ++requestGeneration
   isLoadingReport.value = true
   reportError.value = ''
-  report.value = null
+  downloadError.value = ''
+  downloadStatus.value = ''
+  reportRevisionStale.value = false
+  layoutBundle.value = null
   reportSelectionKey.value = ''
 
   const query = new URLSearchParams({ mode: mode.value })
   if (mode.value === 'month') query.set('month', selectedMonth.value)
 
   try {
-    const result = await $fetch<AttendanceReport>(`/api/reports/${encodeURIComponent(semester.id)}?${query.toString()}`)
+    const result = await $fetch<AttendanceReportLayoutBundle>(`/api/reports/${encodeURIComponent(semester.id)}/layout?${query.toString()}`)
     if (generation !== requestGeneration || currentSelection !== selectionKey.value) return
-    report.value = result
+    layoutBundle.value = result
     reportSelectionKey.value = currentSelection
   } catch (error) {
     if (generation === requestGeneration && currentSelection === selectionKey.value) {
@@ -186,6 +233,80 @@ function printReport() {
 
 function statusDescription(status: AttendanceStatus): string {
   return ({ H: 'Hadir', S: 'Sakit', I: 'Izin', A: 'Alpa' })[status]
+}
+
+function columnStyle(plan: AttendanceReportPaperPlan, index: number) {
+  return { width: `${plan.columnWidthsPt[index] ?? 0}pt` }
+}
+
+function sheetStyle(plan: AttendanceReportPaperPlan) {
+  return {
+    width: `${plan.widthPt}pt`,
+    height: `${plan.heightPt}pt`,
+    padding: `${plan.marginPt}pt`,
+    '--report-content-width': `${plan.contentWidthPt}pt`,
+  }
+}
+
+async function downloadReport() {
+  if (!canDownload.value || import.meta.server) return
+  const semester = selectedSemester.value
+  const bundle = layoutBundle.value
+  if (!semester || !bundle) return
+
+  const currentSelection = selectionKey.value
+  const currentPaper = paperSize.value
+  isDownloading.value = true
+  downloadError.value = ''
+  downloadStatus.value = ''
+
+  const query = new URLSearchParams({ mode: mode.value, paper: currentPaper, revision: bundle.revision })
+  if (mode.value === 'month') query.set('month', selectedMonth.value)
+
+  try {
+    const response = await fetch(`/api/reports/${encodeURIComponent(semester.id)}/pdf?${query.toString()}`, {
+      headers: { accept: 'application/pdf' },
+      credentials: 'same-origin',
+    })
+    if (!response.ok) {
+      const contentType = response.headers.get('content-type')?.split(';', 1)[0]?.trim().toLowerCase()
+      if (contentType === 'application/json') {
+        try {
+          const body = await response.json()
+          downloadError.value = getApiMessage({ data: body }, 'PDF laporan belum dapat disiapkan. Coba lagi.')
+        } catch {
+          downloadError.value = 'PDF laporan belum dapat disiapkan. Coba lagi.'
+        }
+      } else {
+        downloadError.value = 'PDF laporan belum dapat disiapkan. Coba lagi.'
+      }
+      if (response.status === 409) reportRevisionStale.value = true
+      return
+    }
+
+    const contentType = response.headers.get('content-type')?.split(';', 1)[0]?.trim().toLowerCase()
+    if (contentType !== 'application/pdf') throw new Error('Respons bukan berkas PDF.')
+    const blob = await response.blob()
+    if (!blob.size || await blob.slice(0, 5).text() !== '%PDF-') throw new Error('Isi PDF belum lengkap.')
+    if (currentSelection !== selectionKey.value || currentPaper !== paperSize.value) return
+
+    const filenamePeriod = mode.value === 'month' ? selectedMonth.value : 'semester'
+    const filename = `laporan-absensi-${semester.id.replace(/[^a-f\d]/gi, '').slice(0, 8).toLowerCase()}-${filenamePeriod}.pdf`
+    const objectUrl = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = objectUrl
+    link.download = filename
+    link.hidden = true
+    document.body.append(link)
+    link.click()
+    link.remove()
+    window.setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000)
+    downloadStatus.value = 'Unduhan PDF dimulai di browser.'
+  } catch (error) {
+    downloadError.value = getApiMessage(error, 'Belum berhasil menyiapkan PDF. Coba lagi.')
+  } finally {
+    isDownloading.value = false
+  }
 }
 </script>
 
@@ -224,7 +345,7 @@ function statusDescription(status: AttendanceStatus): string {
 
     <template v-else-if="hasLoaded && selectedSemester">
       <form class="content-card report-controls" @submit.prevent="loadReport">
-        <fieldset class="report-field report-mode-field">
+        <fieldset class="report-field report-mode-field" :disabled="isLoadingReport || isDownloading">
           <legend>Jenis laporan</legend>
           <div class="report-choice-row report-mode-options">
             <label class="report-choice" :class="{ 'report-choice-selected': mode === 'month' }">
@@ -240,7 +361,7 @@ function statusDescription(status: AttendanceStatus): string {
 
         <div class="report-field">
           <label for="report-semester">Semester</label>
-          <select id="report-semester" v-model="selectedSemesterId" :disabled="isLoadingReport || isInitialLoading" @change="onSemesterChange">
+          <select id="report-semester" v-model="selectedSemesterId" :disabled="isLoadingReport || isDownloading || isInitialLoading" @change="onSemesterChange">
             <option v-for="semester in semesters" :key="semester.id" :value="semester.id">
               {{ semesterLabel(semester) }} · {{ semester.status === 'active' ? 'Aktif' : 'Arsip' }}
             </option>
@@ -249,12 +370,12 @@ function statusDescription(status: AttendanceStatus): string {
 
         <div v-if="mode === 'month'" class="report-field">
           <label for="report-month">Bulan</label>
-          <select id="report-month" v-model="selectedMonth" :disabled="isLoadingReport || monthOptions.length === 0">
+          <select id="report-month" v-model="selectedMonth" :disabled="isLoadingReport || isDownloading || monthOptions.length === 0">
             <option v-for="month in monthOptions" :key="month" :value="month">{{ formatMonth(month) }}</option>
           </select>
         </div>
 
-        <fieldset class="report-field report-paper-field">
+        <fieldset class="report-field report-paper-field" :disabled="isDownloading">
           <legend>Ukuran kertas · mendatar</legend>
           <div class="report-choice-row report-paper-options">
             <label v-for="paper in paperSizes" :key="paper.value" class="report-choice report-paper-choice" :class="{ 'report-choice-selected': paperSize === paper.value }">
@@ -266,14 +387,24 @@ function statusDescription(status: AttendanceStatus): string {
         </fieldset>
 
         <div class="report-control-actions">
-          <button class="primary-button report-show-button" type="submit" :disabled="!canLoadReport || isLoadingReport">
+          <button class="primary-button report-show-button" type="submit" :disabled="!canLoadReport || isLoadingReport || isDownloading">
             {{ isLoadingReport ? 'Memuat laporan…' : 'Tampilkan laporan' }}
           </button>
-          <button class="secondary-button report-print-button" type="button" :disabled="!canPrint" @click="printReport">
+          <button class="secondary-button report-print-button" type="button" :disabled="!canPrint || isDownloading" @click="printReport">
             {{ mode === 'semester' ? 'Cetak semester' : 'Cetak laporan' }}
+          </button>
+          <button class="primary-button report-download-button" type="button" :disabled="!canDownload" @click="downloadReport">
+            {{ isDownloading ? 'Menyiapkan PDF…' : 'Unduh PDF' }}
           </button>
         </div>
       </form>
+
+      <div v-if="downloadError" class="form-error report-message" role="alert">
+        <span>{{ downloadError }}</span>
+        <button v-if="reportRevisionStale" class="text-button" type="button" :disabled="isLoadingReport" @click="loadReport">Tampilkan ulang laporan</button>
+        <button v-else class="text-button" type="button" :disabled="isDownloading" @click="downloadReport">Coba lagi</button>
+      </div>
+      <p v-if="downloadStatus" class="report-download-status" role="status" aria-live="polite">{{ downloadStatus }}</p>
 
       <p v-if="isLoadingReport" class="report-loading" role="status" aria-live="polite">Memuat laporan…</p>
       <div v-else-if="reportError" class="form-error report-message" role="alert">
@@ -285,41 +416,29 @@ function statusDescription(status: AttendanceStatus): string {
       <template v-if="hasCurrentReport && report">
         <p v-if="!hasStudents" class="content-card report-no-students" role="status">Tidak ada siswa pada periode ini.</p>
 
-        <section v-else class="report-preview" aria-label="Pratinjau laporan">
+        <section v-else-if="selectedPlan" class="report-preview" aria-label="Pratinjau laporan">
           <div class="report-preview-heading">
             <div>
               <p class="eyebrow">Pratinjau</p>
-              <h2>{{ mode === 'semester' ? `Laporan semester · ${semesterLabel(report.semester)}` : `Laporan bulanan · ${formatMonth(report.months[0]?.month ?? selectedMonth)}` }}</h2>
+              <h2>{{ mode === 'semester' ? `Laporan semester · ${semesterLabel(report.semester)}` : `Laporan bulanan · ${formatMonth(report.months[0]?.month ?? selectedMonth)}` }} · {{ paperSizes.find((paper) => paper.value === paperSize)?.label }}</h2>
             </div>
-            <p class="report-scroll-note">Geser tabel ke samping untuk melihat seluruh tanggal dan jumlah.</p>
+            <p class="report-scroll-note">Geser halaman ke samping untuk melihat ukuran kertas penuh.</p>
           </div>
 
-          <article
-            v-for="(month, monthIndex) in report.months"
-            :key="month.month"
-            class="report-sheet"
-          >
-            <header class="report-sheet-heading">
-              <div>
-                <p class="eyebrow">{{ report.semester.schoolName }}<span v-if="report.semester.className"> · {{ report.semester.className }}</span></p>
-                <h3>{{ formatMonth(month.month) }}</h3>
-              </div>
-              <p>{{ semesterLabel(report.semester) }} · {{ report.semester.status === 'closed' ? 'Arsip' : 'Aktif' }}</p>
-            </header>
-            <p class="report-table-note">Hari libur, di luar masa terdaftar atau periode, serta tanggal tanpa catatan tetap kosong.</p>
-            <div class="report-table-wrap" tabindex="0" :aria-label="`Tabel laporan ${formatMonth(month.month)}. Geser mendatar untuk melihat seluruh kolom.`">
-              <table class="report-table">
-                <caption class="visually-hidden">Laporan absensi {{ formatMonth(month.month) }} — {{ report.semester.schoolName }}, {{ report.semester.className }}</caption>
+          <div v-for="(previewPage, pageIndex) in previewPages" :key="`${previewPage.page.month}-${previewPage.page.pageInMonth}`" class="report-sheet-viewport">
+            <article class="report-sheet" :class="{ 'report-sheet-last': pageIndex === previewPages.length - 1 }" :style="sheetStyle(selectedPlan)">
+              <header class="report-sheet-heading">
+                <p v-for="(part, partIndex) in previewPage.page.headingParts" :key="`${part.kind}-${partIndex}`" class="report-heading-part" :class="`report-heading-${part.kind}`" :style="{ fontSize: `${part.fontSizePt}pt`, lineHeight: `${part.lineHeightPt}pt`, fontWeight: part.fontWeight, marginTop: `${part.gapBeforePt}pt`, marginBottom: `${part.gapAfterPt}pt` }">
+                  <span v-for="(line, lineIndex) in part.lines" :key="lineIndex">{{ line }}</span>
+                </p>
+              </header>
+              <table class="report-table" :style="{ width: `${selectedPlan.contentWidthPt}pt` }">
+                <caption class="visually-hidden">Laporan absensi {{ formatMonth(previewPage.month.month) }} — {{ report.semester.schoolName }}, {{ report.semester.className }}</caption>
                 <colgroup>
-                  <col class="report-col-number">
-                  <col class="report-col-name">
-                  <col class="report-col-student-number">
-                  <col class="report-col-gender">
-                  <col v-for="day in month.days" :key="day.day" class="report-col-day">
-                  <col v-for="status in ['S', 'I', 'A']" :key="status" class="report-col-total">
+                  <col v-for="(width, columnIndex) in selectedPlan.columnWidthsPt" :key="columnIndex" :style="columnStyle(selectedPlan, columnIndex)">
                 </colgroup>
                 <thead>
-                  <tr>
+                  <tr :style="{ height: `${previewPage.page.tableHeaderRowHeightsPt[0]}pt` }">
                     <th rowspan="2" scope="col">No.</th>
                     <th rowspan="2" scope="col">Nama siswa</th>
                     <th rowspan="2" scope="col">NIPD</th>
@@ -327,8 +446,8 @@ function statusDescription(status: AttendanceStatus): string {
                     <th colspan="31" scope="colgroup">Tanggal</th>
                     <th colspan="3" scope="colgroup">Jumlah</th>
                   </tr>
-                  <tr>
-                    <th v-for="day in month.days" :key="day.day" scope="col" :aria-label="day.date ? `Tanggal ${day.day} ${formatMonth(month.month)}` : undefined">
+                  <tr :style="{ height: `${previewPage.page.tableHeaderRowHeightsPt[1]}pt` }">
+                    <th v-for="day in previewPage.month.days" :key="day.day" scope="col" :aria-label="day.date ? `Tanggal ${day.day} ${formatMonth(previewPage.month.month)}` : undefined">
                       {{ day.day }}
                     </th>
                     <th scope="col">S</th>
@@ -337,23 +456,20 @@ function statusDescription(status: AttendanceStatus): string {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="(row, rowIndex) in month.rows" :key="row.membershipId">
-                    <td class="report-row-number">{{ rowIndex + 1 }}</td>
-                    <th class="report-student-name" scope="row">{{ row.name }}</th>
-                    <td class="report-student-number">{{ row.studentNumber ?? '' }}</td>
-                    <td>{{ row.gender ?? '' }}</td>
-                    <td v-for="(cell, cellIndex) in row.cells" :key="cellIndex" :aria-label="cell ? statusDescription(cell) : undefined">{{ cell ?? '' }}</td>
-                    <td>{{ row.totals.S }}</td>
-                    <td>{{ row.totals.I }}</td>
-                    <td>{{ row.totals.A }}</td>
-                  </tr>
-                  <tr v-if="month.rows.length === 0" class="report-empty-month-row">
-                    <td colspan="38">Tidak ada siswa pada periode ini.</td>
+                  <tr v-for="entry in previewPage.rows" :key="entry.row.membershipId" :style="{ height: `${entry.layout.heightPt}pt`, lineHeight: `${entry.layout.lineHeightPt}pt` }">
+                    <td class="report-row-number">{{ entry.layout.rowIndex + 1 }}</td>
+                    <th class="report-student-name" scope="row"><span v-for="(line, lineIndex) in entry.layout.nameLines" :key="lineIndex">{{ line }}</span></th>
+                    <td class="report-student-number"><span v-for="(line, lineIndex) in entry.layout.studentNumberLines" :key="lineIndex">{{ line }}</span></td>
+                    <td>{{ entry.row.gender ?? '' }}</td>
+                    <td v-for="(cell, cellIndex) in entry.row.cells" :key="cellIndex" :aria-label="cell ? statusDescription(cell) : undefined">{{ cell ?? '' }}</td>
+                    <td>{{ entry.row.totals.S }}</td>
+                    <td>{{ entry.row.totals.I }}</td>
+                    <td>{{ entry.row.totals.A }}</td>
                   </tr>
                 </tbody>
               </table>
-            </div>
-          </article>
+            </article>
+          </div>
         </section>
       </template>
     </template>
@@ -377,13 +493,13 @@ function statusDescription(status: AttendanceStatus): string {
 .report-paper-options { flex-wrap: wrap; }
 .report-paper-choice { min-width: 74px; }
 .report-paper-choice small { display: block; margin-top: 3px; font-size: 10px; font-weight: 400; line-height: 1.25; }
-.report-control-actions { display: flex; gap: 8px; }
+.report-control-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .report-control-actions button { width: auto; min-width: 132px; min-height: 46px; margin: 0; white-space: nowrap; }
 .report-show-button { padding-inline: 13px; }
-.report-print-button:disabled { opacity: .55; cursor: not-allowed; }
+.report-control-actions button:disabled { opacity: .55; cursor: not-allowed; }
 .report-message { display: flex; align-items: center; gap: 8px; margin: 15px 0; }
 .report-message .text-button { padding-inline: 0; text-decoration: underline; }
-.report-loading, .report-idle-note { margin: 20px 0; color: #536b65; font-size: 14px; }
+.report-loading, .report-idle-note, .report-download-status { margin: 20px 0; color: #536b65; font-size: 14px; }
 .report-empty-state, .report-no-students { max-width: 780px; margin: 19px auto; padding: 35px 24px; text-align: center; }
 .report-empty-state h2 { margin: 0; font-size: 19px; }
 .report-empty-state p, .report-no-students { color: #536b65; font-size: 14px; line-height: 1.5; }
@@ -392,26 +508,21 @@ function statusDescription(status: AttendanceStatus): string {
 .report-preview-heading { display: flex; align-items: end; justify-content: space-between; gap: 18px; margin-bottom: 15px; }
 .report-preview-heading h2 { margin: 4px 0 0; font-size: 20px; line-height: 1.3; }
 .report-scroll-note { margin: 0; color: #536b65; font-size: 12px; }
-.report-sheet { margin: 0 0 22px; padding: 21px 20px 18px; background: #fff; border: 1px solid #d8e4e0; border-radius: 15px; }
-.report-sheet-heading { display: flex; align-items: end; justify-content: space-between; gap: 18px; margin-bottom: 8px; }
-.report-sheet-heading .eyebrow { margin: 0; }
-.report-sheet-heading h3 { margin: 4px 0 0; font-size: 19px; line-height: 1.25; }
-.report-sheet-heading > p { margin: 0; color: #536b65; font-size: 12px; text-align: right; }
-.report-table-note { margin: 0 0 12px; color: #536b65; font-size: 12px; line-height: 1.4; }
-.report-table-wrap { max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; border: 1px solid #9daaa5; }
-.report-table { width: 100%; min-width: 1870px; table-layout: fixed; border-collapse: collapse; color: #172d29; background: #fff; font-size: 11px; text-align: center; }
-.report-table th, .report-table td { height: 31px; padding: 5px 4px; border: 1px solid #aebbb6; line-height: 1.25; }
-.report-table thead th { color: #304d46; background: #f2f5f4; font-size: 10px; font-weight: 700; }
-.report-table thead tr:first-child th { height: 34px; }
-.report-col-number { width: 44px; }
-.report-col-name { width: 225px; }
-.report-col-student-number { width: 120px; }
-.report-col-gender { width: 52px; }
-.report-col-day { width: 42px; }
-.report-col-total { width: 48px; }
-.report-row-number, .report-student-number { color: #536b65; }
-.report-student-name { min-width: 0; text-align: left; overflow-wrap: anywhere; white-space: normal; }
-.report-empty-month-row td { height: 50px; color: #536b65; text-align: left; }
+.report-sheet-viewport { max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; margin: 0 0 18px; padding: 2px 0 8px; }
+.report-sheet { box-sizing: border-box; margin: 0 auto; overflow: hidden; color: #111; background: #fff; box-shadow: 0 8px 24px #193c3022; font-family: Helvetica, Arial, sans-serif; }
+.report-sheet-heading { margin: 0; }
+.report-heading-part { margin-left: 0; margin-right: 0; white-space: normal; }
+.report-heading-part span, .report-student-name span, .report-student-number span { display: block; white-space: pre; }
+.report-heading-school, .report-heading-title { color: #172d29; }
+.report-heading-semester, .report-heading-note { color: #304d46; }
+.report-table { box-sizing: border-box; table-layout: fixed; border-collapse: collapse; color: #111; background: #fff; font-size: 6pt; text-align: center; }
+.report-table th, .report-table td { box-sizing: border-box; height: auto; padding: 0 2.4pt; border: .32pt solid #333; line-height: 7.2pt; overflow: hidden; }
+.report-table thead th { padding: 0 1pt; color: #111; background: #eef2f1; font-size: 5.6pt; font-weight: 700; }
+.report-table thead tr { height: auto; }
+.report-table thead th[rowspan="2"] { vertical-align: middle; }
+.report-row-number, .report-student-number { color: #304d46; }
+.report-student-name { text-align: left; font-weight: 400; }
+.report-table caption { font-size: 0; }
 
 @media (max-width: 1180px) {
   .report-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -435,10 +546,7 @@ function statusDescription(status: AttendanceStatus): string {
   .report-control-actions button { width: 100%; min-width: 0; padding-inline: 8px; font-size: 13px; }
   .report-preview-heading { align-items: flex-start; flex-direction: column; }
   .report-preview-heading h2 { font-size: 18px; }
-  .report-sheet { padding: 16px 13px 13px; border-radius: 13px; }
-  .report-sheet-heading { align-items: flex-start; flex-direction: column; gap: 5px; }
-  .report-sheet-heading > p { text-align: left; }
-  .report-table-note { font-size: 11px; }
+  .report-sheet-viewport { margin-bottom: 12px; }
   .report-empty-state, .report-no-students { padding: 27px 19px; }
 }
 
@@ -446,32 +554,17 @@ function statusDescription(status: AttendanceStatus): string {
   html, body, #__nuxt { min-width: 0 !important; min-height: 0 !important; background: #fff !important; }
   body { margin: 0 !important; }
   .app-shell { min-height: 0 !important; padding: 0 !important; }
-  .app-header, .report-page-heading, .report-controls, .report-loading, .report-idle-note, .report-preview-heading, .report-scroll-note, .report-empty-state, .report-no-students, .report-message { display: none !important; }
+  .app-header, .report-page-heading, .report-controls, .report-loading, .report-idle-note, .report-preview-heading, .report-scroll-note, .report-empty-state, .report-no-students, .report-message, .report-download-status { display: none !important; }
   .reports-page { width: 100% !important; max-width: none !important; margin: 0 !important; padding: 0 !important; }
   .report-preview { display: block !important; margin: 0 !important; }
-  .report-sheet { width: 100% !important; min-width: 0 !important; margin: 0 !important; padding: 0 !important; overflow: visible !important; color: #000 !important; background: #fff !important; border: 0 !important; border-radius: 0 !important; break-inside: auto; page-break-inside: auto; }
-  .report-sheet + .report-sheet { break-before: page; page-break-before: always; }
-  .report-sheet-heading { display: flex !important; align-items: end !important; justify-content: space-between !important; margin: 0 0 2mm !important; color: #000 !important; break-after: avoid-page; page-break-after: avoid; }
-  .report-sheet-heading .eyebrow, .report-sheet-heading > p, .report-sheet-heading h3, .report-table-note { color: #000 !important; }
-  .report-sheet-heading h3 { margin-top: 1mm !important; font-size: 11pt !important; }
-  .report-sheet-heading .eyebrow, .report-sheet-heading > p { font-size: 7pt !important; }
-  .report-table-note { margin: 0 0 2mm !important; font-size: 6.5pt !important; }
-  .report-table-wrap { width: 100% !important; max-width: none !important; overflow: visible !important; border: 0 !important; }
-  .report-table { width: 100% !important; min-width: 0 !important; table-layout: fixed !important; color: #000 !important; font-size: 6pt !important; }
-  .report-table th, .report-table td { height: auto !important; padding: 1.15mm 0.35mm !important; color: #000 !important; background: #fff !important; border: 0.2mm solid #333 !important; line-height: 1.15 !important; }
+  .report-sheet-viewport { width: auto !important; max-width: none !important; overflow: visible !important; margin: 0 !important; padding: 0 !important; }
+  .report-sheet { margin: 0 !important; box-shadow: none !important; break-inside: avoid-page; page-break-inside: avoid; }
+  .report-sheet:not(.report-sheet-last) { break-after: page; page-break-after: always; }
+  .report-table { break-inside: avoid-page; page-break-inside: avoid; }
   .report-table thead { display: table-header-group !important; }
-  .report-table thead th { color: #000 !important; background: #eee !important; font-size: 5.6pt !important; font-weight: 700 !important; }
-  .report-table thead tr:first-child th { height: 6mm !important; }
-  .report-col-number { width: 6mm !important; }
-  .report-col-name { width: 45mm !important; }
-  .report-col-student-number { width: 18mm !important; }
-  .report-col-gender { width: 7mm !important; }
-  .report-col-day { width: 5mm !important; }
-  .report-col-total { width: 6mm !important; }
-  .report-student-name { text-align: left !important; overflow-wrap: anywhere !important; white-space: normal !important; }
   .report-table tbody tr { break-inside: avoid !important; page-break-inside: avoid !important; }
-  .report-empty-month-row { display: none !important; }
-  .report-table caption { color: #000 !important; }
+  .report-heading-school, .report-heading-title, .report-heading-semester, .report-heading-note,
+  .report-table th, .report-table td { color: #000 !important; }
   * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
 }
 </style>

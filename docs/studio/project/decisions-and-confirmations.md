@@ -1,15 +1,17 @@
 # Keputusan dan Konfirmasi LAB-002
 
 Pemilik catatan: Project Manager. Tanggal: 2026-10-11.
-Sumber kebutuhan: [PRD](<D:/ayaa-wae-studio/products/PROD-002-product-prd-v1.md>); sumber izin mulai: [registry](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/README.md#persetujuan>).
+Sumber kebutuhan: [PRD](../../products/PROD-002-product-prd-v1.md); sumber izin mulai: [registry](README.md#persetujuan).
 
 Pilihan belum dijawab tetap OPEN. Rekomendasi bukan keputusan. Konfirmasi disampaikan melalui dialog; urutkan sesuai tahap, jangan menghentikan pekerjaan independen.
+
+Pembaruan acuan15Oktober2026: peta OPEN bertanggal11Oktober di bawah adalah riwayat sebelum delegasi lokal12Oktober. Untuk C05 pada implementasi lokal, aturan blank/header/paper/PDF telah ditetapkan PM melalui [kontrak lokal](local-delivery-contract-v1.md), sesuai catatan penetapan kontrak12Oktober pada dokumen ini. Ini keputusan PM dalam delegasi, bukan approval Ardy per detail atau izin cloud. Task REP-001C memperjelas layout bersama agar browser/PDF mempertahankan baris, header dan pemisah halaman sama; kebutuhan logo tetap dependency terpisah.
 
 ## C01 — Stack aplikasi
 
 Keputusan aktif: Nuxt/Vue full-stack dalam satu aplikasi, hosting Vercel. Sumber: jawaban dialog Ardy “Ganti ke Nuxt/Vue full-stack (rekomendasi PM)”, 11 Oktober 2026. Menggantikan pilihan Laravel + Inertia/Vue sebelumnya karena target hosting. Versi/runtime, database, auth, storage, paket Excel/PDF dan biaya belum dipilih. Tidak memberi izin setup/assignment/deploy. Desain UI-001 APPROVED/CLOSED tetap acuan.
 
-Riwayat: Laravel + Inertia/Vue sempat disetujui; pilihan tersebut kini digantikan. [Perbandingan](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/stack-vercel-comparison.md>). Tabel rekomendasi awal di bawah adalah riwayat sebelum hosting Vercel ditetapkan.
+Riwayat: Laravel + Inertia/Vue sempat disetujui; pilihan tersebut kini digantikan. [Perbandingan](stack-vercel-comparison.md). Tabel rekomendasi awal di bawah adalah riwayat sebelum hosting Vercel ditetapkan.
 
 | Pilihan | Cara kerja | Trade-off untuk LAB-002 |
 |---|---|---|
@@ -43,7 +45,7 @@ C03–C08 tidak harus dijawab sebelum semua planning berjalan. Jawaban wajib seb
 
 - PM planning diterima pada chat utama dari pesan “Gunakan peran Project Manager dan jalankan planning dari handoff LAB-002”. Tidak ada subagent PM; Executor UI-001 kini telah didispatch sesuai keputusan terbaru.
 - Scope fitur v1 dan R01–R15 sudah disetujui; tidak perlu diminta ulang.
-- Ardy menjawab “Belum assignment; aku ingin membaca task dahulu” pada dialog UI-001, 11 Oktober 2026. Ini posisi historis sebelum pesan berikutnya. Ardy kemudian menyetujui assignment Codex subagent gpt-6.1-sol/high; [assignment](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/tasks/LAB002-UI-001-assignment.md>) kini ASSIGNED dengan handle /root/lab002_ui001.
+- Ardy menjawab “Belum assignment; aku ingin membaca task dahulu” pada dialog UI-001, 11 Oktober 2026. Ini posisi historis sebelum pesan berikutnya. Ardy kemudian menyetujui assignment Codex subagent gpt-6.1-sol/high; [assignment](tasks/LAB002-UI-001-assignment.md) kini ASSIGNED dengan handle /root/lab002_ui001.
 - Desain awal harus direview Ardy sebelum implementasi terkait; approval task desain bukan approval hasil desain.
 - Memilih stack tidak mengizinkan coding seluruh backlog, layanan berbayar, commit/push, production atau publikasi.
 
@@ -62,7 +64,7 @@ Setelah jawaban tersedia, PM mencatat sumber, memperbarui PRD bila flow produk b
 
 ## Pembaruan hasil UI-001 — 11 Oktober 2026
 
-Executor selesai menyerahkan sembilan SVG/PNG dan laporan. PM memeriksa semua PNG serta AC; status terbaru READY_FOR_ARDY_REVIEW, next owner Ardy. [Catatan desain](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/design/LAB002-UI-001/README.md>), [review PM](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/reports/LAB002-UI-001-pm-review.md>). Pernyataan pekerjaan berjalan di atas adalah posisi sebelum hasil kembali. Approval desain/closure dan implementasi belum dilakukan.
+Executor selesai menyerahkan sembilan SVG/PNG dan laporan. PM memeriksa semua PNG serta AC; status terbaru READY_FOR_ARDY_REVIEW, next owner Ardy. [Catatan desain](design/LAB002-UI-001/README.md), [review PM](reports/LAB002-UI-001-pm-review.md). Pernyataan pekerjaan berjalan di atas adalah posisi sebelum hasil kembali. Approval desain/closure dan implementasi belum dilakukan.
 
 ## Keputusan Ardy dan status terbaru
 
@@ -82,15 +84,15 @@ Keputusan aktif: Nuxt/Vue full-stack dalam satu aplikasi, hosting Vercel. Sumber
 Sumber: dua dialog lokasi/database, kemudian penyedia/baseline. Ardy menyetujui root app di folder registry, salinan terarah docs development dalam repo dan Git init lokal; commit/push tetap terpisah. App belum ada saat diperiksa PM.
 Nuxt 4 stabil + TypeScript, Node 24, npm/lockfile dan aplikasi minimal tanpa login/absensi/Excel/PDF disetujui. Rekomendasi patch Nuxt 4.6.1 diperiksa sumber resmi; preflight wajib kompatibilitas.
 Supabase dipilih untuk PostgreSQL; pemilihan Auth/Storage, provisioning/reset/akses C04 dan backup C08 tetap terbuka. Tidak ada layanan dibuat, region/plan/biaya/kredensial ditetapkan.
-[SET-001](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/tasks/LAB002-SET-001.md>) READY untuk fondasi lokal/config placeholders tanpa koneksi DB nyata. Tidak ASSIGNED. Provider credentials/ORM/schema bukan dependency scope ini, tetap dependency DATA/AUTH/OPS terkait. C02 path/Git lokal APPROVED; remote/branch strategy/commit/push belum diotorisasi.
+[SET-001](tasks/LAB002-SET-001.md) READY untuk fondasi lokal/config placeholders tanpa koneksi DB nyata. Tidak ASSIGNED. Provider credentials/ORM/schema bukan dependency scope ini, tetap dependency DATA/AUTH/OPS terkait. C02 path/Git lokal APPROVED; remote/branch strategy/commit/push belum diotorisasi.
 
 ## Assignment SET-001 — 11 Oktober 2026
 
-Ardy meminta assignment ke Codex subagent gpt-6.1-sol/high. [SET-001](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/tasks/LAB002-SET-001.md>) ASSIGNED, handle aktual /root/lab002_set001, tahap fondasi lokal sesuai brief; hasil/preflight belum tersedia saat dispatch. [Handoff](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/tasks/LAB002-SET-001-assignment.md>). Next owner Executor lalu PM untuk validation. Tidak ada izin commit/push/deploy/resource layanan.
+Ardy meminta assignment ke Codex subagent gpt-6.1-sol/high. [SET-001](tasks/LAB002-SET-001.md) ASSIGNED, handle aktual /root/lab002_set001, tahap fondasi lokal sesuai brief; hasil/preflight belum tersedia saat dispatch. [Handoff](tasks/LAB002-SET-001-assignment.md). Next owner Executor lalu PM untuk validation. Tidak ada izin commit/push/deploy/resource layanan.
 
 ## Hasil SET-001 — 11 Oktober 2026
 
-Fondasi Nuxt lokal selesai menurut laporan Executor, diperiksa PM terhadap AC dengan HTTP independen; status READY_FOR_ARDY_REVIEW. [Laporan Executor](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/reports/LAB002-SET-001-report.md>), [review PM](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/reports/LAB002-SET-001-pm-review.md>), [README aplikasi](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/app/README.md>). Next owner Ardy, approval PENDING. Repo app sudah init lokal; source/docs untracked, tanpa commit/remote/push/deploy. Supabase belum terhubung. Salinan docs app perlu sync keputusan/status sebelum task berikutnya; registry tetap authority.
+Fondasi Nuxt lokal selesai menurut laporan Executor, diperiksa PM terhadap AC dengan HTTP independen; status READY_FOR_ARDY_REVIEW. [Laporan Executor](reports/LAB002-SET-001-report.md), [review PM](reports/LAB002-SET-001-pm-review.md), [README aplikasi](app/README.md). Next owner Ardy, approval PENDING. Repo app sudah init lokal; source/docs untracked, tanpa commit/remote/push/deploy. Supabase belum terhubung. Salinan docs app perlu sync keputusan/status sebelum task berikutnya; registry tetap authority.
 
 ## Approval dan closure SET-001 — 11 Oktober 2026
 
@@ -114,11 +116,11 @@ Ardy: “untuk git kamu bisa init dan commit saja tanpa menambahkan remote”. P
 
 ## Delivery lokal dimulai 12 Oktober 2026
 
-PM menetapkan [kontrak lokal v1](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/local-delivery-contract-v1.md>) dari delegasi Ardy, menyelesaikan detail C03–C08 untuk local delivery. PostgreSQL16 cluster terisolasi, Postgres.js dan SQL migrations; tidak Supabase/cloud. [DATA-001](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/tasks/LAB002-DATA-001.md>) READY sebelum dispatch. Local browser validation PM diotorisasi.
+PM menetapkan [kontrak lokal v1](local-delivery-contract-v1.md) dari delegasi Ardy, menyelesaikan detail C03–C08 untuk local delivery. PostgreSQL16 cluster terisolasi, Postgres.js dan SQL migrations; tidak Supabase/cloud. [DATA-001](tasks/LAB002-DATA-001.md) READY sebelum dispatch. Local browser validation PM diotorisasi.
 
 ## Pengerjaan ditahan — 12 Oktober 2026
 
-Ardy meminta berhenti pada titik aman. AUTH001 ON_HOLD; perubahan belum selesai dipertahankan, tidak commit atau validation baru. UI002/DATA001 sudah CLOSED; commit8f41e86 terakhir. [Checkpoint](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/local-pause-checkpoint.md>). Tidak lanjut otomatis. Next owner PM setelah permintaan lanjut.
+Ardy meminta berhenti pada titik aman. AUTH001 ON_HOLD; perubahan belum selesai dipertahankan, tidak commit atau validation baru. UI002/DATA001 sudah CLOSED; commit8f41e86 terakhir. [Checkpoint](local-pause-checkpoint.md). Tidak lanjut otomatis. Next owner PM setelah permintaan lanjut.
 
 ## Resume AUTH-001 — 12 Oktober 2026
 
@@ -126,13 +128,13 @@ Ardy meminta melanjutkan task terhenti dari titik aman. AUTH001 ASSIGNED kembali
 
 ## Validasi AUTH-001 — 12 Oktober 2026
 
-Implementasi autentikasi sedang diperiksa PM. Uji browser portable Node pada PostgreSQL sementara lulus untuk login kosong/salah/valid, reload sesi, logout dan akses privat pada laptop serta viewport HP. Uji perangkat fisik belum dilakukan. Pengujian independen awal DATA lulus 6/6, tetapi AUTH timeout; acceptance ditahan dan revisi harness pengujian diminta. [Review/revisi PM](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/reports/LAB002-AUTH-001-pm-review.md>).
+Implementasi autentikasi sedang diperiksa PM. Uji browser portable Node pada PostgreSQL sementara lulus untuk login kosong/salah/valid, reload sesi, logout dan akses privat pada laptop serta viewport HP. Uji perangkat fisik belum dilakukan. Pengujian independen awal DATA lulus 6/6, tetapi AUTH timeout; acceptance ditahan dan revisi harness pengujian diminta. [Review/revisi PM](reports/LAB002-AUTH-001-pm-review.md).
 
 C04 diperjelas: logout hanya sesi perangkat itu; reset owner mencabut semua sesi. Keputusan PM menggunakan delegasi lokal Ardy, tanpa mengubah signup/provider/scope v1. Task AUTH belum diterima atau commit. Next owner Executor untuk hasil revisi lalu PM.
 
 ## AUTH-001 diterima PM — 12 Oktober 2026
 
-Task yang terhenti telah dilanjutkan dan CLOSED. PM menerima hasil berdasarkan delegasi lokal Ardy setelah source review, suite independen DATA 6/6 + AUTH 12/12, typecheck, output build Vercel/Node, browser laptop/viewport HP, login persisten dan CLI reset akun fiktif. Revisi timeout serta konfigurasi startup diselesaikan sebelum acceptance. [Review PM](<D:/ayaa-wae-studio/Labs/LAB-002-website-absensi-siswa/reports/LAB002-AUTH-001-pm-review.md>) memuat bukti dan batasnya.
+Task yang terhenti telah dilanjutkan dan CLOSED. PM menerima hasil berdasarkan delegasi lokal Ardy setelah source review, suite independen DATA 6/6 + AUTH 12/12, typecheck, output build Vercel/Node, browser laptop/viewport HP, login persisten dan CLI reset akun fiktif. Revisi timeout serta konfigurasi startup diselesaikan sebelum acceptance. [Review PM](reports/LAB002-AUTH-001-pm-review.md) memuat bukti dan batasnya.
 
 Aplikasi lokal tersedia di http://127.0.0.1:3000; login/logout sudah tersedia, pengisian absensi belum. Password akun lokal terbaru hanya pada app/.data/teacher-account.json setelah reset uji PM. Ini acceptance PM melalui delegasi, bukan uji/approval langsung Ardy. PM menyiapkan commit lokal tanpa remote/push/deploy. Status stop dan laporan sebelumnya merupakan riwayat. Next owner PM untuk readiness fitur berikut; belum assignment baru.
 

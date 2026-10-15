@@ -1,5 +1,9 @@
 # Titik berhenti aman LAB-002
 
+Status aktif — 16 Oktober 2026: REP-001C CLOSED, diterima PM melalui delegasi lokal Ardy sesudah review source, browser, unduhan PDF dan runtime hasil build. Laporan PDF bulanan/semester A4/F4/Letter tersedia pada source develop. Lihat [review PM](reports/LAB002-REP-001C-pm-review.md) dan [laporan Executor](reports/LAB002-REP-001C-report.md). Tidak push/deploy atau mengubah website online/data guru. Parent REP-001 tetap terbuka untuk logo privat/arsip logo dan bukti printer fisik. Next owner PM untuk menyiapkan dependency OPS; jangan mengulang task A/B/C atau memulihkan snapshot stop.
+
+Checkpoint historis yang sudah di-resume: 15 Oktober2026, REP-001C ON_HOLD atas permintaan Ardy. Executor sudah berhenti. Gunakan [checkpoint PDF](reports/LAB002-REP-001C-pause-2026-10-15.md) untuk empat berkas parsial, salinan/hash, batas verifikasi dan langkah resume. Tidak ada proses aktif, commit/push/deploy atau kelanjutan otomatis. Catatan12Oktober di bawah adalah riwayat, jangan dipakai untuk mengulang AUTH yang sudah selesai.
+
 Tanggal: 12 Oktober 2026. Sumber: Ardy “Hentikan dulu pengerjaan di titik yang aman”.
 Status pengerjaan: ditahan, tidak ada kelanjutan otomatis.
 

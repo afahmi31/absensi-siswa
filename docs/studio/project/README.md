@@ -1,10 +1,14 @@
 # Website Absensi Siswa
 
+Status aktif — 16 Oktober 2026: REP-001C CLOSED, diterima PM melalui delegasi lokal Ardy sesudah review source, browser, unduhan PDF dan runtime hasil build. Laporan PDF bulanan/semester A4/F4/Letter tersedia pada source develop. Lihat [review PM](reports/LAB002-REP-001C-pm-review.md) dan [laporan Executor](reports/LAB002-REP-001C-report.md). Tidak push/deploy atau mengubah website online/data guru. Parent REP-001 tetap terbuka untuk logo privat/arsip logo dan bukti printer fisik. Next owner PM untuk menyiapkan dependency OPS; jangan mengulang task A/B/C atau memulihkan snapshot stop.
+
 ID: LAB-002
 Produk: PROD-002
 Jenis: Labs — produk internal studio
 Klien: tidak berlaku
 Catatan dibuat: 2026-10-11
+
+**Riwayat stop15Oktober2026 (sudah dicabut):** REP-001C ON_HOLD atas permintaan Ardy. Executor berhenti, empat berkas parsial dipertahankan dan belum diverifikasi/commit. [Checkpoint melanjutkan](reports/LAB002-REP-001C-pause-2026-10-15.md). Tidak ada proses aktif atau kelanjutan otomatis; website online tidak diubah.
 Kondisi aktif diperbarui 15 Oktober 2026: pilot online telah dipakai guru untuk absensi, menurut konfirmasi Ardy 14 Oktober. Deployment terakhir yang tercatat adalah main c16bd4f; lihat [laporan deployment](reports/LAB002-PERF-001-deployment.md). Konfirmasi penggunaan tidak membuktikan semua state/perangkat atau menyelesaikan seluruh v1. Lihat [batas bukti pilot](reports/teacher-pilot-confirmation-2026-10-14.md). PM menerima [REP-001A](tasks/LAB002-REP-001A.md) model/API dan [REP-001B](tasks/LAB002-REP-001B.md) halaman laporan/pratinjau/cetak browser lokal melalui delegasi, setelah pengujian independen. Bukti dan batas pada [review B](reports/LAB002-REP-001B-pm-review.md). PDF nyata, logo dan bukti printer fisik tetap belum selesai; task induk REP-001 terbuka. Catatan kondisi lokal/cloud lama di bawah adalah riwayat, bukan kondisi aktif.
 
 ## Tujuan dan batas pekerjaan

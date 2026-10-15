@@ -1,6 +1,8 @@
 # Acuan lanjut LAB-002 — uji lokal absensi
 
-Checkpoint aktif terbaru berada pada bagian “Checkpoint aktif — 15 Oktober 2026” di akhir dokumen. Bagian bertanggal sebelumnya adalah riwayat.
+Status aktif — 16 Oktober 2026: REP-001C CLOSED, diterima PM melalui delegasi lokal Ardy sesudah review source, browser, unduhan PDF dan runtime hasil build. Laporan PDF bulanan/semester A4/F4/Letter tersedia pada source develop. Lihat [review PM](reports/LAB002-REP-001C-pm-review.md) dan [laporan Executor](reports/LAB002-REP-001C-report.md). Tidak push/deploy atau mengubah website online/data guru. Parent REP-001 tetap terbuka untuk logo privat/arsip logo dan bukti printer fisik. Next owner PM untuk menyiapkan dependency OPS; jangan mengulang task A/B/C atau memulihkan snapshot stop.
+
+Checkpoint STOP historis, sudah di-resume dan diselesaikan: [STOP REP-001C — 15 Oktober2026](reports/LAB002-REP-001C-pause-2026-10-15.md). Status ON_HOLD atas permintaan Ardy; tidak ada proses aktif/kelanjutan otomatis. Empat berkas parsial disimpan tanpa commit, belum diverifikasi. Bagian lain di bawah adalah riwayat dan bukan instruksi melanjutkan selama stop.
 
 ## Izin GitHub — 13 Oktober 2026
 

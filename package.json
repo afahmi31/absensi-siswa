@@ -38,12 +38,14 @@
     "@adonisjs/hash": "9.1.1",
     "nuxt": "4.6.1",
     "nuxt-auth-utils": "0.5.31",
+    "pdfkit": "0.20.2",
     "postgres": "3.4.9",
     "vue": "3.5.43",
     "vue-router": "5.4.0"
   },
   "devDependencies": {
     "@types/node": "24.19.2",
+    "@types/pdfkit": "0.17.6",
     "typescript": "5.9.3",
     "vue-tsc": "3.3.13"
   }

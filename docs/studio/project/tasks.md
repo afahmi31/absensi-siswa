@@ -1,6 +1,10 @@
 # Backlog Delivery LAB-002 v1
 
-## Kelanjutan aktif — 15 Oktober 2026
+Status aktif — 16 Oktober 2026: REP-001C CLOSED, diterima PM melalui delegasi lokal Ardy sesudah review source, browser, unduhan PDF dan runtime hasil build. Laporan PDF bulanan/semester A4/F4/Letter tersedia pada source develop. Lihat [review PM](reports/LAB002-REP-001C-pm-review.md) dan [laporan Executor](reports/LAB002-REP-001C-report.md). Tidak push/deploy atau mengubah website online/data guru. Parent REP-001 tetap terbuka untuk logo privat/arsip logo dan bukti printer fisik. Next owner PM untuk menyiapkan dependency OPS; jangan mengulang task A/B/C atau memulihkan snapshot stop.
+
+## Riwayat kelanjutan — 15 Oktober 2026
+
+Task aktif [REP-001C](tasks/LAB002-REP-001C.md) kini ON_HOLD atas permintaan STOP Ardy. Executor /root/lab002_rep_preflight gpt-6-luna/max sudah berhenti; perubahan parsial empat berkas dipertahankan tanpa commit, belum diverifikasi. [Checkpoint lengkap](reports/LAB002-REP-001C-pause-2026-10-15.md) mencatat salinan kode/hash, kontrak yang sudah diputuskan dan langkah resume. Tidak ada proses aktif atau kelanjutan otomatis. Main/website online tidak disentuh.
 
 Kelanjutan terbaru: REP-001B UI/pratinjau/cetak browser lokal CLOSED berdasarkan delegasi penerimaan PM, setelah pengujian browser dan render tiga ukuran; lihat [review PM](reports/LAB002-REP-001B-pm-review.md). Semester enam bulan dan48siswa menghasilkan12halaman Letter, bulanan2halaman masing-masing ukuran. PDF nyata/logo dan bukti printer fisik tetap belum selesai. Task induk REP-001 tetap terbuka; status draft B dalam riwayat di bawah sudah digantikan hasil ini.
 

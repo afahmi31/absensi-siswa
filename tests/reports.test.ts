@@ -7,6 +7,7 @@ import path from 'node:path'
 import { setTimeout as delay } from 'node:timers/promises'
 import { fileURLToPath } from 'node:url'
 import { test } from 'node:test'
+import type { AttendanceReport, AttendanceReportPaper } from '../app/types/attendance-report.ts'
 import postgres from 'postgres'
 import { Scrypt } from '@adonisjs/hash/drivers/scrypt'
 import { runMigrations } from '../server/database/migrate.mjs'
@@ -17,6 +18,7 @@ import { createSemester, closeSemester, getSemesterClosurePreview } from '../ser
 import { addStudentToSemester, createStudent } from '../server/database/repositories/students.ts'
 import { createSchool, createSchoolClass, updateSchoolForTeacher, updateSchoolClass } from '../server/database/repositories/schools.ts'
 import { getAttendanceReport } from '../server/database/repositories/reports.ts'
+import { buildAttendanceReportLayoutBundle, renderAttendanceReportPdf } from '../server/utils/report-export.ts'
 import { createTeacherAccount } from '../server/database/repositories/teacher-accounts.ts'
 import { saveSchoolRoutine, setCalendarException } from '../server/database/repositories/calendar.ts'
 import { startTemporaryPostgres } from './support/temporary-postgres.mjs'
@@ -26,6 +28,77 @@ const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const testRoot = path.join(appRoot, '.data', 'tests')
 const passwordHasher = new Scrypt({})
 const requestTimeoutMs = 5_000
+
+test('REP-001C shared layout plans and PDFKit output cover A4, custom F4, and Letter', async () => {
+  const daysFor = (year: number, month: number) => Array.from({ length: 31 }, (_, index) => {
+    const day = index + 1
+    const date = new Date(Date.UTC(year, month - 1, day))
+    const exists = date.getUTCMonth() === month - 1
+    return {
+      day,
+      date: exists ? `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}` : null,
+      inSemester: exists,
+      isSchoolDay: exists && date.getUTCDay() > 0 && date.getUTCDay() < 6,
+    }
+  })
+  const makeRow = (index: number) => ({
+    membershipId: `${String(index + 1).padStart(8, '0')}-0000-4000-8000-${String(index + 1).padStart(12, '0')}`,
+    name: index === 0 ? 'Siswa dengan nama yang cukup panjang untuk menguji pemenggalan baris laporan '.repeat(2) : `Siswa ${String(index + 1).padStart(2, '0')}`,
+    studentNumber: index % 4 === 0 ? null : `NIPD-${String(index + 1).padStart(3, '0')}`,
+    gender: index % 2 === 0 ? 'L' as const : 'P' as const,
+    cells: Array.from({ length: 31 }, (_, dayIndex) => dayIndex === 1 ? 'H' as const : dayIndex === 4 ? 'S' as const : null),
+    totals: { H: 1, S: 1, I: 0, A: 0 },
+  })
+  const rows = Array.from({ length: 48 }, (_, index) => makeRow(index))
+  const report: AttendanceReport = {
+    mode: 'semester',
+    semester: {
+      id: '11111111-1111-4111-8111-111111111111',
+      academicYear: '2024/2025',
+      term: 'ganjil',
+      startsOn: '2024-07-15',
+      endsOn: '2024-09-10',
+      status: 'active',
+      schoolName: 'Sekolah Sintetis untuk Uji PDF',
+      className: 'Kelas 6A',
+    },
+    months: [
+      { month: '2024-07', days: daysFor(2024, 7), rows },
+      { month: '2024-08', days: daysFor(2024, 8), rows: [] },
+      { month: '2024-09', days: daysFor(2024, 9), rows: rows.slice(0, 1) },
+    ],
+  }
+
+  const bundle = buildAttendanceReportLayoutBundle(report)
+  assert.equal(bundle.revision, buildAttendanceReportLayoutBundle(report).revision, 'revision excludes generated PDF metadata and stays deterministic')
+  assert.match(bundle.revision, /^[a-f\d]{64}$/)
+
+  for (const paper of ['a4', 'f4', 'letter'] as const satisfies readonly AttendanceReportPaper[]) {
+    const plan = bundle.plans[paper]
+    assert.equal(plan.columnWidthsPt.length, 38)
+    assert.ok(Math.abs(plan.columnWidthsPt.reduce((sum, width) => sum + width, 0) - plan.contentWidthPt) < 0.001)
+    assert.equal(plan.pages.some((page) => page.monthIndex === 1 && page.rows.length === 0), true,
+      'an empty month retains its heading/header page without a fabricated student row')
+    assert.deepEqual(
+      plan.pages.filter((page) => page.monthIndex === 0).flatMap((page) => page.rows.map((row) => row.membershipId)).sort(),
+      rows.map((row) => row.membershipId).sort(),
+      'pagination places every student exactly once for the month',
+    )
+
+    const pdf = await renderAttendanceReportPdf(bundle, paper)
+    assert.equal(pdf.subarray(0, 5).toString('ascii'), '%PDF-')
+    const source = pdf.toString('latin1')
+    assert.equal(source.match(/\/Type\s*\/Page\b/g)?.length, plan.pages.length)
+    if (paper === 'f4') {
+      assert.ok(Math.abs(plan.widthPt - 330 * 72 / 25.4) < 0.001, 'F4 width uses the approved custom 330 mm value')
+      assert.ok(Math.abs(plan.heightPt - 216 * 72 / 25.4) < 0.001, 'F4 height uses the approved custom 216 mm value')
+      const mediaBox = source.match(/\/MediaBox\s*\[\s*0\s+0\s+([\d.]+)\s+([\d.]+)\s*\]/)
+      assert.ok(mediaBox, 'F4 PDF exposes a page media box')
+      assert.ok(Math.abs(Number(mediaBox[1]) - plan.widthPt) < 0.001)
+      assert.ok(Math.abs(Number(mediaBox[2]) - plan.heightPt) < 0.001)
+    }
+  }
+})
 
 interface ReportFixture {
   teacherId: string
@@ -514,6 +587,69 @@ test('REP-001A protected report model keeps month cells, totals, archive metadat
       assert.equal(foreignBody.statusCode, unknownBody.statusCode)
       assert.equal(foreignBody.statusMessage, unknownBody.statusMessage, 'foreign and unknown semesters share the same safe error')
       assert.doesNotMatch(JSON.stringify(foreignBody), /Sekolah Guru Lain|postgres(?:ql)?:\/\/|select\s/i)
+    })
+
+    await t.test('layout and PDF endpoints preserve the report, empty state, revision, and safe response headers', async () => {
+      const getLayout = (semesterId: string, query: string, cookie = ownerCookie) => fetchLocal(
+        `${baseUrl}/api/reports/${semesterId}/layout?${query}`,
+        { headers: cookie ? { cookie } : {} },
+      )
+      const getPdf = (semesterId: string, query: string, cookie = ownerCookie) => fetchLocal(
+        `${baseUrl}/api/reports/${semesterId}/pdf?${query}`,
+        { headers: cookie ? { cookie } : { accept: 'application/pdf' } },
+      )
+
+      const unauthenticatedLayout = await getLayout(fixture!.semesterId, 'mode=month&month=2024-02', '')
+      assert.equal(unauthenticatedLayout.status, 401)
+      const unauthenticatedPdf = await getPdf(fixture!.semesterId, 'mode=month&month=2024-02&paper=f4', '')
+      assert.equal(unauthenticatedPdf.status, 401)
+
+      const layoutResponse = await getLayout(fixture!.semesterId, 'mode=month&month=2024-02')
+      assert.equal(layoutResponse.status, 200)
+      assert.equal(layoutResponse.headers.get('cache-control'), 'no-store')
+      assert.equal(layoutResponse.headers.get('x-content-type-options'), 'nosniff')
+      const bundle = await jsonResponse(layoutResponse) as Record<string, unknown>
+      const legacyResponse = await getReport(fixture!.semesterId, 'mode=month&month=2024-02')
+      assert.deepEqual((bundle.report as Record<string, unknown>), await jsonResponse(legacyResponse),
+        'layout GET wraps the existing A report model without changing its content')
+      assert.match(String(bundle.revision), /^[a-f\d]{64}$/)
+      const secondBundle = await jsonResponse(await getLayout(fixture!.semesterId, 'mode=month&month=2024-02')) as Record<string, unknown>
+      assert.equal(secondBundle.revision, bundle.revision, 'the same report creates a stable revision')
+      const plans = bundle.plans as Record<string, Record<string, unknown>>
+      assert.equal(Math.round(Number(plans.f4!.widthPt) * 10000) / 10000, 935.4331)
+      assert.equal(Math.round(Number(plans.f4!.heightPt) * 10000) / 10000, 612.2835)
+      assert.equal((plans.a4!.columnWidthsPt as unknown[]).length, 38)
+
+      const invalidPaper = await getPdf(fixture!.semesterId, 'mode=month&month=2024-02&paper=legal')
+      assert.equal(invalidPaper.status, 422)
+      const staleRevision = String(bundle.revision).startsWith('a') ? 'b' : 'a'
+      const stalePdf = await getPdf(fixture!.semesterId, `mode=month&month=2024-02&paper=f4&revision=${staleRevision.repeat(64)}`)
+      assert.equal(stalePdf.status, 409)
+      const badRevision = await getPdf(fixture!.semesterId, 'mode=month&month=2024-02&paper=f4&revision=old')
+      assert.equal(badRevision.status, 422)
+
+      const pdfResponse = await getPdf(fixture!.semesterId, `mode=month&month=2024-02&paper=f4&revision=${bundle.revision}`)
+      assert.equal(pdfResponse.status, 200)
+      assert.match(pdfResponse.headers.get('content-type') ?? '', /^application\/pdf(?:;|$)/i)
+      assert.match(pdfResponse.headers.get('content-disposition') ?? '', /^attachment; filename="laporan-absensi-[a-f\d]{8}-2024-02\.pdf"$/i)
+      assert.equal(pdfResponse.headers.get('cache-control'), 'no-store')
+      assert.equal(pdfResponse.headers.get('x-content-type-options'), 'nosniff')
+      const pdf = Buffer.from(await pdfResponse.arrayBuffer())
+      assert.ok(pdf.length > 100)
+      assert.equal(pdf.subarray(0, 5).toString('ascii'), '%PDF-')
+
+      const emptyLayoutResponse = await getLayout(fixture!.emptySemesterId, 'mode=semester')
+      assert.equal(emptyLayoutResponse.status, 200, 'the layout route returns an empty report to preserve the UI message')
+      const emptyBundle = await jsonResponse(emptyLayoutResponse) as Record<string, unknown>
+      assert.equal((emptyBundle.report as Record<string, unknown>).months instanceof Array, true)
+      assert.equal((emptyBundle.plans as Record<string, Record<string, unknown>>).f4!.pages instanceof Array, true)
+      const emptyPdf = await getPdf(fixture!.emptySemesterId, 'mode=semester&paper=f4')
+      assert.equal(emptyPdf.status, 422, 'PDF download is rejected when the full semester has no students')
+
+      const foreignLayout = await getLayout(foreignSemester.id, 'mode=semester')
+      assert.equal(foreignLayout.status, 404)
+      const foreignPdf = await getPdf(foreignSemester.id, 'mode=semester&paper=f4')
+      assert.equal(foreignPdf.status, 404)
     })
 
     const [afterReads] = await database<typeof beforeReads>`
