@@ -1,6 +1,6 @@
 {
-  "copiedAt": "2026-10-21T21:33:21.0677311Z",
-  "task": "LAB002-OPS-001B-READY_FOR_ARDY_REVIEW-managed-identity-pass",
+  "copiedAt": "2026-10-21T21:33:53.8041519Z",
+  "task": "LAB002-OPS-001B-CLOSED-Ardy-APPROVED",
   "authority": "Registry studio tetap sumber keputusan aktif. Salinan ini untuk penelusuran development.",
   "transformations": "Selected historic copies keep original sync mappings. Current local-trial snapshots normalize Markdown whitespace and link back to absolute registry sources. Hashes reflect saved copies.",
   "excluded": [
@@ -506,14 +506,14 @@
     {
       "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\tasks.md",
       "copy": "docs/studio/project/tasks.md",
-      "sourceSha256": "a7efbeda07ab7b348e8be3d4f16c22cc66381cc7af3319213e6b30cae2505a6b",
-      "copySha256": "a7efbeda07ab7b348e8be3d4f16c22cc66381cc7af3319213e6b30cae2505a6b"
+      "sourceSha256": "e95e4be23a7972b420525b633deb6854c6fe86232c3cceb9c55989ac0b5d944e",
+      "copySha256": "e95e4be23a7972b420525b633deb6854c6fe86232c3cceb9c55989ac0b5d944e"
     },
     {
       "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\resume-checkpoint.md",
       "copy": "docs/studio/project/resume-checkpoint.md",
-      "sourceSha256": "90a731810dd9ec35d926d0a04d71726200f98a1cfe2df648dee3483f50488309",
-      "copySha256": "90a731810dd9ec35d926d0a04d71726200f98a1cfe2df648dee3483f50488309"
+      "sourceSha256": "97958e460c210185251ec2949f904a56f590f6c265d9540953fa453b7ca0e9e7",
+      "copySha256": "97958e460c210185251ec2949f904a56f590f6c265d9540953fa453b7ca0e9e7"
     },
     {
       "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\local-pause-checkpoint.md",
@@ -632,8 +632,8 @@
     {
       "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\tasks\\LAB002-OPS-001B.md",
       "copy": "docs/studio/project/tasks/LAB002-OPS-001B.md",
-      "sourceSha256": "1291fabb6be28514e8a35d69a8c437c60f168ce0ef498d776431bae2c37abacb",
-      "copySha256": "1291fabb6be28514e8a35d69a8c437c60f168ce0ef498d776431bae2c37abacb"
+      "sourceSha256": "01ab06a0494472c7c9eb780c986abf3fd1eee328c153b088e3b9b5c0ef8c7a23",
+      "copySha256": "01ab06a0494472c7c9eb780c986abf3fd1eee328c153b088e3b9b5c0ef8c7a23"
     },
     {
       "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\reports\\LAB002-OPS-001B-preflight.md",
