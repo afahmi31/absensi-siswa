@@ -1,4 +1,8 @@
+Status terkini22Oktober2026: OPS-001B PM_VALIDATION. Suite PM independen14/14PASS; laporan/review tersedia. Jalur create managed belum terverifikasi (kemungkinan privilege data_directory); menunggu keputusan pemeriksaan read-only lokal. Tidak ada Executor aktif, data guru/cloud/push/deploy tidak disentuh. Baca reports/LAB002-OPS-001B-pm-review.md sebelum lanjut.
+
 # Acuan lanjut LAB-002 — uji lokal absensi
+
+Checkpoint aktif22Oktober2026: OPS-001B ASSIGNED implementasi kepada /root/ops_backup_preflight, gpt-6.1-sol/medium sesuai pilihan Ardy. Baca tasks/LAB002-OPS-001B.md; source developa1cab2d bersih sebelum penyiapan task. Pilihan Executor sudah diterima; preflight diterima dan kontrak implementasi PM sudah ditetapkan pada task. Tidak ulang OPS-A/REP atau mengakses data guru. Tidak push/deploy.
 
 Status aktif — 16 Oktober 2026: REP-001D CLOSED melalui review dan penerimaan PM lokal. Logo aktif/arsip telah terintegrasi pada pratinjau, cetak dan PDF; bukti pada reports/LAB002-REP-001D-pm-review.md. OPS-001A dan REP A–D tidak perlu diulang. Tidak push/deploy atau perubahan data guru/cloud. Sisa: backup/pemulihan aset OPS, provider storage production/Linux Vercel dan printer fisik, lalu QA/rilis sesuai scope.
 
