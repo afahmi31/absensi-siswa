@@ -8,6 +8,7 @@ import { resetTeacherAccountPassword } from '../server/auth/account-admin.ts'
 import { LocalSchoolLogoStorage } from '../server/utils/school-logo-storage.ts'
 import { APP_ROOT, TEST_ROOT, BACKUP_ROOT, LIMITS, directory, privateAcl, ownedDirectory, verifyOwned, cleanup, publish, writePrivate, readPrivate, strictJson, sha256, fail, inside } from './local-backup-files.mjs'
 import { connect, pgTool, connectionArgs, newCluster, verifyCluster, clusterConnection, destroyCluster, secret } from './local-backup-postgres.mjs'
+import { beginManagedIdentity, verifyManagedIdentity } from './local-backup-managed-identity.mjs'
 
 export const TABLES = Object.freeze(['teacher_accounts', 'schools', 'school_classes', 'semesters', 'students', 'semester_memberships', 'school_calendar_rules', 'calendar_exceptions', 'attendance_records', 'semester_archive_snapshots', 'audit_events', 'school_logo_assets'])
 const insertOrder = ['teacher_accounts', 'schools', 'school_classes', 'school_logo_assets', 'semesters', 'students', 'semester_memberships', 'school_calendar_rules', 'calendar_exceptions', 'attendance_records', 'semester_archive_snapshots', 'audit_events']
@@ -51,12 +52,12 @@ async function tableDigests(db) {
   }
   return result
 }
-export async function fixtureSource(capability) {
+export async function fixtureSource(capability, { identityGuard = false } = {}) {
   const state = await verifyCluster(capability)
   const logos = path.join(state.receipt.path, 'logos')
   await mkdir(logos, { recursive: true })
   const source = Object.freeze({})
-  sources.set(source, { kind: 'fixture', capability, logos, backupRoot: path.join(state.receipt.path, 'backups') })
+  sources.set(source, { kind: 'fixture', capability, logos, backupRoot: path.join(state.receipt.path, 'backups'), identityPolicy: identityGuard ? { root: state.dataDirectory, port: state.port, database: 'lab002_test', role: 'lab002_migrator', fixtureConfig: path.join(state.dataDirectory,'backup-config.conf') } : null })
   return source
 }
 export async function managedSource() {
@@ -68,19 +69,14 @@ export async function managedSource() {
   connectionArgs(data.migrationUrl)
   await pgTool('pg_ctl', ['-D', cluster, 'status'])
   const source = Object.freeze({})
-  sources.set(source, { kind: 'managed', url: data.migrationUrl, cluster, logos: path.join(APP_ROOT, '.data', 'uploads', 'school-logos'), backupRoot: BACKUP_ROOT })
+  sources.set(source, { kind: 'managed', url: data.migrationUrl, cluster, logos: path.join(APP_ROOT, '.data', 'uploads', 'school-logos'), backupRoot: BACKUP_ROOT, identityPolicy: { root: cluster, port: 55432, database: 'lab002_local', role: 'lab002_migrator' } })
   return source
 }
 async function sourceDetails(source) {
   const state = sources.get(source)
   if (!state) fail('source-capability')
   if (state.kind === 'fixture') return { ...state, url: await clusterConnection(state.capability) }
-  const db = connect(state.url)
-  try {
-    // This may require an existing read setting privilege. Never add a grant here.
-    const [row] = await db`select current_setting('data_directory') as directory, current_setting('server_version_num')::int as version, host(inet_server_addr()) as host, inet_server_port() as port, current_database() as db, current_user as role`
-    if (path.resolve(row.directory) !== state.cluster || Math.floor(row.version / 10000) !== 16 || row.host !== '127.0.0.1' || row.port !== 55432 || row.db !== 'lab002_local' || row.role !== 'lab002_migrator') fail('source-identity')
-  } catch { fail('managed-source-identity-or-privilege') } finally { await db.end({ timeout: 3 }) }
+  // SQL identity is checked on the reserved exporter, before any business read.
   return state
 }
 export async function fixturePaths(source) { const state = sources.get(source); if (state?.kind !== 'fixture') fail('fixture'); return { logos: state.logos, backups: state.backupRoot } }
@@ -143,14 +139,26 @@ export async function createBackup(source, { afterSnapshot, beforePublish, signa
   // Only this specific new backup directory; never change .data or upload ACLs.
   privateAcl(state.backupRoot)
   const receipt = await ownedDirectory(state.backupRoot, 'pending')
-  const db = connect(state.url)
+  let disconnected = false, failed = false
+  const db = connect(state.url, { onclose: () => { disconnected = true } })
+  let session, reserved, managedIdentity
   const abort=()=>{db.end({timeout:0}).catch(()=>{})}
   signal.addEventListener('abort',abort,{once:true})
   try {
-    const manifest = await db.begin('isolation level repeatable read read only', async (tx) => {
+    reserved = await db.reserve()
+    // postgres reserve() can still queue writes after its socket has closed.
+    // Refuse a dead exporter before touching that handler; never reconnect it.
+    const live = () => { if (disconnected) fail('exporter-disconnected') }
+    session = (strings, ...values) => { live(); return reserved(strings, ...values) }
+    session.unsafe = (...args) => { live(); return reserved.unsafe(...args) }
+    session.array = (...args) => { live(); return reserved.array(...args) }
+    await session.unsafe('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY')
+    const tx = session
+    const manifest = await (async () => {
       await tx`set local statement_timeout='120s'`
       await tx`set local lock_timeout='5s'`
       await tx`set local idle_in_transaction_session_timeout='300s'`
+      if (state.identityPolicy) managedIdentity = await beginManagedIdentity(tx, state.identityPolicy, signal)
       await verifyLedger(tx)
       const schema = await schemaDescriptor(tx)
       const [snapshot] = await tx`select pg_export_snapshot() as id`
@@ -164,7 +172,9 @@ export async function createBackup(source, { afterSnapshot, beforePublish, signa
       checkSignal(signal)
       const archive = path.join(receipt.path, 'database.dump')
       const connection = connectionArgs(state.url)
+      if (managedIdentity) await verifyManagedIdentity(managedIdentity, tx, signal)
       const dump = await pgTool('pg_dump', ['--format=custom', '--data-only', '--no-owner', '--no-acl', `--snapshot=${snapshot.id}`, '--lock-wait-timeout=5000', ...TABLES.map((table) => `--table=public.${table}`), ...connection.args], { env: connection.env, max: LIMITS.dump, signal })
+      if (managedIdentity) await verifyManagedIdentity(managedIdentity, tx, signal)
       await writePrivate(archive, dump)
       parseDump(await extracted(archive, receipt, signal), schema)
       await mkdir(path.join(receipt.path, 'assets'))
@@ -179,9 +189,15 @@ export async function createBackup(source, { afterSnapshot, beforePublish, signa
         await writePrivate(path.join(receipt.path, asset.path), bytes)
       }
       return { kind: 'lab002-local-backup', formatVersion: 1, postgresMajor: 16, createdAt: new Date().toISOString(), migrations: await ledger(tx), schema, authPolicy: 'reset-on-rehearsal-v1', dump: { path: 'database.dump', byteSize: dump.length, sha256: sha256(dump) }, assets, active, archived, tables: digests }
-    })
-    await verifyLedger(db)
-    if (!equal(manifest.schema, await schemaDescriptor(db))) fail('schema-changed')
+    })()
+    // The exporter remains alive through dump and asset reads. Keep the same
+    // reserved backend after COMMIT so final checks use a fresh catalog snapshot.
+    await session.unsafe('COMMIT')
+    await session.unsafe('BEGIN READ ONLY')
+    await session`set local statement_timeout='120s'`
+    await session`set local lock_timeout='5s'`
+    await verifyLedger(session)
+    if (!equal(manifest.schema, await schemaDescriptor(session))) fail('schema-changed')
     const manifestBytes = Buffer.from(json(manifest))
     if (manifestBytes.length > LIMITS.manifest) fail('manifest-limit')
     await writePrivate(path.join(receipt.path, 'manifest.json'), manifestBytes)
@@ -189,11 +205,18 @@ export async function createBackup(source, { afterSnapshot, beforePublish, signa
     await beforePublish?.(receipt.path)
     await validatePackage(receipt.path)
     checkSignal(signal)
+    if (managedIdentity) await verifyManagedIdentity(managedIdentity, session, signal)
+    await session.unsafe('COMMIT')
     const stamp = new Date().toISOString().replaceAll(/[-:]/g, '').replace(/\.\d{3}/, '')
     const id = `backup-${stamp}-${randomUUID()}`
     await publish(receipt, id)
     return { id, durationMs: Date.now() - started, tables: TABLES.length, assets: manifest.assets.length, bytes: manifest.dump.byteSize }
-  } catch (error) { await cleanup(receipt); throw error } finally { signal.removeEventListener('abort',abort); await db.end({ timeout: 3 }) }
+  } catch (error) { failed = true; await cleanup(receipt); throw error } finally {
+    // These transactions are read-only. Destroying our failed connection rolls
+    // them back without issuing SQL/release on a potentially dead reservation.
+    if (!failed && !disconnected) reserved?.release()
+    signal.removeEventListener('abort',abort); await db.end({ timeout: failed || disconnected ? 0 : 3 })
+  }
 }
 
 export async function validatePackage(root) {

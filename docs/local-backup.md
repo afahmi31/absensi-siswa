@@ -4,7 +4,7 @@ Alat owner: `scripts/local-backup.mjs`, Node.js24 dan binary PostgreSQL16 existi
 
 ## Status pekerjaan
 
-Implementasi dan verifikasi Executor pada fixture sintetis tersedia:14tes task dan5tes regresi storage lulus, typecheck serta build Vercel/Node pada salinan terisolasi lulus. Review PM dan penerimaan tetap langkah terpisah. Command create terhadap managed/data guru belum dijalankan pada task ini. Source local-db.mjs membuat migrator nonsuperuser tanpa pg_read_all_settings; guard pembacaan data_directory kemungkinan memblokir setup managed tersebut. Privilege source belum diperiksa langsung dan tidak ada izin menambah grant. **Create managed belum dinyatakan dapat dipakai atau tervalidasi.** Jangan menganggap hasil sintetis sebagai bukti operasi pada data guru atau production.
+Revisi identitas managed mengganti query privileged data_directory dengan bukti filesystem, proses dan endpoint Windows, serta satu sesi SQL read-only yang dipertahankan. Suite gabungan Executor pada source stabil lulus20/20, exit0; hash kode/tes sama sebelum dan sesudah run. Typecheck serta build Vercel/Node pada salinan terisolasi lulus; helper CLI/lifecycle terakhir tidak masuk bundle runtime dan diverifikasi suite tersebut. Hasil dan kegagalan antara dicatat di laporan managed-identity-report pada registry. Review PM dan penerimaan tetap langkah terpisah. Probe PM sebelumnya membuktikan role migrator managed tidak memiliki pg_read_all_settings dan query data_directory ditolak42501. Revisi ini tidak menambah hak tersebut. **Guard baru belum diprobe pada managed nyata dan create data guru belum dijalankan atau dinyatakan siap operasional.** Hasil sintetis tidak membuktikan operasi data guru/production.
 
 ## Command owner
 
@@ -13,7 +13,15 @@ node --experimental-strip-types scripts/local-backup.mjs create
 node --experimental-strip-types scripts/local-backup.mjs restore-test --backup=backup-<UTCstamp>-<uuid>
 ```
 
-`create` membaca metadata managed existing hanya setelah dipilih owner. Source wajib PostgreSQL16 loopback127.0.0.1:55432/lab002_local dan identitas cluster cocok. Jika privilege untuk membaca identitas server tidak tersedia, alat berhenti; jangan menambah grant sebagai workaround.
+`create` membaca metadata managed existing hanya setelah dipilih owner. Source wajib PostgreSQL16 loopback127.0.0.1:55432/lab002_local dan identitas cluster cocok. Jika bukti identitas tidak tersedia, alat berhenti; jangan menambah grant sebagai workaround.
+
+Guard mengikat root canonical, PG_VERSION, bytes/identitas postmaster.pid, pg_ctl status, executable PG16, argv -D, creation time proses, listener dan tuple TCP sesi, serta SQL database/role/owner/backend/server-start. Backend SQL harus anak langsung postmaster yang dibuktikan CIM. Seluruh bukti wajib cocok; OS query ditolak/null/hilang/ambigu, pergantian PID/proses/path/endpoint/binary dan sesi putus menggagalkan operasi. Tidak ada fallback ke nama proses atau port saja. Pengamatan OS berasal dari fixed Windows PowerShell dengan environment child dibersihkan, bounded output dan timeout; tidak meminta admin.
+
+Satu reserved backend memegang READ ONLY/exported snapshot sampai dump dan logo selesai. Guard diulang sebelum/sesudah dump dan sebelum publikasi; pemeriksaan akhir ledger/schema memakai transaksi read-only baru pada backend yang sama. Tidak ada reconnect/retry/baseline baru. Jika operasi gagal, koneksi read-only miliknya ditutup langsung agar cleanup tidak mengirim SQL pada socket mati.
+
+Timestamp postmaster.pid berpresisi detik dan ditulis lebih awal dari SQL server-start PG16. Require creation < akhir detik PID, PID <= SQLstart, creation <= SQLstart <= backendcreation; nilai mentah masing-masing tetap dipin exact. Pembandingan memakai100ns untuk CIM dan microsecond SQL, tanpa delta toleransi sembarang. System32 PowerShell menerima nlink1/2 karena servicing Windows; hanya reader fixed binary ini yang berbeda, dengan dev/ino/nlink/size/hash dipin. Binary PG, paket dan PID tetap nlink1.
+
+Guard membatasi race operasional, bukan transaksi atomik lintas OS/filesystem/DB. Owner/admin OS tepercaya adalah batas alat; administrator bermusuhan dapat mengubah proses/file/binary dan tidak tercakup. Akses CIM/NetTCPIP dapat berbeda antar akun atau service; kompatibilitas managed nyata masih belum diperiksa.
 
 Paket final berada di `app/.data/local-backups/`, privat dan ignored Git. Command tidak menerima parameter URL, target, output/path, --force atau flag tambahan. Simpan ID yang dikeluarkan command; nama sekolah/siswa dan credential tidak ditampilkan. Pending package bukan cadangan sukses.
 

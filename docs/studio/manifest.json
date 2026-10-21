@@ -1,6 +1,6 @@
 {
-  "copiedAt": "2026-10-21T21:01:34.0701678Z",
-  "task": "LAB002-OPS-001B-managed-identity-preflight-reviewed-awaiting-stage",
+  "copiedAt": "2026-10-21T21:31:07.6958725Z",
+  "task": "LAB002-OPS-001B-managed-identity-synthetic-validated",
   "authority": "Registry studio tetap sumber keputusan aktif. Salinan ini untuk penelusuran development.",
   "transformations": "Selected historic copies keep original sync mappings. Current local-trial snapshots normalize Markdown whitespace and link back to absolute registry sources. Hashes reflect saved copies.",
   "excluded": [
@@ -506,14 +506,14 @@
     {
       "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\tasks.md",
       "copy": "docs/studio/project/tasks.md",
-      "sourceSha256": "dd680daf14a4f9b8818783a1f9c9eb7b3dc2cb0670d20510e5c8bb3bfd66c657",
-      "copySha256": "dd680daf14a4f9b8818783a1f9c9eb7b3dc2cb0670d20510e5c8bb3bfd66c657"
+      "sourceSha256": "001eb9e247e41d8e78fd48c5b8d59d2b3822db221f0538fc120b46cf9c299142",
+      "copySha256": "001eb9e247e41d8e78fd48c5b8d59d2b3822db221f0538fc120b46cf9c299142"
     },
     {
       "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\resume-checkpoint.md",
       "copy": "docs/studio/project/resume-checkpoint.md",
-      "sourceSha256": "6b298756efe3593bbde24ff1156cbe79fceba4f829622ecbd8a0ab881efcd39a",
-      "copySha256": "6b298756efe3593bbde24ff1156cbe79fceba4f829622ecbd8a0ab881efcd39a"
+      "sourceSha256": "17b94b9266c67c166b9e96ba889c6272da9fe996566ffc8c0ef7e4e69e21e703",
+      "copySha256": "17b94b9266c67c166b9e96ba889c6272da9fe996566ffc8c0ef7e4e69e21e703"
     },
     {
       "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\local-pause-checkpoint.md",
@@ -632,8 +632,8 @@
     {
       "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\tasks\\LAB002-OPS-001B.md",
       "copy": "docs/studio/project/tasks/LAB002-OPS-001B.md",
-      "sourceSha256": "1ea5691454f4a459f4b6f0a80f29c6902c53ba1c70ab4792f7b4fb51dd1db3e0",
-      "copySha256": "1ea5691454f4a459f4b6f0a80f29c6902c53ba1c70ab4792f7b4fb51dd1db3e0"
+      "sourceSha256": "1de0c70105e6b8e6d9e17b3aa47b1634131178d255da3b96ecf20318e092262f",
+      "copySha256": "1de0c70105e6b8e6d9e17b3aa47b1634131178d255da3b96ecf20318e092262f"
     },
     {
       "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\reports\\LAB002-OPS-001B-preflight.md",
@@ -670,6 +670,18 @@
       "copy": "docs/studio/project/reports/LAB002-OPS-001B-managed-identity-pm-review.md",
       "sourceSha256": "a25bd0a89fffb146a5d2cbbcd25fa8018a0548e57cbcb3719361c2712ecb2d64",
       "copySha256": "a25bd0a89fffb146a5d2cbbcd25fa8018a0548e57cbcb3719361c2712ecb2d64"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\reports\\LAB002-OPS-001B-managed-identity-report.md",
+      "copy": "docs/studio/project/reports/LAB002-OPS-001B-managed-identity-report.md",
+      "sourceSha256": "44cc74f56fa4cbb2446b33651d59fb6c66a6aacce318b2037913f4344767a311",
+      "copySha256": "44cc74f56fa4cbb2446b33651d59fb6c66a6aacce318b2037913f4344767a311"
+    },
+    {
+      "source": "D:\\ayaa-wae-studio\\Labs\\LAB-002-website-absensi-siswa\\reports\\LAB002-OPS-001B-managed-identity-validation.md",
+      "copy": "docs/studio/project/reports/LAB002-OPS-001B-managed-identity-validation.md",
+      "sourceSha256": "8f9cafd3fa8a9d1d8128a0bd71c76e3e9e4c6a684243ab698bc02056b8caabc2",
+      "copySha256": "8f9cafd3fa8a9d1d8128a0bd71c76e3e9e4c6a684243ab698bc02056b8caabc2"
     }
   ]
 }

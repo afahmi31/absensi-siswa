@@ -11,7 +11,7 @@ export const secret = () => randomBytes(32).toString('hex')
 export function childEnvironment(extra = {}) {
   const env = { ...process.env }
   for (const name of Object.keys(env)) {
-    if (/^(PG|SUPABASE_|NUXT_|DATABASE_URL$|LAB002_.*(?:URL|PASSWORD|SECRET))/.test(name)) delete env[name]
+    if (/^(PG|SUPABASE_|NUXT_|DATABASE_URL$|LAB002_.*(?:URL|PASSWORD|SECRET))/i.test(name)) delete env[name]
   }
   return { ...env, ...extra }
 }
@@ -40,7 +40,7 @@ export function pgTool(name, args, options) {
   if (!['initdb', 'pg_ctl', 'pg_dump', 'pg_restore', 'psql'].includes(name)) fail('PG-tool')
   return runChild(path.join(PG_BIN, `${name}.exe`), args, { ...options, ...((name === 'pg_ctl' && args.some((arg) => ['start','stop'].includes(arg))) ? { capture: false } : {}) })
 }
-export const connect = (url) => postgres(url, { max: 1, connect_timeout: 5, idle_timeout: 2, prepare: false, onnotice: () => {} })
+export const connect = (url, { onclose } = {}) => postgres(url, { max: 1, connect_timeout: 5, idle_timeout: 2, prepare: false, onnotice: () => {}, onclose })
 export function connectionArgs(url) {
   const value = new URL(url)
   if (value.protocol !== 'postgres:' || value.hostname !== '127.0.0.1' || !value.password || [...value.searchParams.keys()].some((key) => key !== 'sslmode') || value.searchParams.get('sslmode') !== 'disable') fail('connection')

@@ -45,6 +45,8 @@ test('capability and child connection overrides cannot select an existing target
   for(const uri of ['postgres://x:y@remote:5432/db?sslmode=disable','postgres://x:y@127.0.0.1:5432/db?sslmode=disable&options=unsafe','postgres://x:y@[::1]:5432/db?sslmode=disable']) assert.throws(()=>connectionArgs(uri))
   const previous=process.env.PGHOST; process.env.PGHOST='synthetic-foreign-host'
   try { assert.equal(childEnvironment().PGHOST,undefined) } finally { if(previous===undefined) delete process.env.PGHOST; else process.env.PGHOST=previous }
+  const previousOptions=process.env.pgoptions;process.env.pgoptions='synthetic-override'
+  try{assert.equal(Object.keys(childEnvironment()).some(key=>key.toLowerCase()==='pgoptions'),false)}finally{if(previousOptions===undefined)delete process.env.pgoptions;else process.env.pgoptions=previousOptions}
 })
 
 test('child timeout and output bound terminate only the owned child handle',async()=>{
