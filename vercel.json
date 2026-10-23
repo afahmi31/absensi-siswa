@@ -1,5 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "npx --yes --package=npm@10.9.3 npm ci",
-  "buildCommand": "npx --yes --package=npm@10.9.3 npm run build"
+  "buildCommand": "npx --yes --package=npm@10.9.3 npm run build",
+  "git": {
+    "deploymentEnabled": {
+      "develop": false
+    }
+  }
 }

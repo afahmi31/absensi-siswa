@@ -1,6 +1,16 @@
+import { createError } from 'h3'
 import { safeDatabaseError } from './study-api.ts'
+import { AttendanceDayError } from '../database/repositories/attendance-days.ts'
 
 export function safeAttendanceDatabaseError(error: unknown): never {
+  if (error instanceof AttendanceDayError) {
+    throw createError({
+      statusCode: error.statusCode,
+      statusMessage: error.statusMessage,
+      data: error.data,
+    })
+  }
+
   if (typeof error === 'object' && error !== null && 'statusCode' in error) {
     const statusCode = Number((error as { statusCode?: unknown }).statusCode)
     if (Number.isInteger(statusCode) && statusCode >= 400 && statusCode < 500) throw error

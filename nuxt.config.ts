@@ -7,6 +7,15 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
   telemetry: false,
   nitro: {
+    errorHandler: './server/error-handler.ts',
+    // Node 24 supports native import.meta. Nitro's es2019 transform otherwise
+    // erases the parser's module-local resolver; client targets stay unchanged.
+    esbuild: { options: { supported: { 'import-meta': true } } },
+    externals: {
+      external: ['exceljs', 'yauzl', 'saxes'],
+      // Nitro traceInclude resolves package specifiers, not filesystem globs.
+      traceInclude: ['exceljs', 'yauzl', 'saxes'],
+    },
     // Nitro 2.13.4 auto-detection caps Node at 22; this project targets Node 24.
     vercel: { functions: { runtime: 'nodejs24.x', regions: ['sin1'] } },
   },

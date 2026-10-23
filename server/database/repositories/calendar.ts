@@ -1,5 +1,6 @@
 import type postgres from 'postgres'
 import { createHash } from 'node:crypto'
+import { H3Error } from 'h3'
 import type { AttendanceRecord } from './attendance.ts'
 import { inDatabaseTransaction, type DatabaseExecutor } from '../transaction.ts'
 import { lockSchoolSemesterChanges } from './semesters.ts'
@@ -49,10 +50,10 @@ export interface CalendarAttendanceImpact {
   effectiveAttendanceCount: number
 }
 
-export class CalendarOperationError extends Error {
-  readonly statusCode: number
-  readonly statusMessage: string
-  readonly data?: Record<string, unknown>
+export class CalendarOperationError extends H3Error {
+  override readonly statusCode: number
+  override readonly statusMessage: string
+  override readonly data?: Record<string, unknown>
 
   constructor(statusCode: number, statusMessage: string, data?: Record<string, unknown>) {
     super(statusMessage)

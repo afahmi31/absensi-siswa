@@ -42,6 +42,7 @@ async function logout() {
         <NuxtLink to="/semesters" :aria-current="route.path === '/semesters' ? 'page' : undefined">Semester</NuxtLink>
         <NuxtLink to="/calendar" :aria-current="route.path === '/calendar' ? 'page' : undefined">Kalender</NuxtLink>
         <NuxtLink to="/attendance" :aria-current="route.path === '/attendance' ? 'page' : undefined">Absensi</NuxtLink>
+        <NuxtLink to="/reports" :aria-current="route.path === '/reports' ? 'page' : undefined">Laporan</NuxtLink>
       </nav>
 
       <div class="account-actions">
