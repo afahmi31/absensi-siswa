@@ -11,7 +11,7 @@ import type {
   AttendanceReportRow,
 } from '../../app/types/attendance-report.ts'
 
-export const ATTENDANCE_REPORT_LAYOUT_VERSION = 'rep-001d-v1'
+export const ATTENDANCE_REPORT_LAYOUT_VERSION = 'acc-rep-001-v2'
 export const ATTENDANCE_REPORT_EMPTY_MESSAGE = 'Tidak ada siswa pada periode ini.'
 
 const POINTS_PER_MM = 72 / 25.4
@@ -23,7 +23,6 @@ const BODY_LINE_HEIGHT_PT = 7.2
 const BODY_CELL_PADDING_X_PT = 2.4
 const BODY_CELL_PADDING_Y_PT = 2
 const BODY_MIN_ROW_HEIGHT_PT = 14.4
-const REPORT_NOTE = 'Hari libur, di luar masa terdaftar atau periode, serta tanggal tanpa catatan tetap kosong.'
 
 const paperSpecs: Record<AttendanceReportPaper, { widthMm: number; heightMm: number }> = {
   a4: { widthMm: 297, heightMm: 210 },
@@ -132,7 +131,6 @@ function createHeadingParts(
     { kind: 'school' as const, value: schoolAndClass, font: 'Helvetica-Bold' as const, fontSizePt: 8, lineHeightPt: 9.6, fontWeight: 'bold' as const, gapBeforePt: 0, gapAfterPt: 1.6 },
     { kind: 'title' as const, value: `Laporan absensi · ${monthTitle}`, font: 'Helvetica-Bold' as const, fontSizePt: 10, lineHeightPt: 12, fontWeight: 'bold' as const, gapBeforePt: 0, gapAfterPt: 1.6 },
     { kind: 'semester' as const, value: `Semester ${semesterTerm} ${report.semester.academicYear} · ${semesterStatus}`, font: 'Helvetica' as const, fontSizePt: 7, lineHeightPt: 8.4, fontWeight: 'normal' as const, gapBeforePt: 0, gapAfterPt: 2.2 },
-    { kind: 'note' as const, value: REPORT_NOTE, font: 'Helvetica' as const, fontSizePt: 6.2, lineHeightPt: 7.44, fontWeight: 'normal' as const, gapBeforePt: 0, gapAfterPt: 5 },
   ]
 
   return definitions.map((part) => ({
@@ -219,6 +217,31 @@ function pageRows(
   return pages
 }
 
+function signatureLayout(metrics: PDFKit.PDFDocument, report: AttendanceReport, width: number) {
+  const semester = report.semester
+  const columns = [
+    { title: 'Kepala Sekolah', name: semester.principalName ?? '', nip: semester.principalNip ?? '' },
+    { title: 'Guru Kelas', name: semester.teacherName ?? '', nip: semester.teacherNip ?? '' },
+  ].map(column => ({ title: column.title,
+    nameLines: wrapText(metrics, column.name, width / 2 - 24, 'Helvetica', 8),
+    nipLines: wrapText(metrics, column.nip ? 'NIP ' + column.nip : '', width / 2 - 24, 'Helvetica', 8),
+  }))
+  return { columns, heightPt: 68 + Math.max(...columns.map(c => c.nameLines.length + c.nipLines.length)) * 10 }
+}
+
+function signaturePages(rows: AttendanceReportLayoutRow[], available: number, signatureHeight: number) {
+  if (available - signatureHeight <= 0) throw new AttendanceReportLayoutError('row_too_tall')
+  // Reserve the tail that can share the final page with the indivisible signature.
+  let split = rows.length
+  let tailHeight = 0
+  while (split > 0 && tailHeight + rows[split - 1]!.heightPt <= available - signatureHeight) {
+    tailHeight += rows[--split]!.heightPt
+  }
+  if (!rows.length) return [[]]
+  if (split === rows.length) throw new AttendanceReportLayoutError('row_too_tall')
+  return [...(split ? pageRows(rows.slice(0, split), available) : []), rows.slice(split)]
+}
+
 function makePaperPlan(metrics: PDFKit.PDFDocument, report: AttendanceReport, paper: AttendanceReportPaper): AttendanceReportPaperPlan {
   const spec = paperSpecs[paper]
   const widthPt = millimetersToPoints(spec.widthMm)
@@ -244,7 +267,8 @@ function makePaperPlan(metrics: PDFKit.PDFDocument, report: AttendanceReport, pa
     } : null
     const availableRowsHeightPt = roundPoints(contentHeightPt - headingHeightPt - TABLE_HEADER_HEIGHT_PT)
     const rows = layoutRows(metrics, month.rows, widths)
-    const monthPages = pageRows(rows, availableRowsHeightPt)
+    const signatures = signatureLayout(metrics, report, contentWidthPt)
+    const monthPages = signaturePages(rows, availableRowsHeightPt, signatures.heightPt)
 
     for (const [monthPageIndex, pageRowsLayout] of monthPages.entries()) {
       pages.push({
@@ -259,6 +283,7 @@ function makePaperPlan(metrics: PDFKit.PDFDocument, report: AttendanceReport, pa
         headingTextWidthPt,
         logo,
         tableHeaderRowHeightsPt: TABLE_HEADER_ROW_HEIGHTS_PT,
+        signatures: monthPageIndex === monthPages.length - 1 ? signatures : null,
         rows: pageRowsLayout,
       })
     }
@@ -474,6 +499,18 @@ export function renderAttendanceReportPdf(bundle: AttendanceReportLayoutBundle, 
         for (const row of page.rows) {
           drawBodyRow(document, bundle.report, page, plan, row, plan.marginPt, y)
           y += row.heightPt
+        }
+        if (page.signatures) {
+          page.signatures.columns.forEach((column, index) => {
+            const x = plan.marginPt + index * plan.contentWidthPt / 2 + 12
+            const width = plan.contentWidthPt / 2 - 24
+            drawTextLine(document, column.title, x, y + 12, width, 'Helvetica', 8, 'center')
+            let textY = y + 68
+            for (const line of [...column.nameLines, ...column.nipLines]) {
+              drawTextLine(document, line, x, textY, width, 'Helvetica', 8, 'center')
+              textY += 10
+            }
+          })
         }
       }
       document.end()

@@ -3,12 +3,17 @@ import { onBeforeUnmount, onMounted } from 'vue'
 import { getApiFieldErrors, getApiMessage } from '../utils/api-errors.ts'
 
 interface SchoolResponse {
-  school: { id: string; name: string; className: string; timeZone: string; logoAssetId: string | null } | null
+  school: { principalName: string; principalNip: string; teacherName: string; teacherNip: string; id: string; name: string; className: string; timeZone: string; logoAssetId: string | null } | null
 }
 
 const requestFetch = useRequestFetch()
 const initial = await requestFetch<SchoolResponse>('/api/school').catch(() => null)
 const form = reactive({
+  principalName: initial?.school?.principalName ?? '',
+  principalNip: initial?.school?.principalNip ?? '',
+  teacherName: initial?.school?.teacherName ?? '',
+  teacherNip: initial?.school?.teacherNip ?? '',
+
   name: initial?.school?.name ?? '',
   className: initial?.school?.className ?? '',
   timeZone: initial?.school?.timeZone ?? 'Asia/Jakarta',
@@ -40,16 +45,24 @@ async function saveSchool() {
   pageError.value = ''
   successMessage.value = ''
   fieldErrors.value = {}
+  for (const key of ['principalName','principalNip','teacherName','teacherNip'] as const) {
+    if (Array.from(form[key].trim()).length > (key.endsWith('Nip') ? 50 : 200)) fieldErrors.value[key] = 'Identitas tidak valid atau terlalu panjang.'
+  }
+  if (Object.keys(fieldErrors.value).length) { nextTick(() => document.getElementById(Object.keys(fieldErrors.value)[0]!)?.focus()); return }
   isSaving.value = true
   try {
     const metadata = {
+      principalName: form.principalName,
+      principalNip: form.principalNip,
+      teacherName: form.teacherName,
+      teacherNip: form.teacherNip,
       name: form.name,
       className: form.className,
       timeZone: form.timeZone,
       logoAction: logoAction.value,
     }
     const body = logoAction.value === 'keep'
-      ? { name: metadata.name, className: metadata.className, timeZone: metadata.timeZone }
+      ? metadata
       : createLogoFormData(metadata, selectedLogo.value)
     const result = await $fetch<{ ok: boolean; school: SchoolResponse['school'] }>('/api/school', {
       method: 'PUT',
@@ -57,6 +70,10 @@ async function saveSchool() {
     })
     isConfigured.value = true
     if (result.school) {
+      form.principalName = result.school.principalName
+      form.principalNip = result.school.principalNip
+      form.teacherName = result.school.teacherName
+      form.teacherNip = result.school.teacherNip
       form.name = result.school.name
       form.className = result.school.className
       form.timeZone = result.school.timeZone
@@ -72,6 +89,7 @@ async function saveSchool() {
         : 'Data sekolah tersimpan.'
   } catch (error) {
     fieldErrors.value = getApiFieldErrors(error)
+    nextTick(() => document.getElementById(Object.keys(fieldErrors.value)[0] ?? '')?.focus())
     pageError.value = getApiMessage(error, 'Data sekolah belum tersimpan. Periksa kembali isian lalu coba lagi.')
   } finally {
     isSaving.value = false
@@ -87,6 +105,10 @@ async function reloadSchool() {
   }
   hasLoaded.value = true
   isConfigured.value = Boolean(result.school)
+  form.principalName = result.school?.principalName ?? ''
+  form.principalNip = result.school?.principalNip ?? ''
+  form.teacherName = result.school?.teacherName ?? ''
+  form.teacherNip = result.school?.teacherNip ?? ''
   form.name = result.school?.name ?? ''
   form.className = result.school?.className ?? ''
   form.timeZone = result.school?.timeZone ?? 'Asia/Jakarta'
@@ -174,7 +196,11 @@ onBeforeUnmount(revokeSelectedLogoPreview)
         <span class="single-school-badge">Satu sekolah, satu kelas</span>
       </div>
 
-      <div class="form-field">
+      <div class="form-field"><label for="principalName">Nama kepala sekolah</label><input id="principalName" v-model="form.principalName" type="text" :disabled="isSaving || !isClientReady" :aria-invalid="Boolean(fieldErrors.principalName)" :aria-describedby="fieldErrors.principalName ? 'principalName-error' : undefined"><p v-if="fieldErrors.principalName" id="principalName-error" class="field-error">{{ fieldErrors.principalName }}</p></div>
+<div class="form-field"><label for="principalNip">NIP kepala sekolah</label><input id="principalNip" v-model="form.principalNip" type="text" :disabled="isSaving || !isClientReady" :aria-invalid="Boolean(fieldErrors.principalNip)" :aria-describedby="fieldErrors.principalNip ? 'principalNip-error' : undefined"><p v-if="fieldErrors.principalNip" id="principalNip-error" class="field-error">{{ fieldErrors.principalNip }}</p></div>
+<div class="form-field"><label for="teacherName">Nama guru</label><input id="teacherName" v-model="form.teacherName" type="text" :disabled="isSaving || !isClientReady" :aria-invalid="Boolean(fieldErrors.teacherName)" :aria-describedby="fieldErrors.teacherName ? 'teacherName-error' : undefined"><p v-if="fieldErrors.teacherName" id="teacherName-error" class="field-error">{{ fieldErrors.teacherName }}</p></div>
+<div class="form-field"><label for="teacherNip">NIP guru</label><input id="teacherNip" v-model="form.teacherNip" type="text" :disabled="isSaving || !isClientReady" :aria-invalid="Boolean(fieldErrors.teacherNip)" :aria-describedby="fieldErrors.teacherNip ? 'teacherNip-error' : undefined"><p v-if="fieldErrors.teacherNip" id="teacherNip-error" class="field-error">{{ fieldErrors.teacherNip }}</p></div>
+<div class="form-field">
         <label for="school-name">Nama sekolah <span aria-hidden="true">*</span></label>
         <input
           id="school-name"

@@ -35,7 +35,13 @@ export default defineEventHandler(async (event) => {
   const teacher = await requireAuthenticatedTeacher(event)
   const request = await readSchoolSaveBody(event)
   const body = request.metadata
-  validateRequestKeys(body, ['name', 'className', 'timeZone', 'logoAction'])
+  validateRequestKeys(body, ['name', 'className', 'timeZone', 'logoAction', 'principalName', 'principalNip', 'teacherName', 'teacherNip'])
+  const signatures = Object.fromEntries(['principalName','principalNip','teacherName','teacherNip'].map(key => {
+    if (body[key] === undefined) return [key, undefined]
+    const value = body[key]
+    if (typeof value !== 'string' || Array.from(value.trim()).length > (key.endsWith('Nip') ? 50 : 200)) throw createError({ statusCode: 422, statusMessage: 'Periksa kembali data yang dimasukkan.', data: { fieldErrors: { [key]: 'Identitas tidak valid atau terlalu panjang.' } } })
+    return [key, value.trim()]
+  }).filter(([,value]) => value !== undefined)) as Record<string, string>
   const name = requiredText(body.name, 'name', 'Nama sekolah', 120)
   const className = requiredText(body.className, 'className', 'Nama kelas', 80)
   const timeZone = body.timeZone === undefined
@@ -108,16 +114,17 @@ export default defineEventHandler(async (event) => {
           ? null
           : action === 'replace' ? assetId : school.active_logo_asset_id
         const updated = await updateSchoolProfile(transaction, {
+          ...signatures,
           teacherId: teacher.id,
           schoolId: school.id,
           name,
           timeZone,
           activeLogoAssetId,
         })
-        return { id: updated.id, name: updated.name, timeZone: updated.time_zone, className, logoAssetId: activeLogoAssetId }
+        return { principalName: updated.principalName, principalNip: updated.principalNip, teacherName: updated.teacherName, teacherNip: updated.teacherNip, id: updated.id, name: updated.name, timeZone: updated.time_zone, className, logoAssetId: activeLogoAssetId }
       }
 
-      const created = await createSchool(transaction, { id: newSchoolId, teacherId: teacher.id, name, timeZone })
+      const created = await createSchool(transaction, { id: newSchoolId, teacherId: teacher.id, name, timeZone, ...signatures })
       await createSchoolClass(transaction, { schoolId: created.id, name: className })
       if (validatedLogo && assetId) {
         await createSchoolLogoAsset(transaction, {
@@ -134,6 +141,7 @@ export default defineEventHandler(async (event) => {
       const activeLogoAssetId = action === 'replace' ? assetId : null
       if (activeLogoAssetId) {
         await updateSchoolProfile(transaction, {
+          ...signatures,
           teacherId: teacher.id,
           schoolId: created.id,
           name,
@@ -141,7 +149,7 @@ export default defineEventHandler(async (event) => {
           activeLogoAssetId,
         })
       }
-      return { id: created.id, name: created.name, timeZone: created.time_zone, className, logoAssetId: activeLogoAssetId }
+      return { id: created.id, name: created.name, timeZone: created.time_zone, className, ...signatures, logoAssetId: activeLogoAssetId }
     })
     saved = result
   } catch (error) {

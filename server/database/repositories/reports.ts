@@ -37,6 +37,10 @@ export interface AttendanceReport {
     status: 'active' | 'closed'
     schoolName: string
     className: string
+    principalName: string
+    principalNip: string
+    teacherName: string
+    teacherNip: string
     logo: AttendanceReportLogo | null
   }
   months: AttendanceReportMonth[]
@@ -48,6 +52,7 @@ export type AttendanceReportResult =
   | { kind: 'report'; report: AttendanceReport }
 
 interface ReportQueryRow {
+  signatures: Record<string,string>
   semester_id: string
   academic_year: string
   term: 'ganjil' | 'genap'
@@ -87,6 +92,11 @@ export async function getAttendanceReport(
              coalesce(archive.starts_on, semester.starts_on)::text as starts_on,
              coalesce(archive.ends_on, semester.ends_on)::text as ends_on,
              semester.status,
+             case when semester.status='closed' then archive.principal_name else school.principal_name end as principal_name,
+             case when semester.status='closed' then archive.principal_nip else school.principal_nip end as principal_nip,
+             case when semester.status='closed' then archive.teacher_name else school.teacher_name end as teacher_name,
+             case when semester.status='closed' then archive.teacher_nip else school.teacher_nip end as teacher_nip,
+
              coalesce(archive.school_name, school.name) as school_name,
              archive.class_name as archive_class_name,
              semester.school_id,
@@ -214,6 +224,7 @@ export async function getAttendanceReport(
            scope.status,
            scope.school_name,
            scope.class_name,
+           jsonb_build_object('principalName',scope.principal_name,'principalNip',scope.principal_nip,'teacherName',scope.teacher_name,'teacherNip',scope.teacher_nip) as signatures,
            case when logo.id is not null then jsonb_build_object(
              'assetId', logo.id, 'mimeType', logo.mime_type, 'width', logo.width,
              'height', logo.height, 'byteSize', logo.byte_size, 'sha256', logo.sha256
@@ -285,6 +296,10 @@ export async function getAttendanceReport(
         status: first.status,
         schoolName: first.school_name,
         className: first.class_name,
+        principalName: first.signatures.principalName ?? '',
+        principalNip: first.signatures.principalNip ?? '',
+        teacherName: first.signatures.teacherName ?? '',
+        teacherNip: first.signatures.teacherNip ?? '',
         logo: first.logo,
       },
       months: [...monthsByKey.values()],

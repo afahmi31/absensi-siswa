@@ -549,6 +549,12 @@ async function downloadReport() {
                   </tr>
                 </tbody>
               </table>
+              <div v-if="previewPage.page.signatures" class="report-signatures" :style="{height: `${previewPage.page.signatures.heightPt}pt`}">
+                <div v-for="column in previewPage.page.signatures.columns" :key="column.title" class="report-signature-column">
+                  <p class="report-signature-title">{{ column.title }}</p>
+                  <div class="report-signature-name"><span v-for="(line,index) in column.nameLines" :key="`name-${index}`">{{ line || '\u00a0' }}</span><span v-for="(line,index) in column.nipLines" :key="`nip-${index}`">{{ line || '\u00a0' }}</span></div>
+                </div>
+              </div>
             </article>
           </div>
         </section>
@@ -558,6 +564,11 @@ async function downloadReport() {
 </template>
 
 <style>
+.report-signatures { display: grid; grid-template-columns: 1fr 1fr; break-inside: avoid; font-size: 8pt; line-height: 10pt; color: #111; }
+.report-signature-column { position: relative; padding: 0 12pt; text-align: center; }
+.report-signature-title { position: absolute; top: 12pt; left: 12pt; right: 12pt; margin: 0; }
+.report-signature-name { position: absolute; top: 68pt; left: 12pt; right: 12pt; }
+.report-signature-name span { display: block; white-space: pre; height: 10pt; }
 .reports-page { max-width: 1440px; container-name: report-content; container-type: inline-size; }
 .report-page-heading { margin-bottom: 24px; }
 .report-controls { display: grid; grid-template-columns: minmax(180px, .82fr) minmax(190px, 1fr) minmax(170px, .85fr) minmax(360px, 1.45fr) auto; align-items: end; gap: 20px; padding: 22px 24px; }

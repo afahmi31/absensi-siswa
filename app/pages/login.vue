@@ -1,6 +1,7 @@
 <script setup lang="ts">
 definePageMeta({ layout: false })
 
+const route = useRoute()
 const email = ref('')
 const password = ref('')
 const fieldErrors = reactive({ email: '', password: '' })
@@ -75,6 +76,7 @@ async function submitLogin() {
     <section class="login-panel" aria-labelledby="login-title">
       <div class="login-card">
         <h1 id="login-title">Masuk</h1>
+        <p v-if="route.query.passwordChanged === '1'" role="status">Kata sandi tersimpan. Masuk dengan kata sandi baru.</p>
         <p class="login-intro">Gunakan akun guru untuk mengisi absensi kelas.</p>
 
         <form class="login-form" novalidate @submit.prevent="submitLogin">

@@ -164,6 +164,13 @@ const SAFE_STATUS_COPIES = new Set([
 ])
 
 const SAFE_FIELD_ERRORS: Readonly<Record<string, ReadonlySet<string>>> = {
+  currentPassword: new Set(['Masukkan kata sandi saat ini.', 'Kata sandi saat ini belum cocok.']),
+  newPassword: new Set(['Kata sandi baru harus 12 sampai 1024 karakter.', 'Gunakan kata sandi baru yang berbeda.']),
+  confirmation: new Set(['Konfirmasi kata sandi belum sama.']),
+  principalName: new Set(['Identitas tidak valid atau terlalu panjang.']),
+  principalNip: new Set(['Identitas tidak valid atau terlalu panjang.']),
+  teacherName: new Set(['Identitas tidak valid atau terlalu panjang.']),
+  teacherNip: new Set(['Identitas tidak valid atau terlalu panjang.']),
   name: new Set(['Nama sekolah wajib diisi.', 'Nama sekolah maksimal 120 karakter.']),
   className: new Set(['Nama kelas wajib diisi.', 'Nama kelas maksimal 80 karakter.']),
   fullName: new Set(['Nama siswa wajib diisi.', 'Nama siswa maksimal 200 karakter.']),
@@ -213,6 +220,7 @@ type FieldErrorRule = {
 }
 
 const FIELD_ERROR_RULES: readonly FieldErrorRule[] = [
+  { method: 'POST', pathname: '/api/account/password', fields: new Set(['currentPassword','newPassword','confirmation']), statusMessages: new Set(['Periksa kembali data yang dimasukkan.']) },
   {
     method: 'GET',
     pathname: '/api/students',
@@ -284,7 +292,7 @@ const FIELD_ERROR_RULES: readonly FieldErrorRule[] = [
   {
     method: 'PUT',
     pathname: '/api/school',
-    fields: new Set(['name', 'className', 'timeZone', 'logo']),
+    fields: new Set(['name', 'className', 'timeZone', 'logo', 'principalName','principalNip','teacherName','teacherNip']),
     statusMessages: new Set([
       'Periksa kembali data yang dimasukkan.',
       'Pilih zona waktu sekolah yang valid.',

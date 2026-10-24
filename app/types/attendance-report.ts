@@ -45,6 +45,7 @@ export interface AttendanceReport {
     status: 'active' | 'closed'
     schoolName: string
     className: string
+    principalName?: string; principalNip?: string; teacherName?: string; teacherNip?: string
     logo?: AttendanceReportLogo | null
   }
   months: AttendanceReportMonth[]
@@ -81,6 +82,7 @@ export interface AttendanceReportLayoutPage {
   headingTextWidthPt: number
   logo: { xPt: number; yPt: number; widthPt: number; heightPt: number } | null
   tableHeaderRowHeightsPt: [number, number]
+  signatures: { heightPt: number; columns: Array<{ title: string; nameLines: string[]; nipLines: string[] }> } | null
   rows: AttendanceReportLayoutRow[]
 }
 

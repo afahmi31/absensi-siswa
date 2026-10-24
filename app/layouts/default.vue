@@ -46,6 +46,7 @@ async function logout() {
       </nav>
 
       <div class="account-actions">
+        <NuxtLink class="account-link" to="/account" :aria-current="route.path === '/account' ? 'page' : undefined">Akun</NuxtLink>
         <span class="account-email">{{ email }}</span>
         <button class="secondary-button" type="button" :disabled="isLoggingOut" @click="logout">
           {{ isLoggingOut ? 'Sedang keluar…' : 'Keluar' }}
@@ -57,3 +58,25 @@ async function logout() {
     <slot />
   </div>
 </template>
+
+<style scoped>
+.account-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px 11px;
+  color: #536b65;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-decoration: none;
+}
+.account-link:visited { color: #536b65; }
+.account-link:hover,
+.account-link[aria-current="page"] { color: #126451; background: #e8f1ee; }
+.account-link:focus-visible { outline: 3px solid #61a695; outline-offset: 3px; }
+</style>
